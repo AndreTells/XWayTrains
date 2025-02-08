@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# the pre-commit process:
+make format_code
+make static_analyser

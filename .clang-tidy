@@ -1,6 +1,6 @@
 ---
 Checks:          'clang-diagnostic-*,clang-analyzer-*,*,-clang-analyzer-alpha.*,-llvm-header-guard,-llvm-include-order,-llvmlibc-restrict-system-libc-headers,-altera-unroll-loops,-fuchsia-default-arguments,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-clang-analyzer-security.insecureAPI.strcpy,-concurrency-mt-unsafe,-altera-struct-pack-align'
-WarningsAsErrors: ''
+WarningsAsErrors: '*'
 HeaderFilterRegex: 'include/*'
 AnalyzeTemporaryDtors: false
 FormatStyle: file

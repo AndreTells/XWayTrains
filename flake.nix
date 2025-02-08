@@ -22,6 +22,7 @@
             man-pages
             man-db
             clang-manpages
+            gaphor
           ];
           shellHook = ''
             echo "Entering dev shell"

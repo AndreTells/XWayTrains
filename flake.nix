@@ -10,22 +10,22 @@
       let
         pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
       in
-      {
-        devShells.default = with pkgs; mkShell {
+    {
+      devShells.default = with pkgs; mkShell {
 
-          packages = with pkgs; [
-            clang
-            gnumake
-            clang-tools
-            gdb
-            valgrind
-            man-pages
-            man-db
-            clang-manpages
-            gaphor
-          ];
-          shellHook = ''
-            echo "Entering dev shell"
+        packages = with pkgs; [
+          clang
+          gnumake
+          clang-tools
+          gdb
+          valgrind
+          man-pages
+          man-db
+          clang-manpages
+          gaphor
+        ];
+        shellHook = ''
+          echo "Entering dev shell"
           '';
         };
       }

@@ -27,10 +27,10 @@ void init_package(xway_paquet_t *paquet, const xway_address_t local,
   extension_data[1] = 0x00;
   paquet->extension.data = extension_data;
 
-  requete_unite.code = 0x37;
-  requete_unite.categorie = 0x06;
-  requete_unite.segment_objet = 0x68;
-  requete_unite.type_objet = 0x07;
+  requete_unite.code = UNITE_WRITE_OBJECT;
+  requete_unite.categorie = UNITE_CATEGORY;
+  requete_unite.segment_objet = UNITE_SEGMENT_INTERNAL_DATA;
+  requete_unite.type_objet = UNITE_TYPE_DOUBLE_MOT_INTERNE;
   requete_unite.adresse_premier_mot = 42;
   requete_unite.nb_mots = 0;
 

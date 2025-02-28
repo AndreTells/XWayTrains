@@ -42,6 +42,13 @@ typedef struct {
 #define EXTENSION_OFF 0x00
 #define EXTENSION_ON 0x01
 
+#define UNITE_WRITE_OBJECT 0x37
+#define UNITE_READ_OBJECTS 0x36
+#define UNITE_CATEGORY 0x06               // other values are possible
+#define UNITE_SEGMENT_INTERNAL_DATA 0x68  // mot interne p. 185
+#define UNITE_TYPE_MOT_INTERNE 0x07
+#define UNITE_TYPE_DOUBLE_MOT_INTERNE 0x08
+
 typedef struct {
   uint8_t *data;
   uint8_t len;
@@ -50,8 +57,8 @@ typedef struct {
 typedef struct {
   uint8_t type_npdu;
   addresses_t addresses;
-  xway_requete_unite_t requete;
   extension_t extension;
+  xway_requete_unite_t requete;
 } xway_paquet_t;
 
 void init_package(xway_paquet_t *paquet, const xway_address_t local,

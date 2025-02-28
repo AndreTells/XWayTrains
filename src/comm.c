@@ -21,12 +21,12 @@ void build_request(xway_paquet_t paquet, uint8_t *requete) {
 
   // partie réseau
   requete[7] = paquet.type_npdu;
-  requete[8] = paquet.emetteur.station_id;
-  requete[9] =
-      (paquet.emetteur.reseau_id << 4) | (paquet.emetteur.porte_id & 0x0F);
-  requete[10] = paquet.destinataire.station_id;
-  requete[11] = (paquet.destinataire.reseau_id << 4) |
-                (paquet.destinataire.porte_id & 0x0F);
+  requete[8] = paquet.addresses.emetteur.station_id;
+  requete[9] = (paquet.addresses.emetteur.reseau_id << 4) |
+               (paquet.addresses.emetteur.porte_id & 0x0F);
+  requete[10] = paquet.addresses.destinataire.station_id;
+  requete[11] = (paquet.addresses.destinataire.reseau_id << 4) |
+                (paquet.addresses.destinataire.porte_id & 0x0F);
 
   while (i < paquet.extension_len && i < MAXEXTENSION) {
     requete[12 + i] = paquet.extension_data[i];

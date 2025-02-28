@@ -9,7 +9,6 @@
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -53,8 +52,8 @@ int main(int argc, char *argv[]) {
                              DESTINATAIRE_PORT_ID};
 
   paquet.type_npdu = 0xF1;
-  paquet.emetteur = local;
-  paquet.destinataire = automate;
+  paquet.addresses.emetteur = local;
+  paquet.addresses.destinataire = automate;
 
   paquet.extension_len = 2;
   extension_data[0] = 0x09;
@@ -113,8 +112,8 @@ int main(int argc, char *argv[]) {
     print_data_hex(reponse);
   }
 
-  paquet.destinataire = local;
-  paquet.emetteur = automate;
+  paquet.addresses.destinataire = local;
+  paquet.addresses.emetteur = automate;
 
   close(sd1);
   return EXIT_SUCCESS;

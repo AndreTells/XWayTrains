@@ -8,6 +8,11 @@ typedef struct {
   uint8_t porte_id;
 } xway_address_t;
 
+typedef struct {
+  xway_address_t emetteur;
+  xway_address_t destinataire;
+} addresses_t;
+
 typedef uint16_t mot_t;
 
 typedef struct {
@@ -22,8 +27,7 @@ typedef struct {
 
 typedef struct {
   uint8_t type_npdu;
-  xway_address_t emetteur;
-  xway_address_t destinataire;
+  addresses_t addresses;
   xway_requete_unite_t requete;
   uint8_t *extension_data;
   uint8_t extension_len;

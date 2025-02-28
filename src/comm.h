@@ -50,7 +50,9 @@ typedef struct {
 #define UNITE_TYPE_DOUBLE_MOT_INTERNE 0x08
 
 typedef struct {
-  uint8_t *data;
+  uint8_t train;
+  uint8_t troncon;  // to move
+  uint8_t aig;      // to turn
   uint8_t len;
 } extension_t;
 

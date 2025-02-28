@@ -15,17 +15,16 @@ void convert_mot(mot_t mot, uint8_t res[2]) {
 void init_package(xway_paquet_t *paquet, const xway_address_t local,
                   const xway_address_t automate) {
   xway_requete_unite_t requete_unite;
-  uint8_t extension_data[MAXEXTENSION] = {0};
 
   paquet->type_npdu =
       NPDU_DATA | SERVICE_LEVEL_STD | REFUS_ACCEPTED | EXTENSION_ON;
   paquet->addresses.emitter = local;
   paquet->addresses.reciever = automate;
 
-  paquet->extension.len = 2;
-  extension_data[0] = 0x09;
-  extension_data[1] = 0x00;
-  paquet->extension.data = extension_data;
+  paquet->extension.len = 3;
+  paquet->extension.train = 39;    // TRAIN 1
+  paquet->extension.troncon = 26;  // enable T26
+  paquet->extension.aig = 0;
 
   requete_unite.code = UNITE_WRITE_OBJECT;
   requete_unite.categorie = UNITE_CATEGORY;
@@ -46,7 +45,7 @@ void init_package(xway_paquet_t *paquet, const xway_address_t local,
 
 void build_request(xway_paquet_t paquet, uint8_t *requete) {
   int i = 0, j = 0;
-  int req_off = 12;
+  int req_off = 15;
   uint8_t request_length;
 
   // initialisation
@@ -60,12 +59,9 @@ void build_request(xway_paquet_t paquet, uint8_t *requete) {
   requete[10] = paquet.addresses.reciever.station_id;
   requete[11] = (paquet.addresses.reciever.reseau_id << 4) |
                 (paquet.addresses.reciever.porte_id & 0x0F);
-
-  while (i < paquet.extension.len && i < MAXEXTENSION) {
-    requete[12 + i] = paquet.extension.data[i];
-    i++;
-  }
-  req_off += i;
+  requete[12] = paquet.extension.train;
+  requete[13] = paquet.extension.troncon;
+  requete[14] = paquet.extension.aig;
 
   // requête UNITE
   requete[req_off] = paquet.requete.code;

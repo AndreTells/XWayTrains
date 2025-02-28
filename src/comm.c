@@ -12,6 +12,38 @@ void convert_mot(mot_t mot, uint8_t res[2]) {
   res[1] = (mot >> 8) & 0xFF;
 }
 
+void init_package(xway_paquet_t *paquet, const xway_address_t local,
+                  const xway_address_t automate) {
+  xway_requete_unite_t requete_unite;
+  uint8_t extension_data[MAXEXTENSION] = {0};
+
+  paquet->type_npdu =
+      NPDU_DATA | SERVICE_LEVEL_STD | REFUS_ACCEPTED | EXTENSION_ON;
+  paquet->addresses.emitter = local;
+  paquet->addresses.reciever = automate;
+
+  paquet->extension_len = 2;
+  extension_data[0] = 0x09;
+  extension_data[1] = 0x00;
+  paquet->extension_data = extension_data;
+
+  requete_unite.code = 0x37;
+  requete_unite.categorie = 0x06;
+  requete_unite.segment_objet = 0x68;
+  requete_unite.type_objet = 0x07;
+  requete_unite.adresse_premier_mot = 42;
+  requete_unite.nb_mots = 0;
+
+  mot_t valeurs[requete_unite.nb_mots];
+
+  valeurs[0] = local.station_id;
+  valeurs[1] = -1;
+  valeurs[2] = 7;
+
+  requete_unite.valeurs = valeurs;
+  paquet->requete = requete_unite;
+}
+
 void build_request(xway_paquet_t paquet, uint8_t *requete) {
   int i = 0, j = 0;
   int req_off = 12;

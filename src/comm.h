@@ -50,6 +50,9 @@ typedef struct {
   uint8_t extension_len;
 } xway_paquet_t;
 
+void init_package(xway_paquet_t *paquet, const xway_address_t local,
+                  const xway_address_t automate);
+
 void build_request(xway_paquet_t paquet, uint8_t *requete);
 void print_data_hex(uint8_t *requete);
 void convert_mot(mot_t mot, uint8_t *res);

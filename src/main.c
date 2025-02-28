@@ -40,42 +40,15 @@ int main(int argc, char *argv[]) {
   ssize_t nbbytes = 0;
   unsigned int adr_len = sizeof(struct sockaddr_in);
 
-  uint8_t extension_data[MAXEXTENSION] = {0};
-
   uint8_t requete[MAXOCTETS];
 
   xway_paquet_t paquet;
-  xway_requete_unite_t requete_unite;
   xway_address_t local = {EMETTEUR_STATION_ID, EMETTEUR_RESEAU_ID,
                           EMETTEUR_PORT_ID};
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
                              DESTINATAIRE_PORT_ID};
 
-  paquet.type_npdu =
-      NPDU_DATA | SERVICE_LEVEL_STD | REFUS_ACCEPTED | EXTENSION_ON;
-  paquet.addresses.emitter = local;
-  paquet.addresses.reciever = automate;
-
-  paquet.extension_len = 2;
-  extension_data[0] = 0x09;
-  extension_data[1] = 0x00;
-  paquet.extension_data = extension_data;
-
-  requete_unite.code = 0x37;
-  requete_unite.categorie = 0x06;
-  requete_unite.segment_objet = 0x68;
-  requete_unite.type_objet = 0x07;
-  requete_unite.adresse_premier_mot = 42;
-  requete_unite.nb_mots = 0;
-
-  mot_t valeurs[requete_unite.nb_mots];
-
-  valeurs[0] = local.station_id;
-  valeurs[1] = -1;
-  valeurs[2] = 7;
-
-  requete_unite.valeurs = valeurs;
-  paquet.requete = requete_unite;
+  init_package(&paquet, local, automate);
 
   build_request(paquet, requete);
 

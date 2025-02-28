@@ -2,11 +2,10 @@
 
 #include <netinet/in.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 
-void convert_mot(mot_t mot, uint8_t *res) {
+void convert_mot(mot_t mot, uint8_t res[2]) {
   res[0] = mot & 0xFF;
   res[1] = (mot >> 8) & 0xFF;
 }

@@ -2,6 +2,15 @@
 #define _TPTRAINS3_COMM_H
 #include <stdint.h>
 
+#define MAXOCTETS 150
+#define MAXEXTENSION MAXOCTETS - 14
+
+#define CHECK_ERROR(val1, val2, msg) \
+  if ((val1) == (val2)) {            \
+    perror(msg);                     \
+    exit(EXIT_FAILURE);              \
+  }
+
 typedef struct {
   uint8_t station_id;
   uint8_t reseau_id;
@@ -32,15 +41,6 @@ typedef struct {
   uint8_t *extension_data;
   uint8_t extension_len;
 } xway_paquet_t;
-
-#define MAXOCTETS 150
-#define MAXEXTENSION MAXOCTETS - 14
-
-#define CHECK_ERROR(val1, val2, msg) \
-  if (val1 == val2) {                \
-    perror(msg);                     \
-    exit(EXIT_FAILURE);              \
-  }
 
 void build_request(xway_paquet_t paquet, uint8_t *requete);
 void print_data_hex(uint8_t *requete);

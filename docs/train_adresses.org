@@ -1,0 +1,21 @@
+#+title: Train Adresses
+
+* Train 1
+** %MW39 (addr 1)
+** %MW40 (Req. Tronç 1)
+** %MW41 (Req. Aig. 1)
+
+* Train 2
+** %MW42 (addr 2)
+** %MW43 (Req. Tronç 2)
+** %MW44 (Req. Aig. 2)
+
+* Train 3
+** %MW49 (addr 3)
+** %MW50 (Req. Tronç 3)
+** %MW51 (Req. Aig. 3)
+
+* Train 4
+** %MW52 (addr 4)
+** %MW53 (Req. Tronç 4)
+** %MW54 (Req. Aig. 4)

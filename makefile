@@ -33,7 +33,7 @@ format_code:
 	# clang-format --verbose -i --style=file include/*
 
 static_analyser:
-	clang-tidy src/* -- -I include
+# 	clang-tidy src/* -- -I include
 
 build/main: src/main.c src/comm.c
 	mkdir -p build

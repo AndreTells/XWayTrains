@@ -34,17 +34,15 @@ void init_package(xway_paquet_t *paquet, const xway_address_t local,
   mot_t valeurs[requete_unite.nb_mots];
 
   valeurs[0] = local.station_id;
-  valeurs[1] = -1;
-  valeurs[2] = 7;
+  valeurs[1] = UNCHANGED;
+  valeurs[2] = 31;
 
   requete_unite.valeurs = valeurs;
   paquet->requete = requete_unite;
 }
 
 void build_request(xway_paquet_t paquet, uint8_t *requete) {
-  int i = 0, j = 0;
-  uint8_t request_length;
-
+  int j = 0;
   // initialisation
   memset(requete, 0, MAXOCTETS);
 
@@ -78,12 +76,11 @@ void build_request(xway_paquet_t paquet, uint8_t *requete) {
   requete[20] = nb_mots[0];
   requete[21] = nb_mots[1];
 
-  // while (j < paquet.requete.nb_mots && (j + i < MAXEXTENSION)) {
-  //   convert_mot(paquet.requete.valeurs[j], values[j]);
-  //   requete[22 + j * 2] = values[j][0];
-  //   requete[23 + j * 2] = values[j][1];
-  //   j++;
-  // }
+  for (int i = 0; i < 3; i++) {
+    convert_mot(paquet.requete.valeurs[i], values[i]);
+    requete[22 + i * 2] = values[i][0];
+    requete[23 + i * 2] = values[i][1];
+  }
 
   // en tête modbus
   requete[3] = 0x01;      // always like this

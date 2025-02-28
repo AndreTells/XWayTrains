@@ -56,6 +56,8 @@ typedef struct {
 #define TRAIN2 0x2A
 #define TRAIN3 0x2D
 
+#define UNCHANGED 0xFFFF
+
 typedef struct {
   uint8_t train;
   uint8_t troncon;  // to move

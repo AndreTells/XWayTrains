@@ -78,12 +78,12 @@ void build_request(xway_paquet_t paquet, uint8_t *requete) {
   requete[20] = nb_mots[0];
   requete[21] = nb_mots[1];
 
-  while (j < paquet.requete.nb_mots && (j + i < MAXEXTENSION)) {
-    convert_mot(paquet.requete.valeurs[j], values[j]);
-    requete[22 + j * 2] = values[j][0];
-    requete[23 + j * 2] = values[j][1];
-    j++;
-  }
+  // while (j < paquet.requete.nb_mots && (j + i < MAXEXTENSION)) {
+  //   convert_mot(paquet.requete.valeurs[j], values[j]);
+  //   requete[22 + j * 2] = values[j][0];
+  //   requete[23 + j * 2] = values[j][1];
+  //   j++;
+  // }
 
   // en tête modbus
   requete[3] = 0x01;      // always like this

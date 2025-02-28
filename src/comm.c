@@ -45,7 +45,6 @@ void init_package(xway_paquet_t *paquet, const xway_address_t local,
 
 void build_request(xway_paquet_t paquet, uint8_t *requete) {
   int i = 0, j = 0;
-  int req_off = 15;
   uint8_t request_length;
 
   // initialisation
@@ -59,38 +58,37 @@ void build_request(xway_paquet_t paquet, uint8_t *requete) {
   requete[10] = paquet.addresses.reciever.station_id;
   requete[11] = (paquet.addresses.reciever.reseau_id << 4) |
                 (paquet.addresses.reciever.porte_id & 0x0F);
-  requete[12] = paquet.extension.train;
-  requete[13] = paquet.extension.troncon;
-  requete[14] = paquet.extension.aig;
+
+  requete[12] = CODE_SEND;
+  requete[13] = 0x00;
 
   // requête UNITE
-  requete[req_off] = paquet.requete.code;
-  requete[req_off + 1] = paquet.requete.categorie;
+  requete[14] = paquet.requete.code;
+  requete[15] = paquet.requete.categorie;
 
-  if (paquet.requete.segment_objet != 0)
-    requete[req_off + 2] = paquet.requete.segment_objet;
-  if (paquet.requete.type_objet != 0)
-    requete[req_off + 3] = paquet.requete.type_objet;
+  requete[16] = paquet.requete.segment_objet;
+  requete[17] = paquet.requete.type_objet;
+
   uint8_t adresse_premier_mot[2], nb_mots[2];
   uint8_t values[paquet.requete.nb_mots][2];
 
   convert_mot(paquet.requete.adresse_premier_mot, adresse_premier_mot);
   convert_mot(paquet.requete.nb_mots, nb_mots);
 
-  requete[req_off + 4] = adresse_premier_mot[0];
-  requete[req_off + 5] = adresse_premier_mot[1];
-  requete[req_off + 6] = nb_mots[0];
-  requete[req_off + 7] = nb_mots[1];
+  requete[18] = adresse_premier_mot[0];
+  requete[19] = adresse_premier_mot[1];
+  requete[20] = nb_mots[0];
+  requete[21] = nb_mots[1];
 
   while (j < paquet.requete.nb_mots && (j + i < MAXEXTENSION)) {
     convert_mot(paquet.requete.valeurs[j], values[j]);
-    requete[req_off + 8 + j * 2] = values[j][0];
-    requete[req_off + 9 + j * 2] = values[j][1];
+    requete[22 + j * 2] = values[j][0];
+    requete[23 + j * 2] = values[j][1];
     j++;
   }
 
   // en tête modbus
-  request_length = 7 + i + 4 + (j + 1) * 2;
+  request_length = 0x15;
   requete[3] = 0x01;
   requete[5] = request_length + 1;
 }

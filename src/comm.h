@@ -49,6 +49,8 @@ typedef struct {
 #define UNITE_TYPE_MOT_INTERNE 0x07
 #define UNITE_TYPE_DOUBLE_MOT_INTERNE 0x08
 
+#define CODE_SEND 0x09
+#define CODE_RECEIVE 0x19
 typedef struct {
   uint8_t train;
   uint8_t troncon;  // to move

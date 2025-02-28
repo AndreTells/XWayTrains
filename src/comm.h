@@ -34,6 +34,14 @@ typedef struct {
   mot_t *valeurs;
 } xway_requete_unite_t;
 
+#define NPDU_DATA 0xF0
+#define SERVICE_LEVEL_STD 0x00
+#define SERVICE_LEVEL_TELEGRAM 0x04
+#define REFUS_ACCEPTED 0x00
+#define REFUS_REFUSED 0x02
+#define EXTENSION_OFF 0x00
+#define EXTENSION_ON 0x01
+
 typedef struct {
   uint8_t type_npdu;
   addresses_t addresses;

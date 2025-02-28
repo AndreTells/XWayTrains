@@ -51,7 +51,8 @@ int main(int argc, char *argv[]) {
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
                              DESTINATAIRE_PORT_ID};
 
-  paquet.type_npdu = 0xF1;
+  paquet.type_npdu =
+      NPDU_DATA | SERVICE_LEVEL_STD | REFUS_ACCEPTED | EXTENSION_ON;
   paquet.addresses.emetteur = local;
   paquet.addresses.destinataire = automate;
 

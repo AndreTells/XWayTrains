@@ -49,9 +49,10 @@ int main(int argc, char *argv[]) {
                              DESTINATAIRE_PORT_ID};
 
   init_package(&paquet, local, automate);
-
   build_request(paquet, requete);
-
+  printf("Requete : \n");
+  print_data_hex(requete);
+  return 0;
   sd1 = socket(AF_INET, SOCK_STREAM, 0);
 
   CHECKERROR(sd1, -1, "Creation fail !!!\n");
@@ -65,9 +66,6 @@ int main(int argc, char *argv[]) {
     addr_serv.sin_port = htons(REMOTEPORT);
     addr_serv.sin_addr.s_addr = inet_addr(REMOTEIP);
   }
-
-  printf("Requete : \n");
-  print_data_hex(requete);
 
   CHECKERROR(connect(sd1, (const struct sockaddr *)&addr_serv,
                      sizeof(struct sockaddr_in)),

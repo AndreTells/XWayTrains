@@ -34,10 +34,13 @@
   }
 
 int main(int argc, char *argv[]) {
-  int sd1;
-  struct sockaddr_in addr_serv, addr_cli;
+  int sd1 = 0;
+  struct sockaddr_in addr_serv;
+  struct sockaddr_in addr_cli;
+
   uint8_t reponse[MAXOCTETS];
-  int erreur, nbbytes;
+  int erreur = 0;
+  ssize_t nbbytes = 0;
   unsigned int adr_len = sizeof(struct sockaddr_in);
 
   uint8_t extension_data[MAXEXTENSION] = {0};

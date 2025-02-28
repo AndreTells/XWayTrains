@@ -6,7 +6,9 @@
 #include <sys/socket.h>
 
 void convert_mot(mot_t mot, uint8_t res[2]) {
-  res[0] = mot & 0xFF;
+  // least significant bits
+  res[0] = mot & 0x00FF;
+  // more significant bits
   res[1] = (mot >> 8) & 0xFF;
 }
 

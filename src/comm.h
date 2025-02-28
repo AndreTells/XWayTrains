@@ -51,6 +51,11 @@ typedef struct {
 
 #define CODE_SEND 0x09
 #define CODE_RECEIVE 0x19
+
+#define TRAIN1 0x27
+#define TRAIN2 0x2A
+#define TRAIN3 0x2D
+
 typedef struct {
   uint8_t train;
   uint8_t troncon;  // to move

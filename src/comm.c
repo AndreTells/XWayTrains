@@ -21,17 +21,15 @@ void init_package(xway_paquet_t *paquet, const xway_address_t local,
   paquet->addresses.emitter = local;
   paquet->addresses.reciever = automate;
 
-  paquet->extension.len = 3;
-  paquet->extension.train = 39;    // TRAIN 1
-  paquet->extension.troncon = 26;  // enable T26
+  paquet->extension.troncon = 31;  // enable T26
   paquet->extension.aig = 0;
 
   requete_unite.code = UNITE_WRITE_OBJECT;
   requete_unite.categorie = UNITE_CATEGORY;
   requete_unite.segment_objet = UNITE_SEGMENT_INTERNAL_DATA;
-  requete_unite.type_objet = UNITE_TYPE_DOUBLE_MOT_INTERNE;
-  requete_unite.adresse_premier_mot = 42;
-  requete_unite.nb_mots = 0;
+  requete_unite.type_objet = UNITE_TYPE_MOT_INTERNE;
+  requete_unite.adresse_premier_mot = TRAIN1;
+  requete_unite.nb_mots = 0x03;
 
   mot_t valeurs[requete_unite.nb_mots];
 
@@ -88,9 +86,8 @@ void build_request(xway_paquet_t paquet, uint8_t *requete) {
   }
 
   // en tête modbus
-  request_length = 0x15;
-  requete[3] = 0x01;
-  requete[5] = request_length + 1;
+  requete[3] = 0x01;      // always like this
+  requete[5] = 0x15 + 1;  // hard-coded
 }
 
 void print_data_hex(uint8_t *data) {

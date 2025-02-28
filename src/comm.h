@@ -18,8 +18,8 @@ typedef struct {
 } xway_address_t;
 
 typedef struct {
-  xway_address_t emetteur;
-  xway_address_t destinataire;
+  xway_address_t emitter;
+  xway_address_t reciever;
 } addresses_t;
 
 typedef uint16_t mot_t;

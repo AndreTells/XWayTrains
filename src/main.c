@@ -53,8 +53,8 @@ int main(int argc, char *argv[]) {
 
   paquet.type_npdu =
       NPDU_DATA | SERVICE_LEVEL_STD | REFUS_ACCEPTED | EXTENSION_ON;
-  paquet.addresses.emetteur = local;
-  paquet.addresses.destinataire = automate;
+  paquet.addresses.emitter = local;
+  paquet.addresses.reciever = automate;
 
   paquet.extension_len = 2;
   extension_data[0] = 0x09;
@@ -113,8 +113,8 @@ int main(int argc, char *argv[]) {
     print_data_hex(reponse);
   }
 
-  paquet.addresses.destinataire = local;
-  paquet.addresses.emetteur = automate;
+  paquet.addresses.reciever = local;
+  paquet.addresses.emitter = automate;
 
   close(sd1);
   return EXIT_SUCCESS;

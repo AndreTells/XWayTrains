@@ -25,6 +25,9 @@ CFLAGS += -I$(INCLUDE_DIR)
 # --------------------------------------------------------------------- #
 LDFLAGS = -lrt
 
+unit_test_ressource_manager:
+	clang -I include src/unit_test_ressource_manager.c src/ressource_database.c src/ressource_database_proxy.c -o bin/ressource_manager_unit_test.out
+
 format_code:
 	clang-format --verbose -i --style=file src/*
 	clang-format --verbose -i --style=file include/*

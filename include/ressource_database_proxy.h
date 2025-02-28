@@ -5,11 +5,11 @@
 #include "ressource_database.h"
 
 typedef struct {
-  RessourceDataBase_t database;
+  RessourceDataBase_t* database;
   sem_t lock;
 } RessourceDataBaseProxy_t;
 
-RessourceDataBaseProxy_t* initRessourceDatabaseProxy();
+RessourceDataBaseProxy_t* initRessourceDatabaseProxy(void);
 
 int attemptLockRessourceProxy(RessourceDataBaseProxy_t* db_proxy,
                               int ressourceId);

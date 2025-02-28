@@ -43,11 +43,15 @@ typedef struct {
 #define EXTENSION_ON 0x01
 
 typedef struct {
+  uint8_t *data;
+  uint8_t len;
+} extension_t;
+
+typedef struct {
   uint8_t type_npdu;
   addresses_t addresses;
   xway_requete_unite_t requete;
-  uint8_t *extension_data;
-  uint8_t extension_len;
+  extension_t extension;
 } xway_paquet_t;
 
 void init_package(xway_paquet_t *paquet, const xway_address_t local,

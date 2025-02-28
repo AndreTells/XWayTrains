@@ -22,10 +22,10 @@ void init_package(xway_paquet_t *paquet, const xway_address_t local,
   paquet->addresses.emitter = local;
   paquet->addresses.reciever = automate;
 
-  paquet->extension_len = 2;
+  paquet->extension.len = 2;
   extension_data[0] = 0x09;
   extension_data[1] = 0x00;
-  paquet->extension_data = extension_data;
+  paquet->extension.data = extension_data;
 
   requete_unite.code = 0x37;
   requete_unite.categorie = 0x06;
@@ -61,8 +61,8 @@ void build_request(xway_paquet_t paquet, uint8_t *requete) {
   requete[11] = (paquet.addresses.reciever.reseau_id << 4) |
                 (paquet.addresses.reciever.porte_id & 0x0F);
 
-  while (i < paquet.extension_len && i < MAXEXTENSION) {
-    requete[12 + i] = paquet.extension_data[i];
+  while (i < paquet.extension.len && i < MAXEXTENSION) {
+    requete[12 + i] = paquet.extension.data[i];
     i++;
   }
   req_off += i;

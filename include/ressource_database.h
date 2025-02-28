@@ -12,6 +12,6 @@ RessourceDataBase_t * initRessourceDataBase ();
 
 int attemptLockRessource(RessourceDataBase_t * db, int ressourceId);
 
-int releaseRessourceById(RessourceDataBase_t * db, int ressourceId);
+int releaseRessource(RessourceDataBase_t * db, int ressourceId);
 
 #endif // RESSOURCE_DATABASE_H_

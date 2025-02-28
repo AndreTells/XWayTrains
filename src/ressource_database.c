@@ -28,7 +28,7 @@ int attemptLockRessource(RessourceDataBase_t * db, int ressourceId){
   return 0;
 }
 
-int releaseRessourceById(RessourceDataBase_t * db, int ressourceId){
+int releaseRessource(RessourceDataBase_t * db, int ressourceId){
   // if ressource is not registered, return error
   if(!db.registered[ressourceId]){
     return -1;

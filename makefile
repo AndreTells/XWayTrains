@@ -30,4 +30,4 @@ format_code:
 	clang-format --verbose -i --style=file include/*
 
 static_analyser:
-	clang-tidy src/* -- -I include
+	clang-tidy src/* -- -std=c11 -I include

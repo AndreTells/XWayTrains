@@ -1,3 +1,2 @@
-int main() {
-  return 0;
-}
+#include <stdlib.h>
+int main() { return 0; }

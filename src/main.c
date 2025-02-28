@@ -5,7 +5,6 @@
 /* Compilation : gcc clientUdp.c -o clientUdpc          */
 /* Usage : ./clientUdpc [adrIPserv] [portServ]   [adrIPcli] */
 /****************************************************/
-#include "comm.h"
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -13,6 +12,8 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+
+#include "comm.h"
 
 #define LOCALIP "172.31.70.17"
 #define REMOTEIP "10.31.125.14"
@@ -26,14 +27,13 @@
 #define DESTINATAIRE_RESEAU_ID 1
 #define DESTINATAIRE_PORT_ID 0
 
-#define CHECKERROR(var, val, msg)                                              \
-  if (var == val) {                                                            \
-    perror(msg);                                                               \
-    exit(1);                                                                   \
+#define CHECKERROR(var, val, msg) \
+  if (var == val) {               \
+    perror(msg);                  \
+    exit(1);                      \
   }
 
 int main(int argc, char *argv[]) {
-
   int sd1;
   struct sockaddr_in addr_serv, addr_cli;
   uint8_t reponse[MAXOCTETS];

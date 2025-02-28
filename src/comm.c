@@ -1,10 +1,10 @@
+#include "comm.h"
+
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
-
-#include "comm.h"
 
 void convert_mot(mot_t mot, uint8_t *res) {
   res[0] = mot & 0xFF;

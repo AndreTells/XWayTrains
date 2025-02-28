@@ -35,7 +35,7 @@ format_code:
 static_analyser:
 	clang-tidy src/* -- -I include
 
-build/main: src/main.c
+build/main: src/main.c src/comm.c
 	mkdir -p build
 	$(CC) $(CFLAGS) $^ -o $@
 

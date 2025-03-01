@@ -122,7 +122,7 @@ bool is_read_successful(const uint8_t response[MAXOCTETS],
   bool switch_success;
   if (request.request.data.switch_id != UNCHANGED) {
     invert_byte_order(request.request.data.switch_id, values);
-    switch_success = response[23] == values[0] && response[23] == values[1];
+    switch_success = response[22] == values[0] && response[23] == values[1];
   } else {
     // 0x0100 should be the answer
     switch_success = true;

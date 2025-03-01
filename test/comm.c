@@ -82,6 +82,55 @@ void test_write_ack_validation() {
   printf(GREEN " passed.\n" NOCOLOR);
 }
 
+void test_read_validation() {
+  uint8_t requete[MAXOCTETS];
+
+  xway_package_t paquet;
+  xway_address_t local = {EMETTEUR_STATION_ID, EMETTEUR_RESEAU_ID,
+                          EMETTEUR_PORT_ID};
+  xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
+                             DESTINATAIRE_PORT_ID};
+
+  init_write_package(&paquet, local, automate, TRAIN1, UNCHANGED, 31);
+  build_write_request(paquet, requete);
+
+  uint8_t reponse[MAXOCTETS];
+  reponse[0] = 0x00;
+  reponse[1] = 0x00;
+  reponse[2] = 0x00;
+  reponse[3] = 0x01;
+  reponse[4] = 0x00;
+  reponse[5] = 0x12;
+  reponse[6] = 0x00;
+  reponse[7] = 0xF1;
+  reponse[8] = 0x0E;
+  reponse[9] = 0x10;
+  reponse[10] = 0x28;
+  reponse[11] = 0x10;
+  reponse[12] = 0x09;
+  reponse[13] = 0x34;  // it answers a port_number
+  reponse[14] = 0x37;
+  reponse[15] = 0x07;
+  reponse[16] = 0x68;
+  reponse[17] = 0x07;
+  reponse[18] = 0x09;
+  reponse[19] = 0x00;
+  reponse[20] = 0x01;
+  reponse[21] = 0x00;
+  reponse[22] = 0x1F;
+  reponse[23] = 0x00;
+
+  uint8_t port_number;
+  const bool result =
+      is_read_successful(reponse, requete, &port_number, paquet);
+
+  printf("It validates the sample READ recieved: ");
+  fflush(stdout);
+  assert(result);
+  assert(port_number == 0x34);
+  printf(GREEN " passed.\n" NOCOLOR);
+}
+
 void test_ack() {
   uint8_t requete[MAXOCTETS];
 
@@ -119,5 +168,6 @@ void test_ack() {
 int main() {
   test_write_req();
   test_write_ack_validation();
+  test_read_validation();
   test_ack();
 }

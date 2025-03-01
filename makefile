@@ -42,9 +42,9 @@ build/main: src/main.c src/comm.c
 build/test/comm: test/comm.c src/comm.c
 	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
-	@printf "\n\nUnit testing...\n\n"
+	@printf "\n[Unit testing]\n"
 	$@
-	@printf "\n\nDone unit testing\n\n"
+	@printf "\nDone unit testing\n"
 
 clean:
 	rm -fr build/*

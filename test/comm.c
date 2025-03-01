@@ -1,4 +1,4 @@
-#include "../src/comm.h"
+#include "comm.h"
 
 #include <arpa/inet.h>
 #include <assert.h>

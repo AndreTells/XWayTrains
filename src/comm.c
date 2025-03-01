@@ -73,11 +73,11 @@ void build_request(xway_paquet_t paquet, uint8_t *requete) {
   requete[22] = values[0];
   requete[23] = values[1];
 
-  convert_mot(paquet.requete.valeurs.aig, values);
+  convert_mot(paquet.requete.valeurs.troncon, values);
   requete[24] = values[0];
   requete[25] = values[1];
 
-  convert_mot(paquet.requete.valeurs.troncon, values);
+  convert_mot(paquet.requete.valeurs.aig, values);
   requete[26] = values[0];
   requete[27] = values[1];
 
@@ -93,4 +93,10 @@ void print_data_hex(uint8_t *data) {
     printf("%02X ", data[i]);
   }
   printf("\n");
+  printf(
+      "\tPosition:    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 "
+      "19 "
+      "20 "
+      "21 "
+      "22 23 24 25 26 27\n\n");
 }

@@ -26,7 +26,7 @@ CFLAGS += -lm
 # --------------------------------------------------------------------- #
 LDFLAGS = -lrt
 
-all: format_code static_analyser build/main
+all: format_code static_analyser build/main build/comm_test
 
 format_code:
 	clang-format --verbose -i --style=file src/*
@@ -38,6 +38,13 @@ static_analyser:
 build/main: src/main.c src/comm.c
 	mkdir -p build
 	$(CC) $(CFLAGS) $^ -o $@
+
+build/comm_test: test/comm.c src/comm.c
+	mkdir -p build
+	$(CC) $(CFLAGS) $^ -o $@
+	@printf "\n\nUnit testing...\n\n"
+	$@
+	@printf "\n\nDone unit testing\n\n"
 
 clean:
 	rm -fr build/*

@@ -14,18 +14,6 @@
 
 #include "comm.h"
 
-#define LOCALIP "172.31.70.17"
-#define REMOTEIP "10.31.125.14"
-#define REMOTEPORT 502
-
-#define EMETTEUR_STATION_ID 40
-#define EMETTEUR_RESEAU_ID 1
-#define EMETTEUR_PORT_ID 0
-
-#define DESTINATAIRE_STATION_ID 14
-#define DESTINATAIRE_RESEAU_ID 1
-#define DESTINATAIRE_PORT_ID 0
-
 #define CHECKERROR(var, val, msg) \
   if (var == val) {               \
     perror(msg);                  \

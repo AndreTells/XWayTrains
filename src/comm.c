@@ -12,9 +12,9 @@ void invert_byte_order(word_t word, uint8_t res[2]) {
   res[1] = (word >> 8) & 0xFF;
 }
 
-void init_package(xway_package_t *package, const xway_address_t local,
-                  const xway_address_t automate, word_t train,
-                  word_t section_id, word_t switch_id) {
+void init_write_package(xway_package_t *package, const xway_address_t local,
+                        const xway_address_t automate, word_t train,
+                        word_t section_id, word_t switch_id) {
   package->npdu_type =
       NPDU_DATA | SERVICE_LEVEL_STD | REFUS_ACCEPTED | EXTENSION_ON;
   package->addresses.emitter = local;
@@ -33,7 +33,7 @@ void init_package(xway_package_t *package, const xway_address_t local,
   package->request.data.switch_id = switch_id;
 }
 
-void build_request(xway_package_t package, uint8_t *request) {
+void build_write_request(xway_package_t package, uint8_t *request) {
   // initialisation
   memset(request, 0, MAXOCTETS);
 

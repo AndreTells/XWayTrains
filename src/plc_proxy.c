@@ -117,7 +117,7 @@ int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
   // TODO(felipe): send message plc
   sleep(10);
 
-  sem_pos(&(plc->mutex));
+  sem_post(&(plc->mutex));
   return 0;
 }
 
@@ -140,7 +140,7 @@ PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc) {
 void* plcProxyMsgReceiverThread(void* plcProxy) {
   PlcProxy_t* plcProxy = (PlcProxy_t*)plcProxy;
   while (!plcProxy->finished) {
-    PlcMessage_t* msg = readMessagePlcProxy()
+    PlcMessage_t* msg = readMessagePlcProxy();
     // TODO(andre):check the target is registered
     // copy message to correct output file descriptor
   }

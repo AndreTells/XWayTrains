@@ -38,4 +38,11 @@ Train_t* initTrain(enum TrainId_e trainId, PlcProxy_t* plc,
  */
 int endTrain(Train_t* train);
 
+/**
+ * @brief Entry point for the train thread
+ * @param[in] train Pointer to the Train_t instance
+ * @return Thread exit status (always NULL)
+ */
+void* trainThread(Train_t* train);
+
 #endif  // TRAIN_H_

@@ -129,7 +129,7 @@ int requestResource(ResourceManagerProxy_t* resManager, int ressourceId,
   // TODO(andre): send message ressource manager
   sleep(10);
 
-  sem_pos(&(resManager->mutex));
+  sem_post(&(resManager->mutex));
   return 0;
 }
 

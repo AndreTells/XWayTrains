@@ -16,7 +16,7 @@
 struct ResourceManagerProxy_t {
   pthread_t readerThreadTid;
   semaphore_t mutex;
-  int outputFd[MAX_NUM_REGISTRABLE_TRAINS];
+  int outputFd[MAX_NUM_REGISTRABLE_TRAINS][2];
   bool finished;
   int sock_fd;
 };
@@ -37,6 +37,11 @@ void* resManagerMsgReceiverThread(void* resourceManagerProxy);
  *       `endResourceManagerProxy()`.
  */
 ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr) {
+  // check if it's a valid IP address
+  if (resManagerIpAddr == NULL) {
+    return NULL;
+  }
+
   ResourceManagerProxy_t* resManager =
       (ResourceManagerProxy_t*)malloc(sizeof(ResourceManagerProxy_t));
 
@@ -51,7 +56,8 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr) {
 
   // Initialize the output file descriptors to -1 (invalid)
   for (int i = 0; i < MAX_NUM_REGISTRABLE_TRAINS; i++) {
-    resManager->outputFd[i] = -1;
+    resManager->outputFd[i][0] = -1;
+    resManager->outputFd[i][1] = -1;
   }
 
   int resSemInit = sem_init(&(resManager->mutex), 0, 1);
@@ -62,8 +68,13 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr) {
   }
 
   // create reader thread
-  pthread_create(&(resManager->readerThreadTid), NULL,
-                 reseManagerMsgReceiverThread, (void*)resManager);
+  int resPthreadCreate = pthread_create(&(resManager->readerThreadTid), NULL,
+                     resManagerMsgReceiverThread, (void*)resManager);
+  // check if pthread_create
+  if (resPthreadCreate != 0) {
+    free(resManager);
+    return NULL;
+  }
 
   return resManager;
 }
@@ -87,6 +98,15 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
   }
 
   sem_destroy(&(resManager->mutex));
+
+  // closing all open pipes
+  for (int i = 0; i < MAX_NUM_REGISTRABLE_TRAINS; i++) {
+    if (plcProxy->outputFd[i][0] == -1) {
+      continue;
+    }
+    close(plcProxy->outputFd[i][0]);
+    close(plcProxy->outputFd[i][1]);
+  }
 
   // TODO(andre): end tcp connection (?)
 
@@ -140,7 +160,8 @@ int releaseResource(ResourceManagerProxy_t* resManager, int ressourceId,
  * @return Thread exit status (always NULL)
  */
 void* resManagerMsgReceiverThread(void* resourceManagerProxy) {
-  ResourceManagerProxy_t* resManager = resourceManagerProxy;
+  ResourceManagerProxy_t* resManager =
+      (ResourceManagerProxy_t*)resourceManagerProxy;
   while (!resManager->finished) {
     // TODO(andre): do the following
     // read from socket

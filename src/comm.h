@@ -83,7 +83,8 @@ typedef struct {
 } xway_package_t;
 
 void init_package(xway_package_t *package, const xway_address_t local,
-                  const xway_address_t automate);
+                  const xway_address_t automate, word_t train,
+                  word_t section_id, word_t switch_id);
 
 void build_request(xway_package_t package, uint8_t *request);
 void print_data_hex(uint8_t *request);

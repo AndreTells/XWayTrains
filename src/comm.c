@@ -13,7 +13,8 @@ void invert_byte_order(word_t word, uint8_t res[2]) {
 }
 
 void init_package(xway_package_t *package, const xway_address_t local,
-                  const xway_address_t automate) {
+                  const xway_address_t automate, word_t train,
+                  word_t section_id, word_t switch_id) {
   package->npdu_type =
       NPDU_DATA | SERVICE_LEVEL_STD | REFUS_ACCEPTED | EXTENSION_ON;
   package->addresses.emitter = local;
@@ -25,11 +26,11 @@ void init_package(xway_package_t *package, const xway_address_t local,
   package->request.object_type = UNITE_TYPE_MOT_INTERNE;
   package->request.word_count = 0x03;
 
-  package->request.address_start = TRAIN1;
+  package->request.address_start = train;
 
   package->request.data.train_station_id = local.station_id;
-  package->request.data.section_id = UNCHANGED;
-  package->request.data.switch_id = 31;
+  package->request.data.section_id = section_id;
+  package->request.data.switch_id = switch_id;
 }
 
 void build_request(xway_package_t package, uint8_t *request) {

@@ -16,7 +16,7 @@ void test_write_req() {
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
                              DESTINATAIRE_PORT_ID};
 
-  init_package(&paquet, local, automate);
+  init_package(&paquet, local, automate, TRAIN1, UNCHANGED, 31);
   build_request(paquet, requete);
 
   printf("\nTest the WRITE_OBJECTS is identical: ");

@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
                              DESTINATAIRE_PORT_ID};
 
-  init_package(&paquet, local, automate);
+  init_package(&paquet, local, automate, TRAIN1, UNCHANGED, 31);
   build_request(paquet, requete);
   printf("Request : \n");
   print_data_hex(requete);

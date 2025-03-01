@@ -9,6 +9,7 @@
 #define PLC_PROXY_H_
 
 #include "plc_info.h"
+#define MAX_NUM_REGISTRABLE_TRAINS 3
 
 /**
  * @brief Opaque handle for the PLC Proxy instance

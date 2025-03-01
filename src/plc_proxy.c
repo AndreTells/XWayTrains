@@ -1,6 +1,9 @@
 #include "plc_proxy.h"
 
+#include <pthread.h>
+#include <semaphore.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 /**
@@ -10,7 +13,7 @@
  */
 struct PlcProxy_t {
   pthread_t readerThreadTid;
-  semaphore_t mutex;
+  sem_t mutex;
   int outputFd[MAX_NUM_REGISTRABLE_TRAINS][2];
   bool finished;
   int sock_fd;
@@ -82,7 +85,7 @@ int endPlcProxy(PlcProxy_t* plc) {
   plc->finished = true;
 
   int retVal = 0;
-  (void)pthread_join(plc->readerThreadTid, &retVal);
+  (void)pthread_join(plc->readerThreadTid, (void*)&retVal);
   // check if the join failed
   if (retVal != 0) {
     return -1;

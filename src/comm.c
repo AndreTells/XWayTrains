@@ -14,8 +14,6 @@ void convert_mot(mot_t mot, uint8_t res[2]) {
 
 void init_package(xway_paquet_t *paquet, const xway_address_t local,
                   const xway_address_t automate) {
-  xway_requete_unite_t requete_unite;
-
   paquet->type_npdu =
       NPDU_DATA | SERVICE_LEVEL_STD | REFUS_ACCEPTED | EXTENSION_ON;
   paquet->addresses.emitter = local;
@@ -24,21 +22,16 @@ void init_package(xway_paquet_t *paquet, const xway_address_t local,
   paquet->extension.troncon = 31;  // enable T26
   paquet->extension.aig = 0;
 
-  requete_unite.code = UNITE_WRITE_OBJECT;
-  requete_unite.categorie = UNITE_CATEGORY;
-  requete_unite.segment_objet = UNITE_SEGMENT_INTERNAL_DATA;
-  requete_unite.type_objet = UNITE_TYPE_MOT_INTERNE;
-  requete_unite.adresse_premier_mot = TRAIN1;
-  requete_unite.nb_mots = 0x03;
+  paquet->requete.code = UNITE_WRITE_OBJECT;
+  paquet->requete.categorie = UNITE_CATEGORY;
+  paquet->requete.segment_objet = UNITE_SEGMENT_INTERNAL_DATA;
+  paquet->requete.type_objet = UNITE_TYPE_MOT_INTERNE;
+  paquet->requete.adresse_premier_mot = TRAIN1;
+  paquet->requete.nb_mots = 0x03;
 
-  mot_t valeurs[requete_unite.nb_mots];
-
-  valeurs[0] = local.station_id;
-  valeurs[1] = UNCHANGED;
-  valeurs[2] = 31;
-
-  requete_unite.valeurs = valeurs;
-  paquet->requete = requete_unite;
+  paquet->requete.valeurs.trainStationId = local.station_id;
+  paquet->requete.valeurs.troncon = UNCHANGED;
+  paquet->requete.valeurs.aig = 31;
 }
 
 void build_request(xway_paquet_t paquet, uint8_t *requete) {
@@ -66,7 +59,7 @@ void build_request(xway_paquet_t paquet, uint8_t *requete) {
   requete[17] = paquet.requete.type_objet;
 
   uint8_t adresse_premier_mot[2], nb_mots[2];
-  uint8_t values[paquet.requete.nb_mots][2];
+  uint8_t values[2];
 
   convert_mot(paquet.requete.adresse_premier_mot, adresse_premier_mot);
   convert_mot(paquet.requete.nb_mots, nb_mots);
@@ -76,15 +69,21 @@ void build_request(xway_paquet_t paquet, uint8_t *requete) {
   requete[20] = nb_mots[0];
   requete[21] = nb_mots[1];
 
-  for (int i = 0; i < 3; i++) {
-    convert_mot(paquet.requete.valeurs[i], values[i]);
-    requete[22 + i * 2] = values[i][0];
-    requete[23 + i * 2] = values[i][1];
-  }
+  convert_mot(paquet.requete.valeurs.trainStationId, values);
+  requete[22] = values[0];
+  requete[23] = values[1];
 
-  // en tête modbus
+  convert_mot(paquet.requete.valeurs.aig, values);
+  requete[24] = values[0];
+  requete[25] = values[1];
+
+  convert_mot(paquet.requete.valeurs.troncon, values);
+  requete[26] = values[0];
+  requete[27] = values[1];
+
+  // header
   requete[3] = 0x01;      // always like this
-  requete[5] = 0x15 + 1;  // hard-coded
+  requete[5] = 0x15 + 1;  // hard-coded, length starting at this point
 }
 
 void print_data_hex(uint8_t *data) {

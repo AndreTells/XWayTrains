@@ -10,9 +10,10 @@
     perror(msg);                     \
     exit(EXIT_FAILURE);              \
   }
+typedef uint16_t mot_t;
 
 typedef struct {
-  uint8_t station_id;
+  mot_t station_id;
   uint8_t reseau_id;
   uint8_t porte_id;
 } xway_address_t;
@@ -22,7 +23,11 @@ typedef struct {
   xway_address_t reciever;
 } addresses_t;
 
-typedef uint16_t mot_t;
+typedef struct {
+  mot_t trainStationId;
+  mot_t troncon;
+  mot_t aig;
+} xway_data_t;
 
 typedef struct {
   uint8_t code;
@@ -31,7 +36,7 @@ typedef struct {
   uint8_t type_objet;
   mot_t adresse_premier_mot;
   mot_t nb_mots;
-  mot_t *valeurs;
+  xway_data_t valeurs;
 } xway_requete_unite_t;
 
 #define NPDU_DATA 0xF0

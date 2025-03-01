@@ -1,8 +1,9 @@
 /**
  * @file plc_proxy.h
- * @brief Interface for communicating with the PLC (Programmable Logic Controller)
- * @details Provides functions to initialize, deinitialize, send messages to, and
- *          read messages from the PLC.
+ * @brief Interface for communicating with the PLC (Programmable Logic
+ * Controller)
+ * @details Provides functions to initialize, deinitialize, send messages to,
+ * and read messages from the PLC.
  */
 #ifndef PLC_PROXY_H_
 #define PLC_PROXY_H_
@@ -37,13 +38,14 @@ int endPlcProxy(PlcProxy_t* resManager);
  * @param[in] msg Pointer to the message to send
  * @return 0 on success, non-zero error code on failure
  */
-int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t * msg);
+int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg);
 
 /**
  * @brief Read a message from the PLC
- * @param[out] msg Pointer to the structure where the received message will be stored
+ * @param[out] msg Pointer to the structure where the received message will be
+ * stored
  * @return 0 on success, non-zero error code on failure
  */
-int readMessagePlcProxy(PlcMessage_t * msg);
+int readMessagePlcProxy(PlcMessage_t* msg);
 
-#endif // PLC_PROXY_H_
+#endif  // PLC_PROXY_H_

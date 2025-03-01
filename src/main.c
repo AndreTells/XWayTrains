@@ -21,15 +21,8 @@
   }
 
 int main(int argc, char *argv[]) {
-  int sd1 = 0;
-  struct sockaddr_in addr_serv;
-
-  uint8_t reponse[MAXOCTETS];
-  ssize_t nbbytes = 0;
-  unsigned int adr_len = sizeof(struct sockaddr_in);
-
+  // init request
   uint8_t requete[MAXOCTETS];
-
   xway_paquet_t paquet;
   xway_address_t local = {EMETTEUR_STATION_ID, EMETTEUR_RESEAU_ID,
                           EMETTEUR_PORT_ID};
@@ -40,10 +33,18 @@ int main(int argc, char *argv[]) {
   build_request(paquet, requete);
   printf("Requete : \n");
   print_data_hex(requete);
-  return 0;
-  sd1 = socket(AF_INET, SOCK_STREAM, 0);
 
+  // init sockets
+
+  int sd1 = socket(AF_INET, SOCK_STREAM, 0);
   CHECKERROR(sd1, -1, "Creation fail !!!\n");
+
+  struct sockaddr_in addr_serv;
+  unsigned int adr_len = sizeof(struct sockaddr_in);
+
+  CHECKERROR(connect(sd1, (const struct sockaddr *)&addr_serv,
+                     sizeof(struct sockaddr_in)),
+             -1, "Connexion fail !!!\n");
 
   addr_serv.sin_family = AF_INET;
 
@@ -55,13 +56,13 @@ int main(int argc, char *argv[]) {
     addr_serv.sin_addr.s_addr = inet_addr(REMOTEIP);
   }
 
-  CHECKERROR(connect(sd1, (const struct sockaddr *)&addr_serv,
-                     sizeof(struct sockaddr_in)),
-             -1, "Connexion fail !!!\n");
+  uint8_t reponse[MAXOCTETS];
+  ssize_t nbbytes = 0;
 
+  return 0;
   nbbytes = send(sd1, requete, requete[5] + 6, 0);
   if (nbbytes < 0) {
-    perror("Erreur lors de l'envoi de la requete");
+    perror("send: error on initial connection");
     exit(1);
   }
 

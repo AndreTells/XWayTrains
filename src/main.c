@@ -58,20 +58,30 @@ int main(int argc, char *argv[]) {
 
   uint8_t reponse[MAXOCTETS];
   ssize_t nbbytes = 0;
+  ssize_t nbbytes_expected = requete[5] + 6;
+  uint8_t port_number;
 
-  return 0;
-  nbbytes = send(sd1, requete, requete[5] + 6, 0);
-  if (nbbytes < 0) {
+  // Start actual communication
+  nbbytes = send(sd1, requete, nbbytes_expected, 0);
+  if (nbbytes < nbbytes_expected) {
     perror("send: error on initial connection");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
+  // wait for ACK
   nbbytes = recvfrom(sd1, reponse, MAXOCTETS, 0, (struct sockaddr *)&addr_serv,
                      &adr_len);
   if (nbbytes > 0) {
     printf("Response : \n");
     print_data_hex(reponse);
   }
+
+  if (!is_write_ack_successful(reponse, &port_number)) {
+    perror("Unsuccessful request");
+    exit(EXIT_FAILURE);
+  }
+
+  // wait for return
 
   paquet.addresses.reciever = local;
   paquet.addresses.emitter = automate;

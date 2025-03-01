@@ -5,7 +5,7 @@
 #include <string.h>
 #include <sys/socket.h>
 
-void invert_byte_order(word_t word, uint8_t res[2]) {
+void invert_byte_order(const word_t word, uint8_t res[2]) {
   // least significant bits
   res[0] = word & 0x00FF;
   // more significant bits
@@ -13,8 +13,8 @@ void invert_byte_order(word_t word, uint8_t res[2]) {
 }
 
 void init_write_package(xway_package_t *package, const xway_address_t local,
-                        const xway_address_t automate, word_t train,
-                        word_t section_id, word_t switch_id) {
+                        const xway_address_t automate, const word_t train,
+                        const word_t section_id, const word_t switch_id) {
   package->npdu_type =
       NPDU_DATA | SERVICE_LEVEL_STD | REFUS_ACCEPTED | EXTENSION_ON;
   package->addresses.emitter = local;
@@ -84,7 +84,7 @@ void build_write_request(xway_package_t package, uint8_t *request) {
   request[5] = 0x15 + 1;  // hard-coded, length starting at this point
 }
 
-void print_data_hex(uint8_t *data) {
+void print_data_hex(const uint8_t *data) {
   printf("\tData (HEX): ");
   int len = data[5] + 6;
   for (int i = 0; i < len; i++) {
@@ -94,4 +94,11 @@ void print_data_hex(uint8_t *data) {
   printf(
       "\tPosition:    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 "
       "19 20 21 22 23 24 25 26 27\n\n");
+}
+
+bool is_write_ack_successful(const uint8_t request[MAXOCTETS],
+                             uint8_t *port_number) {
+  *port_number = request[13];
+  return request[14] == 0xFE;
+  ;
 }

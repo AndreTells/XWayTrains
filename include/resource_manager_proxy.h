@@ -36,7 +36,8 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager);
  * @param[in] clientId ID of the client requesting the resource
  * @return 0 on success, non-zero error code on failure
  */
-int requestResource(ResourceManagerProxy_t * resManager, int ressourceId, int clientId);
+int requestResource(ResourceManagerProxy_t* resManager, int ressourceId,
+                    int clientId);
 
 /**
  * @brief Release a previously allocated resource
@@ -45,6 +46,7 @@ int requestResource(ResourceManagerProxy_t * resManager, int ressourceId, int cl
  * @param[in] clientId ID of the client releasing the resource
  * @return 0 on success, non-zero error code on failure
  */
-int releaseResource(ResourceManagerProxy_t * resManager, int ressourceId, int clientId);
+int releaseResource(ResourceManagerProxy_t* resManager, int ressourceId,
+                    int clientId);
 
-#endif // RESOURCE_MANAGER_PROXY_H_
+#endif  // RESOURCE_MANAGER_PROXY_H_

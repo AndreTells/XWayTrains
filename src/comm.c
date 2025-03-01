@@ -19,9 +19,6 @@ void init_package(xway_paquet_t *paquet, const xway_address_t local,
   paquet->addresses.emitter = local;
   paquet->addresses.reciever = automate;
 
-  paquet->extension.troncon = 31;  // enable T26
-  paquet->extension.aig = 0;
-
   paquet->requete.code = UNITE_WRITE_OBJECT;
   paquet->requete.categorie = UNITE_CATEGORY;
   paquet->requete.segment_objet = UNITE_SEGMENT_INTERNAL_DATA;

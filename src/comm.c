@@ -96,9 +96,7 @@ void print_data_hex(const uint8_t *data) {
       "19 20 21 22 23 24 25 26 27\n\n");
 }
 
-bool is_write_ack_successful(const uint8_t request[MAXOCTETS],
-                             uint8_t *port_number) {
-  *port_number = request[13];
+bool is_write_ack_successful(const uint8_t request[MAXOCTETS]) {
   const bool length_success = request[5] == 0x09;
   const bool status_success = request[14] == 0xFE;
   return length_success && status_success;

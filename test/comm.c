@@ -56,6 +56,32 @@ void test_write_req() {
   printf(GREEN " passed.\n" NOCOLOR);
 }
 
+void test_write_ack_validation() {
+  uint8_t reponse[MAXOCTETS];
+  reponse[0] = 0x00;
+  reponse[1] = 0x00;
+  reponse[2] = 0x00;
+  reponse[3] = 0x01;
+  reponse[4] = 0x00;
+  reponse[5] = 0x09;
+  reponse[6] = 0x00;
+  reponse[7] = 0xF1;
+  reponse[8] = 0x0E;
+  reponse[9] = 0x10;
+  reponse[10] = 0x28;
+  reponse[11] = 0x10;
+  reponse[12] = 0x19;
+  reponse[13] = 0x00;  // we sent a 00 beforehand
+  reponse[14] = 0xFE;  // success
+
+  const bool result = is_write_ack_successful(reponse);
+
+  printf("It validates the sample WRITE_OBJECTS_ACK: ");
+  fflush(stdout);
+  assert(result);
+  printf(GREEN " passed.\n" NOCOLOR);
+}
+
 void test_ack() {
   uint8_t requete[MAXOCTETS];
 
@@ -92,5 +118,6 @@ void test_ack() {
 
 int main() {
   test_write_req();
+  test_write_ack_validation();
   test_ack();
 }

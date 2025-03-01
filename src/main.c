@@ -61,14 +61,14 @@ int main(int argc, char *argv[]) {
   ssize_t nbbytes_expected = requete[5] + 6;
   uint8_t port_number;
 
-  // Start actual communication
+  // STEP 1 - Start actual communication
   nbbytes = send(sd1, requete, nbbytes_expected, 0);
   if (nbbytes < nbbytes_expected) {
     perror("send: error on initial connection");
     exit(EXIT_FAILURE);
   }
 
-  // wait for ACK
+  // STEP 2 - Wait for ACK
   nbbytes = recvfrom(sd1, reponse, MAXOCTETS, 0, (struct sockaddr *)&addr_serv,
                      &adr_len);
   if (nbbytes > 0) {
@@ -76,12 +76,12 @@ int main(int argc, char *argv[]) {
     print_data_hex(reponse);
   }
 
-  if (!is_write_ack_successful(reponse, &port_number)) {
+  if (!is_write_ack_successful(reponse)) {
     perror("Unsuccessful request");
     exit(EXIT_FAILURE);
   }
 
-  // wait for return that signals the train has passed
+  // STEP 3 - Wait for return that signals the train has passed
   nbbytes = recvfrom(sd1, reponse, MAXOCTETS, 0, (struct sockaddr *)&addr_serv,
                      &adr_len);
   if (nbbytes > 0) {
@@ -95,8 +95,11 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
   paquet.addresses.port_ack = port_number;
-  // Send the ACK signal
 
+  // STEP 4 - Send the ACK signal
+  build_ack(paquet, requete);
+
+  // cleanup
   close(sd1);
   return EXIT_SUCCESS;
 }

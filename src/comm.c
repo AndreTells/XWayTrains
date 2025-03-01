@@ -5,82 +5,82 @@
 #include <string.h>
 #include <sys/socket.h>
 
-void invert_byte_order(mot_t mot, uint8_t res[2]) {
+void invert_byte_order(word_t word, uint8_t res[2]) {
   // least significant bits
-  res[0] = mot & 0x00FF;
+  res[0] = word & 0x00FF;
   // more significant bits
-  res[1] = (mot >> 8) & 0xFF;
+  res[1] = (word >> 8) & 0xFF;
 }
 
-void init_package(xway_paquet_t *paquet, const xway_address_t local,
+void init_package(xway_package_t *package, const xway_address_t local,
                   const xway_address_t automate) {
-  paquet->npdu_type =
+  package->npdu_type =
       NPDU_DATA | SERVICE_LEVEL_STD | REFUS_ACCEPTED | EXTENSION_ON;
-  paquet->addresses.emitter = local;
-  paquet->addresses.reciever = automate;
+  package->addresses.emitter = local;
+  package->addresses.reciever = automate;
 
-  paquet->request.code = UNITE_WRITE_OBJECT;
-  paquet->request.category = UNITE_CATEGORY;
-  paquet->request.object_segment = UNITE_SEGMENT_INTERNAL_DATA;
-  paquet->request.object_type = UNITE_TYPE_MOT_INTERNE;
-  paquet->request.word_count = 0x03;
+  package->request.code = UNITE_WRITE_OBJECT;
+  package->request.category = UNITE_CATEGORY;
+  package->request.object_segment = UNITE_SEGMENT_INTERNAL_DATA;
+  package->request.object_type = UNITE_TYPE_MOT_INTERNE;
+  package->request.word_count = 0x03;
 
-  paquet->request.address_start = TRAIN1;
+  package->request.address_start = TRAIN1;
 
-  paquet->request.data.train_station_id = local.station_id;
-  paquet->request.data.section_id = UNCHANGED;
-  paquet->request.data.switch_id = 31;
+  package->request.data.train_station_id = local.station_id;
+  package->request.data.section_id = UNCHANGED;
+  package->request.data.switch_id = 31;
 }
 
-void build_request(xway_paquet_t paquet, uint8_t *requete) {
+void build_request(xway_package_t package, uint8_t *request) {
   // initialisation
-  memset(requete, 0, MAXOCTETS);
+  memset(request, 0, MAXOCTETS);
 
   // partie réseau
-  requete[7] = paquet.npdu_type;
-  requete[8] = paquet.addresses.emitter.station_id;
-  requete[9] = (paquet.addresses.emitter.network_id << 4) |
-               (paquet.addresses.emitter.porte_id & 0x0F);
-  requete[10] = paquet.addresses.reciever.station_id;
-  requete[11] = (paquet.addresses.reciever.network_id << 4) |
-                (paquet.addresses.reciever.porte_id & 0x0F);
+  request[7] = package.npdu_type;
+  request[8] = package.addresses.emitter.station_id;
+  request[9] = (package.addresses.emitter.network_id << 4) |
+               (package.addresses.emitter.porte_id & 0x0F);
+  request[10] = package.addresses.reciever.station_id;
+  request[11] = (package.addresses.reciever.network_id << 4) |
+                (package.addresses.reciever.porte_id & 0x0F);
 
-  requete[12] = CODE_SEND;
-  requete[13] = 0x00;
+  request[12] = CODE_SEND;
+  request[13] = 0x00;
 
   // requête UNITE
-  requete[14] = paquet.request.code;
-  requete[15] = paquet.request.category;
+  request[14] = package.request.code;
+  request[15] = package.request.category;
 
-  requete[16] = paquet.request.object_segment;
-  requete[17] = paquet.request.object_type;
+  request[16] = package.request.object_segment;
+  request[17] = package.request.object_type;
 
-  uint8_t adresse_premier_mot[2], nb_mots[2];
+  uint8_t address_start[2], nb_mots[2];
   uint8_t values[2];
 
-  invert_byte_order(paquet.request.address_start, adresse_premier_mot);
-  invert_byte_order(paquet.request.word_count, nb_mots);
+  invert_byte_order(package.request.address_start, address_start);
+  invert_byte_order(package.request.word_count, nb_mots);
 
-  requete[18] = adresse_premier_mot[0];
-  requete[19] = adresse_premier_mot[1];
-  requete[20] = nb_mots[0];
-  requete[21] = nb_mots[1];
+  request[18] = address_start[0];
+  request[19] = address_start[1];
+  request[20] = nb_mots[0];
+  request[21] = nb_mots[1];
 
-  invert_byte_order(paquet.request.data.train_station_id, values);
-  requete[22] = values[0];
-  requete[23] = values[1];
+  invert_byte_order(package.request.data.train_station_id, values);
+  request[22] = values[0];
+  request[23] = values[1];
 
-  invert_byte_order(paquet.request.data.section_id, values);
-  requete[24] = values[0];
-  requete[25] = values[1];
+  invert_byte_order(package.request.data.section_id, values);
+  request[24] = values[0];
+  request[25] = values[1];
 
-  invert_byte_order(paquet.request.data.switch_id, values);
-  requete[26] = values[0];
-  requete[27] = values[1];
+  invert_byte_order(package.request.data.switch_id, values);
+  request[26] = values[0];
+  request[27] = values[1];
 
   // header
-  requete[3] = 0x01;      // always like this
-  requete[5] = 0x15 + 1;  // hard-coded, length starting at this point
+  request[3] = 0x01;      // always like this
+  request[5] = 0x15 + 1;  // hard-coded, length starting at this point
 }
 
 void print_data_hex(uint8_t *data) {

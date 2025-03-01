@@ -23,7 +23,7 @@
 int main(int argc, char *argv[]) {
   // init request
   uint8_t requete[MAXOCTETS];
-  xway_paquet_t paquet;
+  xway_package_t paquet;
   xway_address_t local = {EMETTEUR_STATION_ID, EMETTEUR_RESEAU_ID,
                           EMETTEUR_PORT_ID};
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 
   init_package(&paquet, local, automate);
   build_request(paquet, requete);
-  printf("Requete : \n");
+  printf("Request : \n");
   print_data_hex(requete);
 
   // init sockets
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
   nbbytes = recvfrom(sd1, reponse, MAXOCTETS, 0, (struct sockaddr *)&addr_serv,
                      &adr_len);
   if (nbbytes > 0) {
-    printf("Reponse : \n");
+    printf("Response : \n");
     print_data_hex(reponse);
   }
 

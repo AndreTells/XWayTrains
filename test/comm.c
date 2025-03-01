@@ -10,7 +10,7 @@
 void test_write_req() {
   uint8_t requete[MAXOCTETS];
 
-  xway_paquet_t paquet;
+  xway_package_t paquet;
   xway_address_t local = {EMETTEUR_STATION_ID, EMETTEUR_RESEAU_ID,
                           EMETTEUR_PORT_ID};
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,

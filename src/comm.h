@@ -47,10 +47,10 @@
 
 #define UNCHANGED 0xFFFF
 
-typedef uint16_t mot_t;
+typedef uint16_t word_t;
 
 typedef struct {
-  mot_t station_id;
+  word_t station_id;
   uint8_t network_id;
   uint8_t porte_id;
 } xway_address_t;
@@ -61,9 +61,9 @@ typedef struct {
 } addresses_t;
 
 typedef struct {
-  mot_t train_station_id;
-  mot_t section_id;
-  mot_t switch_id;
+  word_t train_station_id;
+  word_t section_id;
+  word_t switch_id;
 } xway_data_t;
 
 typedef struct {
@@ -71,8 +71,8 @@ typedef struct {
   uint8_t category;
   uint8_t object_segment;
   uint8_t object_type;
-  mot_t address_start;
-  mot_t word_count;
+  word_t address_start;
+  word_t word_count;
   xway_data_t data;
 } xway_unite_req_t;
 
@@ -80,12 +80,12 @@ typedef struct {
   uint8_t npdu_type;
   addresses_t addresses;
   xway_unite_req_t request;
-} xway_paquet_t;
+} xway_package_t;
 
-void init_package(xway_paquet_t *paquet, const xway_address_t local,
+void init_package(xway_package_t *package, const xway_address_t local,
                   const xway_address_t automate);
 
-void build_request(xway_paquet_t paquet, uint8_t *requete);
-void print_data_hex(uint8_t *requete);
-void convert_mot(mot_t mot, uint8_t *res);
+void build_request(xway_package_t package, uint8_t *request);
+void print_data_hex(uint8_t *request);
+void convert_word(word_t word, uint8_t *res);
 #endif

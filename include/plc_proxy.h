@@ -19,18 +19,19 @@ typedef struct PlcProxy_t PlcProxy_t;
 
 /**
  * @brief Initialize a new PLC Proxy instance
+ * @param plcIpAddr IP Address of the plc
  * @return Pointer to the newly created PlcProxy_t instance
  * @note The caller is responsible for gracefully terminating the instance using
  *       `endPlcProxy()`.
  */
-PlcProxy_t* initPlcProxy(void);
+PlcProxy_t* initPlcProxy(char* plcIpAddr);
 
 /**
  * @brief Gracefully terminate a PLC Proxy instance
  * @param[in] plc Proxy instance handle to terminate
  * @return 0 on success, non-zero error code on failure
  */
-int endPlcProxy(PlcProxy_t* resManager);
+int endPlcProxy(PlcProxy_t* plc);
 
 /**
  * @brief Send a message to the PLC
@@ -42,10 +43,9 @@ int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg);
 
 /**
  * @brief Read a message from the PLC
- * @param[out] msg Pointer to the structure where the received message will be
- * stored
- * @return 0 on success, non-zero error code on failure
+ * @param[in] plc Proxy instance handle
+ * @return Pointer to the received message, or NULL on failure
  */
-int readMessagePlcProxy(PlcMessage_t* msg);
+int readMessagePlcProxy(PlcProxy_t* plc);
 
 #endif  // PLC_PROXY_H_

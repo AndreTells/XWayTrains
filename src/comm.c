@@ -104,7 +104,9 @@ bool is_write_ack_successful(const uint8_t request[MAXOCTETS],
   return length_success && status_success;
 }
 
-bool is_read_successful(const uint8_t response[MAXOCTETS], const uint8_t request_bytes[MAXOCTETS], uint8_t * port_number, const  xway_package_t request){
+bool is_read_successful(const uint8_t response[MAXOCTETS],
+                        const uint8_t request_bytes[MAXOCTETS],
+                        uint8_t *port_number, const xway_package_t request) {
   // TODO: emit an error message for each verification ?
   uint8_t values[2];
   *port_number = response[13];
@@ -112,7 +114,7 @@ bool is_read_successful(const uint8_t response[MAXOCTETS], const uint8_t request
   const bool length_success = response[5] == 0x12;
 
   bool section_success;
-  if(request.request.data.section_id != UNCHANGED){
+  if (request.request.data.section_id != UNCHANGED) {
     invert_byte_order(request.request.data.section_id, values);
     section_success = response[20] == values[0] && response[21] == values[1];
   } else {
@@ -120,7 +122,7 @@ bool is_read_successful(const uint8_t response[MAXOCTETS], const uint8_t request
   }
 
   bool switch_success;
-  if(request.request.data.switch_id != UNCHANGED){
+  if (request.request.data.switch_id != UNCHANGED) {
     invert_byte_order(request.request.data.switch_id, values);
     switch_success = response[23] == values[0] && response[23] == values[1];
   } else {
@@ -128,9 +130,34 @@ bool is_read_successful(const uint8_t response[MAXOCTETS], const uint8_t request
     switch_success = true;
   }
 
-  bool reciever_success = response[8] == request_bytes[10] && response[9] == request_bytes[11];
-  bool emitter_success = response[10] == request_bytes[8] && response[11] == request_bytes[9];
+  bool reciever_success =
+      response[8] == request_bytes[10] && response[9] == request_bytes[11];
+  bool emitter_success =
+      response[10] == request_bytes[8] && response[11] == request_bytes[9];
 
-  return length_success && section_success && switch_success && reciever_success && emitter_success;
+  return length_success && section_success && switch_success &&
+         reciever_success && emitter_success;
 }
 
+void build_ack(const xway_package_t package, uint8_t request[MAXOCTETS]) {
+  // initialisation
+  memset(request, 0, MAXOCTETS);
+
+  // partie réseau
+  request[7] = package.npdu_type;
+  request[8] = package.addresses.emitter.station_id;
+  request[9] = (package.addresses.emitter.network_id << 4) |
+               (package.addresses.emitter.porte_id & 0x0F);
+  request[10] = package.addresses.reciever.station_id;
+  request[11] = (package.addresses.reciever.network_id << 4) |
+                (package.addresses.reciever.porte_id & 0x0F);
+
+  request[12] = CODE_RECEIVE;
+  request[13] = package.addresses.port_ack;
+
+  // STATUS
+  request[14] = 0xFE;
+  // header
+  request[3] = 0x01;  // always like this
+  request[5] = 0x09;  // hard-coded, length starting at this point
+}

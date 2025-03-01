@@ -58,6 +58,7 @@ typedef struct {
 typedef struct {
   xway_address_t emitter;
   xway_address_t reciever;
+  uint8_t port_ack;
 } addresses_t;
 
 typedef struct {
@@ -93,4 +94,6 @@ void convert_word(const word_t word, uint8_t *res);
 bool is_write_ack_successful(const uint8_t request[MAXOCTETS], uint8_t * port_number);
 
 bool is_read_successful(const uint8_t response[MAXOCTETS], const uint8_t request_bytes[MAXOCTETS], uint8_t * port_number, const  xway_package_t request);
+
+void build_ack(const xway_package_t package, uint8_t request[MAXOCTETS]);
 #endif

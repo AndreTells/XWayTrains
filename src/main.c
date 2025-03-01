@@ -90,11 +90,11 @@ int main(int argc, char *argv[]) {
   }
 
   // make sure it is correct
-  if(!is_read_successful(reponse, requete, &port_number, paquet)) {
+  if (!is_read_successful(reponse, requete, &port_number, paquet)) {
     perror("Unsucceful response");
     exit(EXIT_FAILURE);
   }
-
+  paquet.addresses.port_ack = port_number;
   // Send the ACK signal
 
   close(sd1);

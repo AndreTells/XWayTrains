@@ -26,10 +26,10 @@ CFLAGS += -lm
 # --------------------------------------------------------------------- #
 LDFLAGS = -lrt
 
-all: format_code static_analyser build/main build/comm_test
+all: format_code static_analyser build/main build/test/comm
 
 format_code:
-	clang-format --verbose -i --style=file src/*
+	clang-format --verbose -i --style=file src/* test/*
 	# clang-format --verbose -i --style=file include/*
 
 static_analyser:
@@ -39,8 +39,8 @@ build/main: src/main.c src/comm.c
 	mkdir -p build
 	$(CC) $(CFLAGS) $^ -o $@
 
-build/comm_test: test/comm.c src/comm.c
-	mkdir -p build
+build/test/comm: test/comm.c src/comm.c
+	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
 	@printf "\n\nUnit testing...\n\n"
 	$@

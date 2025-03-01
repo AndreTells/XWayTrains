@@ -5,7 +5,7 @@
 #include <string.h>
 #include <sys/socket.h>
 
-void convert_mot(mot_t mot, uint8_t res[2]) {
+void invert_byte_order(mot_t mot, uint8_t res[2]) {
   // least significant bits
   res[0] = mot & 0x00FF;
   // more significant bits
@@ -14,21 +14,22 @@ void convert_mot(mot_t mot, uint8_t res[2]) {
 
 void init_package(xway_paquet_t *paquet, const xway_address_t local,
                   const xway_address_t automate) {
-  paquet->type_npdu =
+  paquet->npdu_type =
       NPDU_DATA | SERVICE_LEVEL_STD | REFUS_ACCEPTED | EXTENSION_ON;
   paquet->addresses.emitter = local;
   paquet->addresses.reciever = automate;
 
-  paquet->requete.code = UNITE_WRITE_OBJECT;
-  paquet->requete.categorie = UNITE_CATEGORY;
-  paquet->requete.segment_objet = UNITE_SEGMENT_INTERNAL_DATA;
-  paquet->requete.type_objet = UNITE_TYPE_MOT_INTERNE;
-  paquet->requete.adresse_premier_mot = TRAIN1;
-  paquet->requete.nb_mots = 0x03;
+  paquet->request.code = UNITE_WRITE_OBJECT;
+  paquet->request.category = UNITE_CATEGORY;
+  paquet->request.object_segment = UNITE_SEGMENT_INTERNAL_DATA;
+  paquet->request.object_type = UNITE_TYPE_MOT_INTERNE;
+  paquet->request.word_count = 0x03;
 
-  paquet->requete.valeurs.trainStationId = local.station_id;
-  paquet->requete.valeurs.troncon = UNCHANGED;
-  paquet->requete.valeurs.aig = 31;
+  paquet->request.address_start = TRAIN1;
+
+  paquet->request.data.train_station_id = local.station_id;
+  paquet->request.data.section_id = UNCHANGED;
+  paquet->request.data.switch_id = 31;
 }
 
 void build_request(xway_paquet_t paquet, uint8_t *requete) {
@@ -36,44 +37,44 @@ void build_request(xway_paquet_t paquet, uint8_t *requete) {
   memset(requete, 0, MAXOCTETS);
 
   // partie réseau
-  requete[7] = paquet.type_npdu;
+  requete[7] = paquet.npdu_type;
   requete[8] = paquet.addresses.emitter.station_id;
-  requete[9] = (paquet.addresses.emitter.reseau_id << 4) |
+  requete[9] = (paquet.addresses.emitter.network_id << 4) |
                (paquet.addresses.emitter.porte_id & 0x0F);
   requete[10] = paquet.addresses.reciever.station_id;
-  requete[11] = (paquet.addresses.reciever.reseau_id << 4) |
+  requete[11] = (paquet.addresses.reciever.network_id << 4) |
                 (paquet.addresses.reciever.porte_id & 0x0F);
 
   requete[12] = CODE_SEND;
   requete[13] = 0x00;
 
   // requête UNITE
-  requete[14] = paquet.requete.code;
-  requete[15] = paquet.requete.categorie;
+  requete[14] = paquet.request.code;
+  requete[15] = paquet.request.category;
 
-  requete[16] = paquet.requete.segment_objet;
-  requete[17] = paquet.requete.type_objet;
+  requete[16] = paquet.request.object_segment;
+  requete[17] = paquet.request.object_type;
 
   uint8_t adresse_premier_mot[2], nb_mots[2];
   uint8_t values[2];
 
-  convert_mot(paquet.requete.adresse_premier_mot, adresse_premier_mot);
-  convert_mot(paquet.requete.nb_mots, nb_mots);
+  invert_byte_order(paquet.request.address_start, adresse_premier_mot);
+  invert_byte_order(paquet.request.word_count, nb_mots);
 
   requete[18] = adresse_premier_mot[0];
   requete[19] = adresse_premier_mot[1];
   requete[20] = nb_mots[0];
   requete[21] = nb_mots[1];
 
-  convert_mot(paquet.requete.valeurs.trainStationId, values);
+  invert_byte_order(paquet.request.data.train_station_id, values);
   requete[22] = values[0];
   requete[23] = values[1];
 
-  convert_mot(paquet.requete.valeurs.troncon, values);
+  invert_byte_order(paquet.request.data.section_id, values);
   requete[24] = values[0];
   requete[25] = values[1];
 
-  convert_mot(paquet.requete.valeurs.aig, values);
+  invert_byte_order(paquet.request.data.switch_id, values);
   requete[26] = values[0];
   requete[27] = values[1];
 

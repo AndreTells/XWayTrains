@@ -22,34 +22,6 @@
     perror(msg);                     \
     exit(EXIT_FAILURE);              \
   }
-typedef uint16_t mot_t;
-
-typedef struct {
-  mot_t station_id;
-  uint8_t reseau_id;
-  uint8_t porte_id;
-} xway_address_t;
-
-typedef struct {
-  xway_address_t emitter;
-  xway_address_t reciever;
-} addresses_t;
-
-typedef struct {
-  mot_t trainStationId;
-  mot_t troncon;
-  mot_t aig;
-} xway_data_t;
-
-typedef struct {
-  uint8_t code;
-  uint8_t categorie;
-  uint8_t segment_objet;
-  uint8_t type_objet;
-  mot_t adresse_premier_mot;
-  mot_t nb_mots;
-  xway_data_t valeurs;
-} xway_requete_unite_t;
 
 #define NPDU_DATA 0xF0
 #define SERVICE_LEVEL_STD 0x00
@@ -75,10 +47,39 @@ typedef struct {
 
 #define UNCHANGED 0xFFFF
 
+typedef uint16_t mot_t;
+
 typedef struct {
-  uint8_t type_npdu;
+  mot_t station_id;
+  uint8_t network_id;
+  uint8_t porte_id;
+} xway_address_t;
+
+typedef struct {
+  xway_address_t emitter;
+  xway_address_t reciever;
+} addresses_t;
+
+typedef struct {
+  mot_t train_station_id;
+  mot_t section_id;
+  mot_t switch_id;
+} xway_data_t;
+
+typedef struct {
+  uint8_t code;
+  uint8_t category;
+  uint8_t object_segment;
+  uint8_t object_type;
+  mot_t address_start;
+  mot_t word_count;
+  xway_data_t data;
+} xway_unite_req_t;
+
+typedef struct {
+  uint8_t npdu_type;
   addresses_t addresses;
-  xway_requete_unite_t requete;
+  xway_unite_req_t request;
 } xway_paquet_t;
 
 void init_package(xway_paquet_t *paquet, const xway_address_t local,

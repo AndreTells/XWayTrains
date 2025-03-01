@@ -1,12 +1,11 @@
+#include "../src/comm.h"
+
 #include <arpa/inet.h>
+#include <assert.h>
 #include <netinet/in.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <assert.h>
-
-#include "../src/comm.h"
 
 void test_write_req() {
   uint8_t requete[MAXOCTETS];
@@ -20,7 +19,8 @@ void test_write_req() {
   init_package(&paquet, local, automate);
   build_request(paquet, requete);
 
-  printf("\nTest the WRITE_OBJECTS is identical: "); fflush(stdout);
+  printf("\nTest the WRITE_OBJECTS is identical: ");
+  fflush(stdout);
   assert(requete[0] == 0x00);
   assert(requete[1] == 0x00);
   assert(requete[2] == 0x00);
@@ -53,6 +53,4 @@ void test_write_req() {
   printf(" passed.\n");
 }
 
-int main() {
-  test_write_req();
-}
+int main() { test_write_req(); }

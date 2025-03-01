@@ -33,7 +33,7 @@ void init_write_package(xway_package_t *package, const xway_address_t local,
   package->request.data.switch_id = switch_id;
 }
 
-void build_write_request(xway_package_t package, uint8_t *request) {
+void build_write_request(const xway_package_t package, uint8_t *request) {
   // initialisation
   memset(request, 0, MAXOCTETS);
 
@@ -99,6 +99,38 @@ void print_data_hex(const uint8_t *data) {
 bool is_write_ack_successful(const uint8_t request[MAXOCTETS],
                              uint8_t *port_number) {
   *port_number = request[13];
-  return request[14] == 0xFE;
-  ;
+  const bool length_success = request[5] == 0x09;
+  const bool status_success = request[14] == 0xFE;
+  return length_success && status_success;
 }
+
+bool is_read_successful(const uint8_t response[MAXOCTETS], const uint8_t request_bytes[MAXOCTETS], uint8_t * port_number, const  xway_package_t request){
+  // TODO: emit an error message for each verification ?
+  uint8_t values[2];
+  *port_number = response[13];
+
+  const bool length_success = response[5] == 0x12;
+
+  bool section_success;
+  if(request.request.data.section_id != UNCHANGED){
+    invert_byte_order(request.request.data.section_id, values);
+    section_success = response[20] == values[0] && response[21] == values[1];
+  } else {
+    section_success = true;
+  }
+
+  bool switch_success;
+  if(request.request.data.switch_id != UNCHANGED){
+    invert_byte_order(request.request.data.switch_id, values);
+    switch_success = response[23] == values[0] && response[23] == values[1];
+  } else {
+    // 0x0100 should be the answer
+    switch_success = true;
+  }
+
+  bool reciever_success = response[8] == request_bytes[10] && response[9] == request_bytes[11];
+  bool emitter_success = response[10] == request_bytes[8] && response[11] == request_bytes[9];
+
+  return length_success && section_success && switch_success && reciever_success && emitter_success;
+}
+

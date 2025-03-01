@@ -81,10 +81,21 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  // wait for return
+  // wait for return that signals the train has passed
+  nbbytes = recvfrom(sd1, reponse, MAXOCTETS, 0, (struct sockaddr *)&addr_serv,
+                     &adr_len);
+  if (nbbytes > 0) {
+    printf("Response : \n");
+    print_data_hex(reponse);
+  }
 
-  paquet.addresses.reciever = local;
-  paquet.addresses.emitter = automate;
+  // make sure it is correct
+  if(!is_read_successful(reponse, requete, &port_number, paquet)) {
+    perror("Unsucceful response");
+    exit(EXIT_FAILURE);
+  }
+
+  // Send the ACK signal
 
   close(sd1);
   return EXIT_SUCCESS;

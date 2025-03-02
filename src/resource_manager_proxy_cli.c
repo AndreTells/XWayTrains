@@ -1,7 +1,9 @@
 #include "resource_manager_proxy.h"
 
+#include <signal.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -29,6 +31,8 @@ struct ResourceManagerProxy_t {
  */
 void* resManagerMsgReceiverThread(void* resourceManagerProxy);
 
+int tryRegisterClient(ResourceManagerProxy_t* resManager, int clientId);
+
 /**
  * @brief Initialize a new Resource Manager Proxy instance
  * @param[in] resManagerIpAddr IP address of the resource Manager
@@ -44,8 +48,6 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr) {
 
   ResourceManagerProxy_t* resManager =
       (ResourceManagerProxy_t*)malloc(sizeof(ResourceManagerProxy_t));
-
-  // TODO(andre): connect to remote ressource manager
 
   // check if malloc failed
   if (resManager == NULL) {
@@ -92,6 +94,7 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
 
   resManager->finished = true;
   int retVal = 0;
+  pthread_kill(resManager->readerThreadTid, SIGINT);
   (void)pthread_join(resManager->readerThreadTid, (void*)&retVal);
   // check if the join failed
   if (retVal != 0) {
@@ -102,11 +105,11 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
 
   // closing all open pipes
   for (int i = 0; i < MAX_NUM_REGISTRABLE_TRAINS; i++) {
-    if (plcProxy->outputFd[i][0] == -1) {
+    if (resManager->outputFd[i][0] == -1) {
       continue;
     }
-    close(plcProxy->outputFd[i][0]);
-    close(plcProxy->outputFd[i][1]);
+    close(resManager->outputFd[i][0]);
+    close(resManager->outputFd[i][1]);
   }
 
   // TODO(andre): end tcp connection (?)
@@ -124,12 +127,24 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
  */
 int requestResource(ResourceManagerProxy_t* resManager, int ressourceId,
                     int clientId) {
+
+  if(tryRegisterClient(resManager, clientId) != 0){
+    return -1;
+  }
+
   sem_wait(&(resManager->mutex));
 
-  // TODO(andre): send message ressource manager
-  sleep(10);
+  printf("%d requested: %d\n",clientId, ressourceId);
 
   sem_post(&(resManager->mutex));
+
+  int res = 0;
+  ssize_t res_size = read(resManager->outputFd[clientId][0], &res, sizeof(int));
+  if(res_size == 0){
+    return -1;
+  }
+  printf("%d received %d with size %d from %d \n",clientId, res, res_size, resManager->outputFd[clientId][0]);
+
   return 0;
 }
 
@@ -161,13 +176,40 @@ int releaseResource(ResourceManagerProxy_t* resManager, int ressourceId,
  * @return Thread exit status (always NULL)
  */
 void* resManagerMsgReceiverThread(void* resourceManagerProxy) {
+
   ResourceManagerProxy_t* resManager =
       (ResourceManagerProxy_t*)resourceManagerProxy;
+
+
+  printf("reader thread initialized\n");
   while (!resManager->finished) {
-    // TODO(andre): do the following
-    // read from socket
-    // check the target is registered
-    // copy message to correct output file descriptor
+    printf("attempting to get a line: \n");
+    int target;
+    int resp;
+    (void)scanf("%d,%d",&target, &resp);
+    (void)printf("reader read: %d %d\n", target, resp);
+
+    if(tryRegisterClient(resManager, target) != 0){
+      // TODO(andre): treat silent error ??
+      continue;
+    }
+    printf("outputing to %d\n",resManager->outputFd[target][1]);
+    (void)write(resManager->outputFd[target][1], &resp, sizeof(int));
   }
+
   pthread_exit(NULL);
+}
+
+int tryRegisterClient(ResourceManagerProxy_t* resManager, int clientId){
+  // index out of range
+  if(clientId < 0 || clientId > MAX_NUM_REGISTRABLE_TRAINS - 1){
+    return -1;
+  }
+  if(resManager->outputFd[clientId][0] != -1){
+    return 0;
+  }
+
+  int status = pipe(resManager->outputFd[clientId]);
+
+  return status;
 }

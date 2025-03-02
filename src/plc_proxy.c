@@ -1,7 +1,12 @@
 #include "plc_proxy.h"
 
+#include <pthread.h>
+#include <semaphore.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <unistd.h>
+
+#define MAX_NUM_REGISTRABLE_TRAINS 4
 
 /**
  * @brief Structure representing a PLC Proxy instance
@@ -10,7 +15,7 @@
  */
 struct PlcProxy_t {
   pthread_t readerThreadTid;
-  semaphore_t mutex;
+  sem_t mutex;
   int outputFd[MAX_NUM_REGISTRABLE_TRAINS][2];
   bool finished;
   int sock_fd;
@@ -56,7 +61,8 @@ PlcProxy_t* initPlcProxy(char* plcIpAddr) {
   }
 
   // create reader thread
-  int resPthreadCreate = pthread_create(&(plcProxy->readerThreadTid), NULL,
+  int resPthreadCreate =
+      pthread_create(&(plcProxy->readerThreadTid), NULL,
                      plcProxyMsgReceiverThread, (void*)plcProxy);
 
   // check if pthread_create
@@ -81,7 +87,7 @@ int endPlcProxy(PlcProxy_t* plc) {
   plc->finished = true;
 
   int retVal = 0;
-  (void)pthread_join(plc->readerThreadTid, &retVal);
+  (void)pthread_join(plc->readerThreadTid, (void*)&retVal);
   // check if the join failed
   if (retVal != 0) {
     return -1;
@@ -113,7 +119,7 @@ int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
   // TODO(felipe): send message plc
   sleep(10);
 
-  sem_pos(&(plc->mutex));
+  sem_post(&(plc->mutex));
   return 0;
 }
 
@@ -136,7 +142,7 @@ PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc) {
 void* plcProxyMsgReceiverThread(void* plcProxy) {
   PlcProxy_t* plcProxy = (PlcProxy_t*)plcProxy;
   while (!plcProxy->finished) {
-    PlcMessage_t* msg = readMessagePlcProxy()
+    PlcMessage_t* msg = readMessagePlcProxy();
     // TODO(andre):check the target is registered
     // copy message to correct output file descriptor
   }

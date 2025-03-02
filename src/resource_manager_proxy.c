@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define MAX_NUM_REGISTRABLE_TRAINS 4;
+#define MAX_NUM_REGISTRABLE_TRAINS 4
 
 /**
  * @brief Structure representing a Resource Manager Proxy instance
@@ -15,7 +15,7 @@
  */
 struct ResourceManagerProxy_t {
   pthread_t readerThreadTid;
-  semaphore_t mutex;
+  sem_t mutex;
   int outputFd[MAX_NUM_REGISTRABLE_TRAINS][2];
   bool finished;
   int sock_fd;
@@ -68,7 +68,8 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr) {
   }
 
   // create reader thread
-  int resPthreadCreate = pthread_create(&(resManager->readerThreadTid), NULL,
+  int resPthreadCreate =
+      pthread_create(&(resManager->readerThreadTid), NULL,
                      resManagerMsgReceiverThread, (void*)resManager);
   // check if pthread_create
   if (resPthreadCreate != 0) {
@@ -91,7 +92,7 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
 
   resManager->finished = true;
   int retVal = 0;
-  (void)pthread_join(resManager->readerThreadTid, &retVal);
+  (void)pthread_join(resManager->readerThreadTid, (void*)&retVal);
   // check if the join failed
   if (retVal != 0) {
     return -1;
@@ -128,7 +129,7 @@ int requestResource(ResourceManagerProxy_t* resManager, int ressourceId,
   // TODO(andre): send message ressource manager
   sleep(10);
 
-  sem_pos(&(resManager->mutex));
+  sem_post(&(resManager->mutex));
   return 0;
 }
 

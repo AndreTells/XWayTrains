@@ -1,0 +1,53 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-c",
+      "-Wall",
+      "-std=gnu23",
+      "-Wextra",
+      "-pedantic",
+      "-I./include/",
+      "-o",
+      "build/main",
+      "src/main.c"
+    ],
+    "directory": "/mnt/sda1/felipe/UFSC/france3/parcours/tronc_comun/XWayTrains",
+    "file": "/mnt/sda1/felipe/UFSC/france3/parcours/tronc_comun/XWayTrains/src/main.c",
+    "output": "/mnt/sda1/felipe/UFSC/france3/parcours/tronc_comun/XWayTrains/build/main"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-c",
+      "-Wall",
+      "-std=gnu23",
+      "-Wextra",
+      "-pedantic",
+      "-I./include/",
+      "-o",
+      "build/main",
+      "src/comm.c"
+    ],
+    "directory": "/mnt/sda1/felipe/UFSC/france3/parcours/tronc_comun/XWayTrains",
+    "file": "/mnt/sda1/felipe/UFSC/france3/parcours/tronc_comun/XWayTrains/src/comm.c",
+    "output": "/mnt/sda1/felipe/UFSC/france3/parcours/tronc_comun/XWayTrains/build/main"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-c",
+      "-Wall",
+      "-std=gnu23",
+      "-Wextra",
+      "-pedantic",
+      "-I./include/",
+      "-o",
+      "build/test/comm",
+      "test/comm.c"
+    ],
+    "directory": "/mnt/sda1/felipe/UFSC/france3/parcours/tronc_comun/XWayTrains",
+    "file": "/mnt/sda1/felipe/UFSC/france3/parcours/tronc_comun/XWayTrains/test/comm.c",
+    "output": "/mnt/sda1/felipe/UFSC/france3/parcours/tronc_comun/XWayTrains/build/test/comm"
+  }
+]

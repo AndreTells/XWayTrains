@@ -60,7 +60,8 @@ Train_t* initTrain(enum TrainId_e trainId, PlcProxy_t* plc,
   train->routeFilePath = routeFilePath;
 
   // creating train thread
-  pthread_create(&(train->trainTid), NULL, trainThread, (void*)train);
+  pthread_create(&(train->trainTid), NULL, (void* (*)(void*))trainThread,
+                 (void*)train);
 
   return train;
 }
@@ -73,7 +74,7 @@ Train_t* initTrain(enum TrainId_e trainId, PlcProxy_t* plc,
 int endTrain(Train_t* train) {
   train->finished = true;
   int retVal = 0;
-  (void)pthread_join(train->trainTid, &retVal);
+  (void)pthread_join(train->trainTid, (void*)&retVal);
   // check if the join failed
   if (retVal != 0) {
     return -1;
@@ -87,7 +88,7 @@ int endTrain(Train_t* train) {
  * @param[in] train Pointer to the Train_t instance
  * @return Thread exit status (always NULL)
  */
-void* trainThread(void* train) {
+void* trainThread(Train_t* train) {
   // open route file
   while (!train->finished) {
     // TODO(andre): do the following

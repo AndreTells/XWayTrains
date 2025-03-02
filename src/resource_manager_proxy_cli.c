@@ -197,7 +197,7 @@ void* resManagerMsgReceiverThread(void* resourceManagerProxy) {
 
   printf("reader thread initialized\n");
   while (!resManager->finished) {
-    printf("attempting to get a line: \n");
+    printf("res manager attempting to get a line: \n");
     int target;
     int resp;
     (void)scanf("%d,%d",&target, &resp);
@@ -209,6 +209,7 @@ void* resManagerMsgReceiverThread(void* resourceManagerProxy) {
     }
     printf("outputing to %d\n",resManager->outputFd[target][1]);
     (void)write(resManager->outputFd[target][1], &resp, sizeof(int));
+    sleep(5);
   }
 
   pthread_exit(NULL);

@@ -31,6 +31,12 @@ struct ResourceManagerProxy_t {
  */
 void* resManagerMsgReceiverThread(void* resourceManagerProxy);
 
+/**
+ * @brief Attempt to register a client with the resource manager
+ * @param[in] resManager Proxy instance handle
+ * @param[in] clientId ID of the client to register
+ * @return 0 on success, non-zero error code on failure
+ */
 int tryRegisterClient(ResourceManagerProxy_t* resManager, int clientId);
 
 /**
@@ -157,15 +163,23 @@ int requestResource(ResourceManagerProxy_t* resManager, int ressourceId,
  */
 int releaseResource(ResourceManagerProxy_t* resManager, int ressourceId,
                     int clientId) {
+  if(tryRegisterClient(resManager, clientId) != 0){
+    return -1;
+  }
+
   sem_wait(&(resManager->mutex));
 
-  // TODO(andre): do the following
-  // build message
-  // TODO(andre): send message ressource manager
-  // read from file descriptor
-  sleep(10);
+  printf("%d tried to release: %d\n",clientId, ressourceId);
 
   sem_post(&(resManager->mutex));
+
+  int res = 0;
+  ssize_t res_size = read(resManager->outputFd[clientId][0], &res, sizeof(int));
+  if(res_size == 0){
+    return -1;
+  }
+  printf("%d received %d with size %d from %d \n",clientId, res, res_size, resManager->outputFd[clientId][0]);
+
   return 0;
 }
 
@@ -200,6 +214,12 @@ void* resManagerMsgReceiverThread(void* resourceManagerProxy) {
   pthread_exit(NULL);
 }
 
+/**
+ * @brief Attempt to register a client with the resource manager
+ * @param[in] resManager Proxy instance handle
+ * @param[in] clientId ID of the client to register
+ * @return 0 on success, non-zero error code on failure
+ */
 int tryRegisterClient(ResourceManagerProxy_t* resManager, int clientId){
   // index out of range
   if(clientId < 0 || clientId > MAX_NUM_REGISTRABLE_TRAINS - 1){

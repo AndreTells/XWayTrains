@@ -1,11 +1,11 @@
 #include <stdio.h>
 
 #include "model_info.h"
-#include "train.h"
 #include "plc_proxy.h"
 #include "resource_manager_proxy.h"
+#include "train.h"
 
-int main(void){
+int main(void) {
   ResourceManagerProxy_t* resMan = initResourceManagerProxy(" ");
   if (resMan == NULL) {
     printf("failed to create resource manager\n");
@@ -17,8 +17,7 @@ int main(void){
     printf("failed to create plc proxy\n");
     return -1;
   }
-  Train_t* train = initTrain(TRAIN_1,plc,resMan, " ");
-
+  Train_t* train = initTrain(TRAIN_1, plc, resMan, " ");
 
   (void)endResourceManagerProxy(resMan);
   (void)endPlcProxy(plc);

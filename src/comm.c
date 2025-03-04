@@ -115,14 +115,8 @@ bool is_read_successful(const uint8_t response[MAXOCTETS],
 
   const bool length_success = response[5] == 0x12;
 
-  bool section_success;
-  if (request.request.data.section_id != UNCHANGED) {
-    invert_byte_order(request.request.data.section_id, values);
-    section_success = response[20] == values[0] && response[21] == values[1];
-  } else {
-    section_success = true;
-  }
-
+  // reponse[18, 19] have an obscure meaning
+  // reponse[20, 21] = 0x0100
   *switch_id = ((uint16_t)response[23] << 8) + response[22];
 
   const bool reciever_success =
@@ -130,11 +124,10 @@ bool is_read_successful(const uint8_t response[MAXOCTETS],
   const bool emitter_success =
       response[10] == request_bytes[8] && response[11] == request_bytes[9];
 
-  const bool success =
-      length_success && section_success && reciever_success && emitter_success;
+  const bool success = length_success && reciever_success && emitter_success;
   if (!success)
-    printf("Conditions: %d, %d, %d, %d\n", length_success, section_success,
-           reciever_success, emitter_success);
+    printf("Conditions: %d, %d, %d, %d\n", length_success, reciever_success,
+           emitter_success);
   return success;
 }
 

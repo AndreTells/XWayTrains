@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include "model_info.h"
+#include "plc_info.h"
 #include "plc_proxy.h"
 #include "resource_manager_proxy.h"
 
@@ -24,10 +25,10 @@ struct Train_t {
 
 /**
  * @brief Entry point for the train thread
- * @param[in] train Pointer to the Train_t instance
+ * @param[in] data Pointer to the Train_t instance
  * @return Thread exit status (always NULL)
  */
-void* trainThread(void* train);
+void* trainThread(void* data);
 
 /**
  * @brief Initialize a new Train instance
@@ -60,7 +61,7 @@ Train_t* initTrain(enum TrainId_e trainId, PlcProxy_t* plc,
   train->routeFilePath = routeFilePath;
 
   // creating train thread
-  pthread_create(&(train->trainTid), NULL, (void* (*)(void*))trainThread,
+  pthread_create(&(train->trainTid), NULL, trainThread,
                  (void*)train);
 
   return train;
@@ -88,15 +89,19 @@ int endTrain(Train_t* train) {
  * @param[in] train Pointer to the Train_t instance
  * @return Thread exit status (always NULL)
  */
-void* trainThread(Train_t* train) {
+void* trainThread(void* data) {
+  Train_t* train = (Train_t*) data;
   // open route file
   while (!train->finished) {
-    // TODO(andre): do the following
-    // get a line from route file
-    // send it to interpreter
-    // check if file is done
-    // if yes, set train->finished = true;
-    sleep(10);
+    // read next line of route file
+    // interpret line
+    // interpret message
+    // generate appropriate message
+    PlcMessage_t* cmd_msg = getNullMessage();
+    sendMessagePlcProxy(train->plc,cmd_msg);
+    PlcMessage_t* resp_msg = readMessagePlcProxy(train->plc,train->trainId );
+    //check if there was an error
+    sleep(5);
   }
 
   pthread_exit(NULL);

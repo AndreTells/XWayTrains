@@ -47,6 +47,10 @@ build/unit_test_plc_proxy_cli: src/unit_test_plc_proxy.c src/plc_proxy_cli.c src
 	mkdir -p build
 	$(CC) -g $(CFLAGS) $^ -o $@
 
+build/unit_test_train: src/unit_test_train.c src/plc_proxy_cli.c src/plc_info_test.c src/resource_manager_proxy_cli.c src/train.c
+	mkdir -p build
+	$(CC) -g $(CFLAGS) $^ -o $@
+
 build/test/comm: test/comm.c src/comm.c
 	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@

@@ -1,12 +1,17 @@
 #include <stdio.h>
+
+#include "plc_info.h"
 #include "plc_proxy.h"
 
-int main(void){
+int main(void) {
   PlcProxy_t* plc = initPlcProxy(" ");
-  if(plc == NULL){
-    printf("failed to create resource manager\n");
+  if (plc == NULL) {
+    printf("failed to create plc proxy\n");
     return -1;
   }
+
+  sendMessagePlcProxy(plc, getNullMessage());
+  (void)readMessagePlcProxy(plc, 0);
 
   (void)endPlcProxy(plc);
   return 0;

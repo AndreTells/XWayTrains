@@ -30,7 +30,7 @@ int send_command(const int port, const in_addr_t addr) {
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
                              DESTINATAIRE_PORT_ID};
 
-  init_write_package(&paquet, local, automate, TRAIN1, 0, UNCHANGED);
+  init_write_package(&paquet, local, automate, TRAIN1, 12, UNCHANGED);
   build_write_request(paquet, requete);
 
   printf("Request : \n");

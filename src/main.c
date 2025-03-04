@@ -20,7 +20,8 @@
     exit(1);                      \
   }
 
-int send_command(const int port, const in_addr_t addr) {
+int send_command(const int port, const in_addr_t addr, const word_t train,
+                 const word_t section_id, const word_t switch_id) {
   // init request
   uint8_t requete[MAXOCTETS];
 
@@ -30,7 +31,7 @@ int send_command(const int port, const in_addr_t addr) {
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
                              DESTINATAIRE_PORT_ID};
 
-  init_write_package(&paquet, local, automate, TRAIN1, 12, UNCHANGED);
+  init_write_package(&paquet, local, automate, train, section_id, switch_id);
   build_write_request(paquet, requete);
 
   printf("Request : \n");
@@ -126,6 +127,6 @@ int main(int argc, char *argv[]) {
     addr = inet_addr(REMOTEIP);
   }
 
-  send_command(port, addr);
+  send_command(port, addr, TRAIN1, 29, UNCHANGED);
   return EXIT_SUCCESS;
 }

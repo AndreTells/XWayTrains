@@ -1,4 +1,4 @@
-#include "ressource_database.h"
+#include "resource_database.h"
 
 #include <err.h>
 #include <stdio.h>
@@ -31,6 +31,8 @@ int attemptLockRessource(RessourceDataBase_t *database, int ressourceId) {
     sem_init(database->availability[ressourceId], 0, 1);
   }
 
+  // TODO: not necessarily a sem_wait()
+  // if not possible return erro
   // check if ressource is available
   int res = sem_wait(database->availability[ressourceId]);
   return res;

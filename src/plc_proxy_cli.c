@@ -165,6 +165,7 @@ void* plcProxyMsgReceiverThread(void* plcProxy) {
   while (!plc->finished) {
     printf("plc proxy attempting to get a line: \n");
     // will be switched with code to read a real PlcMessage_t
+    // AND not an ack
     int target;
     int resp;
     (void)scanf("%d,%d", &target, &resp);

@@ -2,7 +2,7 @@
 #define RESSOURCE_DATABASE_PROXY_H_
 #include <semaphore.h>
 
-#include "ressource_database.h"
+#include "resource_database.h"
 
 typedef struct {
   RessourceDataBase_t* database;

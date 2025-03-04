@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "ressource_database.h"
-#include "ressource_database_proxy.h"
+#include "resource_database.h"
+#include "resource_database_proxy.h"
 
 #define KRED "\x1B[31m"
 #define KGRN "\x1B[32m"

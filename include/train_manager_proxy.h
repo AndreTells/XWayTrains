@@ -1,21 +1,10 @@
 #ifndef TRAIN_MANAGER_PROXY_H_
 #define TRAIN_MANAGER_PROXY_H_
 
-enum RequestResponse_e { GRANTED, REFUSED, UNDEFINED };
+#include "comm_resource.h"
 
-typedef struct {
-  int trainId;
-  int* ressourceId;
-  struct sockaddr* trainAddress;
-} RessourceRequest_t;
+ResourceRequest_t* getNewRequest(void);
 
-typedef struct {
-  int trainId;
-  enum RequestResponse_e resp;
-} RessourceRequestAnswer_t;
-
-RessourceRequest_t* getNewRequest(void);
-
-int answerRequest(RessourceRequest_t* request, enum RequestResponse_e response);
+int answerRequest(ResourceRequestResponse_t* response);
 
 #endif  // TRAIN_MANAGER_PROXY_H_

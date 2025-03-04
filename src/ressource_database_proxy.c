@@ -1,10 +1,10 @@
-#include "ressource_database_proxy.h"
 
 #include <err.h>
 #include <semaphore.h>
 #include <stdlib.h>
 
-#include "ressource_database.h"
+#include "resource_database.h"
+#include "resource_database_proxy.h"
 
 RessourceDataBaseProxy_t* initRessourceDatabaseProxy() {
   RessourceDataBaseProxy_t* db_proxy =

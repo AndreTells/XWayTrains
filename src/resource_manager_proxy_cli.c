@@ -37,7 +37,8 @@ void* resManagerMsgReceiverThread(void* resourceManagerProxy);
  * @param[in] clientId ID of the client to register
  * @return 0 on success, non-zero error code on failure
  */
-int resManagerTryRegisterClient(ResourceManagerProxy_t* resManager, int clientId);
+int resManagerTryRegisterClient(ResourceManagerProxy_t* resManager,
+                                int clientId);
 
 /**
  * @brief Initialize a new Resource Manager Proxy instance
@@ -220,7 +221,8 @@ void* resManagerMsgReceiverThread(void* resourceManagerProxy) {
  * @param[in] clientId ID of the client to register
  * @return 0 on success, non-zero error code on failure
  */
-int resManagerTryRegisterClient(ResourceManagerProxy_t* resManager, int clientId) {
+int resManagerTryRegisterClient(ResourceManagerProxy_t* resManager,
+                                int clientId) {
   // index out of range
   if (clientId < 0 || clientId > MAX_NUM_REGISTRABLE_TRAINS - 1) {
     return -1;

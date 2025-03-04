@@ -61,8 +61,7 @@ Train_t* initTrain(enum TrainId_e trainId, PlcProxy_t* plc,
   train->routeFilePath = routeFilePath;
 
   // creating train thread
-  pthread_create(&(train->trainTid), NULL, trainThread,
-                 (void*)train);
+  pthread_create(&(train->trainTid), NULL, trainThread, (void*)train);
 
   return train;
 }
@@ -90,7 +89,7 @@ int endTrain(Train_t* train) {
  * @return Thread exit status (always NULL)
  */
 void* trainThread(void* data) {
-  Train_t* train = (Train_t*) data;
+  Train_t* train = (Train_t*)data;
   // open route file
   while (!train->finished) {
     // read next line of route file
@@ -98,9 +97,9 @@ void* trainThread(void* data) {
     // interpret message
     // generate appropriate message
     PlcMessage_t* cmd_msg = getNullMessage();
-    sendMessagePlcProxy(train->plc,cmd_msg);
-    PlcMessage_t* resp_msg = readMessagePlcProxy(train->plc,train->trainId );
-    //check if there was an error
+    sendMessagePlcProxy(train->plc, cmd_msg);
+    PlcMessage_t* resp_msg = readMessagePlcProxy(train->plc, train->trainId);
+    // check if there was an error
     sleep(5);
   }
 

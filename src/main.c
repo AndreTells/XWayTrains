@@ -74,12 +74,12 @@ int send_command(const int port, const in_addr_t addr) {
   nbbytes = recvfrom(sd1, reponse, MAXOCTETS, 0, (struct sockaddr *)&addr_serv,
                      &adr_len);
   if (nbbytes > 0) {
-    printf("Response : \n");
+    perror("Response : \n");
     print_data_hex(reponse);
   }
 
   if (!is_write_ack_successful(reponse)) {
-    perror("Unsuccessful request");
+    printf("Unsuccessful request\n");
     return 4;
   }
 
@@ -100,6 +100,7 @@ int send_command(const int port, const in_addr_t addr) {
   paquet.addresses.port_ack = port_number;
 
   // STEP 4 - Send the ACK signal
+  printf("Send the ACK\n");
   build_ack(paquet, requete);
   nbbytes_expected = requete[5] + 6;
   nbbytes = send(sd1, requete, nbbytes_expected, 0);

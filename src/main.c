@@ -46,15 +46,15 @@ int send_command(const int port, const in_addr_t addr) {
   struct sockaddr_in addr_serv;
   unsigned int adr_len = sizeof(struct sockaddr_in);
 
+  addr_serv.sin_family = AF_INET;
+  addr_serv.sin_port = port;
+  addr_serv.sin_addr.s_addr = addr;
+
   if (connect(sd1, (const struct sockaddr *)&addr_serv,
               sizeof(struct sockaddr_in)) == -1) {
     perror("Connexion fail !!!\n");
     return 2;
   }
-
-  addr_serv.sin_family = AF_INET;
-  addr_serv.sin_port = port;
-  addr_serv.sin_addr.s_addr = addr;
 
   uint8_t reponse[MAXOCTETS];
   ssize_t nbbytes = 0;
@@ -62,6 +62,7 @@ int send_command(const int port, const in_addr_t addr) {
   uint8_t port_number;
 
   // STEP 1 - Start actual communication
+  printf("Send\n");
   nbbytes = send(sd1, requete, nbbytes_expected, 0);
   if (nbbytes < nbbytes_expected) {
     perror("send: error on initial connection");
@@ -69,6 +70,7 @@ int send_command(const int port, const in_addr_t addr) {
   }
 
   // STEP 2 - Wait for ACK
+  printf("Wait\n");
   nbbytes = recvfrom(sd1, reponse, MAXOCTETS, 0, (struct sockaddr *)&addr_serv,
                      &adr_len);
   if (nbbytes > 0) {
@@ -82,6 +84,7 @@ int send_command(const int port, const in_addr_t addr) {
   }
 
   // STEP 3 - Wait for return that signals the train has passed
+  printf("Wait for completion\n");
   nbbytes = recvfrom(sd1, reponse, MAXOCTETS, 0, (struct sockaddr *)&addr_serv,
                      &adr_len);
   if (nbbytes > 0) {

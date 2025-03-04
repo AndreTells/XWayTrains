@@ -107,7 +107,8 @@ bool is_write_ack_successful(const uint8_t request[MAXOCTETS]) {
 
 bool is_read_successful(const uint8_t response[MAXOCTETS],
                         const uint8_t request_bytes[MAXOCTETS],
-                        uint8_t *port_number, const xway_package_t request) {
+                        uint8_t *port_number, const xway_package_t request,
+                        word_t *switch_id) {
   // TODO: emit an error message for each verification ?
   uint8_t values[2];
   *port_number = response[13];
@@ -122,25 +123,18 @@ bool is_read_successful(const uint8_t response[MAXOCTETS],
     section_success = true;
   }
 
-  bool switch_success;
-  if (request.request.data.switch_id != UNCHANGED) {
-    invert_byte_order(request.request.data.switch_id, values);
-    switch_success = response[22] == values[0] && response[23] == values[1];
-  } else {
-    // 0x0100 should be the answer
-    switch_success = true;
-  }
+  *switch_id = ((uint16_t)response[23] << 8) + response[22];
 
   const bool reciever_success =
       response[8] == request_bytes[10] && response[9] == request_bytes[11];
   const bool emitter_success =
       response[10] == request_bytes[8] && response[11] == request_bytes[9];
 
-  const bool success = length_success && section_success && switch_success &&
-                       reciever_success && emitter_success;
+  const bool success =
+      length_success && section_success && reciever_success && emitter_success;
   if (!success)
-    printf("Conditions: %d, %d, %d, %d, %d\n", length_success, section_success,
-           switch_success, reciever_success, emitter_success);
+    printf("Conditions: %d, %d, %d, %d\n", length_success, section_success,
+           reciever_success, emitter_success);
   return success;
 }
 

@@ -119,13 +119,15 @@ void test_read_validation() {
   reponse[23] = 0x00;
 
   uint8_t port_number;
-  const bool result =
-      is_read_successful(reponse, requete, &port_number, paquet);
+  word_t new_switch_id;
+  const bool result = is_read_successful(reponse, requete, &port_number, paquet,
+                                         &new_switch_id);
 
   printf("It validates the sample READ recieved: ");
   fflush(stdout);
   assert(result);
   assert(port_number == 0x34);
+  assert(new_switch_id == 0x001F);
   printf(GREEN " passed.\n" NOCOLOR);
 }
 

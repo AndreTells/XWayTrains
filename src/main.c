@@ -20,7 +20,7 @@
     exit(1);                      \
   }
 
-int main(int argc, char *argv[]) {
+int send_command(const int port, const in_addr_t addr) {
   // init request
   uint8_t requete[MAXOCTETS];
 
@@ -30,32 +30,31 @@ int main(int argc, char *argv[]) {
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
                              DESTINATAIRE_PORT_ID};
 
-  init_write_package(&paquet, local, automate, TRAIN1, UNCHANGED, 31);
+  init_write_package(&paquet, local, automate, TRAIN1, 0, UNCHANGED);
   build_write_request(paquet, requete);
+
   printf("Request : \n");
   print_data_hex(requete);
 
   // init sockets
-
   int sd1 = socket(AF_INET, SOCK_STREAM, 0);
-  CHECKERROR(sd1, -1, "Creation fail !!!\n");
+  if (sd1 == -1) {
+    perror("Creation fail !!!\n");
+    return 1;
+  }
 
   struct sockaddr_in addr_serv;
   unsigned int adr_len = sizeof(struct sockaddr_in);
 
-  CHECKERROR(connect(sd1, (const struct sockaddr *)&addr_serv,
-                     sizeof(struct sockaddr_in)),
-             -1, "Connexion fail !!!\n");
+  if (connect(sd1, (const struct sockaddr *)&addr_serv,
+              sizeof(struct sockaddr_in)) == -1) {
+    perror("Connexion fail !!!\n");
+    return 2;
+  }
 
   addr_serv.sin_family = AF_INET;
-
-  if (argc >= 3) {
-    addr_serv.sin_port = htons(atoi(argv[2]));
-    addr_serv.sin_addr.s_addr = inet_addr(argv[1]);
-  } else {
-    addr_serv.sin_port = htons(REMOTEPORT);
-    addr_serv.sin_addr.s_addr = inet_addr(REMOTEIP);
-  }
+  addr_serv.sin_port = port;
+  addr_serv.sin_addr.s_addr = addr;
 
   uint8_t reponse[MAXOCTETS];
   ssize_t nbbytes = 0;
@@ -66,7 +65,7 @@ int main(int argc, char *argv[]) {
   nbbytes = send(sd1, requete, nbbytes_expected, 0);
   if (nbbytes < nbbytes_expected) {
     perror("send: error on initial connection");
-    exit(EXIT_FAILURE);
+    return 3;
   }
 
   // STEP 2 - Wait for ACK
@@ -79,7 +78,7 @@ int main(int argc, char *argv[]) {
 
   if (!is_write_ack_successful(reponse)) {
     perror("Unsuccessful request");
-    exit(EXIT_FAILURE);
+    return 4;
   }
 
   // STEP 3 - Wait for return that signals the train has passed
@@ -93,19 +92,36 @@ int main(int argc, char *argv[]) {
   // make sure it is correct
   if (!is_read_successful(reponse, requete, &port_number, paquet)) {
     perror("Unsucceful response");
-    exit(EXIT_FAILURE);
+    return 5;
   }
   paquet.addresses.port_ack = port_number;
 
   // STEP 4 - Send the ACK signal
   build_ack(paquet, requete);
+  nbbytes_expected = requete[5] + 6;
   nbbytes = send(sd1, requete, nbbytes_expected, 0);
   if (nbbytes < nbbytes_expected) {
     perror("send: error on initial connection");
-    exit(EXIT_FAILURE);
+    return 6;
   }
-  // cleanup
-  close(sd1);
 
+  // cleanup - success
+  close(sd1);
+  return 0;
+}
+
+int main(int argc, char *argv[]) {
+  int port;
+  in_addr_t addr;
+
+  if (argc >= 3) {
+    port = htons(atoi(argv[2]));
+    addr = inet_addr(argv[1]);
+  } else {
+    port = htons(REMOTEPORT);
+    addr = inet_addr(REMOTEIP);
+  }
+
+  send_command(port, addr);
   return EXIT_SUCCESS;
 }

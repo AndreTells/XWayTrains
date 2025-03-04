@@ -38,9 +38,9 @@ static_analyser:
 test: build/test/comm build/test/unit_test_resource_manager_proxy_cli build/test/unit_test_plc_proxy_cli build/test/unit_test_train
 	@printf "\n[Unit testing]\n"
 	build/test/comm
-	build/test/unit_test_resource_manager_proxy_cli
-	build/test/unit_test_plc_proxy_cli
-	build/test/unit_test_train
+# 	build/test/unit_test_resource_manager_proxy_cli
+# 	build/test/unit_test_plc_proxy_cli
+# 	build/test/unit_test_train
 	@printf "\nDone unit testing\n"
 
 

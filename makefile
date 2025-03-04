@@ -26,7 +26,7 @@ CFLAGS += -lm
 # --------------------------------------------------------------------- #
 LDFLAGS = -lrt
 
-all: format_code static_analyser build/main build/test/comm
+all: format_code static_analyser build/main test
 
 unit_test_ressource_manager:
 	clang -I include src/unit_test_ressource_manager.c src/ressource_database.c src/ressource_database_proxy.c -o bin/ressource_manager_unit_test.out
@@ -38,28 +38,39 @@ format_code:
 static_analyser:
 	clang-tidy src/* -- -std=c11 -I include
 
+test: build/test/comm build/test/unit_test_resource_manager_proxy_cli build/test/unit_test_plc_proxy_cli build/test/unit_test_train
+	@printf "\n[Unit testing]\n"
+	build/test/comm
+# 	build/test/unit_test_resource_manager_proxy_cli
+# 	build/test/unit_test_plc_proxy_cli
+# 	build/test/unit_test_train
+	@printf "\nDone unit testing\n"
+
+
 build/main: src/main.c src/comm.c
 	mkdir -p build
 	$(CC) $(CFLAGS) $^ -o $@
 
-build/unit_test_resource_manager_proxy_cli: src/unit_test_resource_manager_proxy.c src/resource_manager_proxy_cli.c
+build/plc_proxy: src/plc_proxy.c
+	mkdir -p build
+	$(CC) $(CFLAGS) $^ -o $@
+
+
+build/test/unit_test_resource_manager_proxy_cli: test/unit_test_resource_manager_proxy.c src/resource_manager_proxy_cli.c
 	mkdir -p build
 	$(CC) -g $(CFLAGS) $^ -o $@
 
-build/unit_test_plc_proxy_cli: src/unit_test_plc_proxy.c src/plc_proxy_cli.c src/plc_info_test.c
+build/test/unit_test_plc_proxy_cli: test/unit_test_plc_proxy.c src/plc_proxy_cli.c src/plc_info_test.c
 	mkdir -p build
 	$(CC) -g $(CFLAGS) $^ -o $@
 
-build/unit_test_train: src/unit_test_train.c src/plc_proxy_cli.c src/plc_info_test.c src/resource_manager_proxy_cli.c src/train.c
+build/test/unit_test_train: test/unit_test_train.c src/plc_proxy_cli.c src/plc_info_test.c src/resource_manager_proxy_cli.c src/train.c
 	mkdir -p build
 	$(CC) -g $(CFLAGS) $^ -o $@
 
 build/test/comm: test/comm.c src/comm.c
 	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
-	@printf "\n[Unit testing]\n"
-	$@
-	@printf "\nDone unit testing\n"
 
 clean:
 	rm -fr build/*

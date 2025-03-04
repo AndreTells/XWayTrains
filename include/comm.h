@@ -10,7 +10,7 @@
 #define REMOTEIP "10.31.125.14"
 #define REMOTEPORT 502
 
-#define EMETTEUR_STATION_ID 40
+#define EMETTEUR_STATION_ID 36
 #define EMETTEUR_RESEAU_ID 1
 #define EMETTEUR_PORT_ID 0
 
@@ -94,7 +94,7 @@ void convert_word(const word_t word, uint8_t *res);
 
 bool is_write_ack_successful(const uint8_t request[MAXOCTETS]);
 
-bool is_read_successful(const uint8_t response[MAXOCTETS], const uint8_t request_bytes[MAXOCTETS], uint8_t * port_number, const  xway_package_t request);
+bool is_read_successful(const uint8_t response[MAXOCTETS], const uint8_t request_bytes[MAXOCTETS], uint8_t * port_number, const  xway_package_t request, word_t * switch_id);
 
 void build_ack(const xway_package_t package, uint8_t request[MAXOCTETS]);
 #endif

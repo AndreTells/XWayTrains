@@ -46,8 +46,9 @@ void build_write_request(const xway_package_t package, uint8_t *request) {
   request[11] = (package.addresses.reciever.network_id << 4) |
                 (package.addresses.reciever.porte_id & 0x0F);
 
+  // addr extension
   request[12] = CODE_SEND;
-  request[13] = 0x00;
+  request[13] = 0x10;
 
   // requête UNITE
   request[14] = package.request.code;
@@ -88,11 +89,13 @@ void print_data_hex(const uint8_t *data) {
   printf("\tData (HEX): ");
   int len = data[5] + 6;
   for (int i = 0; i < len; i++) {
+    if (i == 5 || i == 6 || i == 8 || i == 18) printf("| ");
     printf("%02X ", data[i]);
   }
   printf("\n");
   printf(
-      "\tPosition:    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 "
+      "\tPosition:    0  1  2  3  4 |  5 |  6  7 |  8  9 10 11 12 13 14 15 16 "
+      "17 | 18 "
       "19 20 21 22 23 24 25 26 27\n\n");
 }
 
@@ -104,37 +107,28 @@ bool is_write_ack_successful(const uint8_t request[MAXOCTETS]) {
 
 bool is_read_successful(const uint8_t response[MAXOCTETS],
                         const uint8_t request_bytes[MAXOCTETS],
-                        uint8_t *port_number, const xway_package_t request) {
+                        uint8_t *port_number, const xway_package_t request,
+                        word_t *switch_id) {
   // TODO: emit an error message for each verification ?
   uint8_t values[2];
   *port_number = response[13];
 
   const bool length_success = response[5] == 0x12;
 
-  bool section_success;
-  if (request.request.data.section_id != UNCHANGED) {
-    invert_byte_order(request.request.data.section_id, values);
-    section_success = response[20] == values[0] && response[21] == values[1];
-  } else {
-    section_success = true;
-  }
+  // reponse[18, 19] have an obscure meaning
+  // reponse[20, 21] = 0x0100
+  *switch_id = ((uint16_t)response[23] << 8) + response[22];
 
-  bool switch_success;
-  if (request.request.data.switch_id != UNCHANGED) {
-    invert_byte_order(request.request.data.switch_id, values);
-    switch_success = response[22] == values[0] && response[23] == values[1];
-  } else {
-    // 0x0100 should be the answer
-    switch_success = true;
-  }
-
-  bool reciever_success =
+  const bool reciever_success =
       response[8] == request_bytes[10] && response[9] == request_bytes[11];
-  bool emitter_success =
+  const bool emitter_success =
       response[10] == request_bytes[8] && response[11] == request_bytes[9];
 
-  return length_success && section_success && switch_success &&
-         reciever_success && emitter_success;
+  const bool success = length_success && reciever_success && emitter_success;
+  if (!success)
+    printf("Conditions: %d, %d, %d, %d\n", length_success, reciever_success,
+           emitter_success);
+  return success;
 }
 
 void build_ack(const xway_package_t package, uint8_t request[MAXOCTETS]) {

@@ -14,14 +14,13 @@ void test_write_req() {
   uint8_t requete[MAXOCTETS];
 
   xway_package_t paquet;
-  xway_address_t local = {EMETTEUR_STATION_ID, EMETTEUR_RESEAU_ID,
-                          EMETTEUR_PORT_ID};
+  xway_address_t local = {0x28, EMETTEUR_RESEAU_ID, EMETTEUR_PORT_ID};
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
                              DESTINATAIRE_PORT_ID};
 
   init_write_package(&paquet, local, automate, TRAIN1, UNCHANGED, 31);
   build_write_request(paquet, requete);
-
+  print_data_hex(requete);
   printf("Test the WRITE_OBJECTS is identical: ");
   fflush(stdout);
   assert(requete[0] == 0x00);
@@ -38,7 +37,7 @@ void test_write_req() {
   assert(requete[10] == 0x0E);
   assert(requete[11] == 0x10);
   assert(requete[12] == 0x09);
-  assert(requete[13] == 0x00);
+  assert(requete[13] == 0x10);
   assert(requete[14] == 0x37);
   assert(requete[15] == 0x06);
   assert(requete[16] == 0x68);
@@ -86,8 +85,7 @@ void test_read_validation() {
   uint8_t requete[MAXOCTETS];
 
   xway_package_t paquet;
-  xway_address_t local = {EMETTEUR_STATION_ID, EMETTEUR_RESEAU_ID,
-                          EMETTEUR_PORT_ID};
+  xway_address_t local = {0x28, EMETTEUR_RESEAU_ID, EMETTEUR_PORT_ID};
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
                              DESTINATAIRE_PORT_ID};
 
@@ -121,13 +119,15 @@ void test_read_validation() {
   reponse[23] = 0x00;
 
   uint8_t port_number;
-  const bool result =
-      is_read_successful(reponse, requete, &port_number, paquet);
+  word_t new_switch_id;
+  const bool result = is_read_successful(reponse, requete, &port_number, paquet,
+                                         &new_switch_id);
 
   printf("It validates the sample READ recieved: ");
   fflush(stdout);
   assert(result);
   assert(port_number == 0x34);
+  assert(new_switch_id == 0x001F);
   printf(GREEN " passed.\n" NOCOLOR);
 }
 
@@ -135,8 +135,7 @@ void test_ack() {
   uint8_t requete[MAXOCTETS];
 
   xway_package_t paquet;
-  xway_address_t local = {EMETTEUR_STATION_ID, EMETTEUR_RESEAU_ID,
-                          EMETTEUR_PORT_ID};
+  xway_address_t local = {0x28, EMETTEUR_RESEAU_ID, EMETTEUR_PORT_ID};
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
                              DESTINATAIRE_PORT_ID};
 

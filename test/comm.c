@@ -14,14 +14,13 @@ void test_write_req() {
   uint8_t requete[MAXOCTETS];
 
   xway_package_t paquet;
-  xway_address_t local = {EMETTEUR_STATION_ID, EMETTEUR_RESEAU_ID,
-                          EMETTEUR_PORT_ID};
+  xway_address_t local = {0x28, EMETTEUR_RESEAU_ID, EMETTEUR_PORT_ID};
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
                              DESTINATAIRE_PORT_ID};
 
   init_write_package(&paquet, local, automate, TRAIN1, UNCHANGED, 31);
   build_write_request(paquet, requete);
-
+  print_data_hex(requete);
   printf("Test the WRITE_OBJECTS is identical: ");
   fflush(stdout);
   assert(requete[0] == 0x00);
@@ -38,7 +37,7 @@ void test_write_req() {
   assert(requete[10] == 0x0E);
   assert(requete[11] == 0x10);
   assert(requete[12] == 0x09);
-  assert(requete[13] == 0x00);
+  assert(requete[13] == 0x10);
   assert(requete[14] == 0x37);
   assert(requete[15] == 0x06);
   assert(requete[16] == 0x68);
@@ -86,8 +85,7 @@ void test_read_validation() {
   uint8_t requete[MAXOCTETS];
 
   xway_package_t paquet;
-  xway_address_t local = {EMETTEUR_STATION_ID, EMETTEUR_RESEAU_ID,
-                          EMETTEUR_PORT_ID};
+  xway_address_t local = {0x28, EMETTEUR_RESEAU_ID, EMETTEUR_PORT_ID};
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
                              DESTINATAIRE_PORT_ID};
 
@@ -135,8 +133,7 @@ void test_ack() {
   uint8_t requete[MAXOCTETS];
 
   xway_package_t paquet;
-  xway_address_t local = {EMETTEUR_STATION_ID, EMETTEUR_RESEAU_ID,
-                          EMETTEUR_PORT_ID};
+  xway_address_t local = {0x28, EMETTEUR_RESEAU_ID, EMETTEUR_PORT_ID};
   xway_address_t automate = {DESTINATAIRE_STATION_ID, DESTINATAIRE_RESEAU_ID,
                              DESTINATAIRE_PORT_ID};
 

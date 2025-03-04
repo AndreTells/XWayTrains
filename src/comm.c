@@ -46,8 +46,9 @@ void build_write_request(const xway_package_t package, uint8_t *request) {
   request[11] = (package.addresses.reciever.network_id << 4) |
                 (package.addresses.reciever.porte_id & 0x0F);
 
+  // addr extension
   request[12] = CODE_SEND;
-  request[13] = 0x00;
+  request[13] = 0x10;
 
   // requête UNITE
   request[14] = package.request.code;
@@ -88,12 +89,13 @@ void print_data_hex(const uint8_t *data) {
   printf("\tData (HEX): ");
   int len = data[5] + 6;
   for (int i = 0; i < len; i++) {
-    if(i == 5 || i == 6 || i == 8) printf("| ");
+    if (i == 5 || i == 6 || i == 8) printf("| ");
     printf("%02X ", data[i]);
   }
   printf("\n");
   printf(
-      "\tPosition:    0  1  2  3  4 |  5 |  6  7 |  8  9 10 11 12 13 14 15 16 17 18 "
+      "\tPosition:    0  1  2  3  4 |  5 |  6  7 |  8  9 10 11 12 13 14 15 16 "
+      "17 18 "
       "19 20 21 22 23 24 25 26 27\n\n");
 }
 
@@ -129,13 +131,17 @@ bool is_read_successful(const uint8_t response[MAXOCTETS],
     switch_success = true;
   }
 
-  bool reciever_success =
+  const bool reciever_success =
       response[8] == request_bytes[10] && response[9] == request_bytes[11];
-  bool emitter_success =
+  const bool emitter_success =
       response[10] == request_bytes[8] && response[11] == request_bytes[9];
 
-  return length_success && section_success && switch_success &&
-         reciever_success && emitter_success;
+  const bool success = length_success && section_success && switch_success &&
+                       reciever_success && emitter_success;
+  if (!success)
+    printf("Conditions: %d, %d, %d, %d, %d\n", length_success, section_success,
+           switch_success, reciever_success, emitter_success);
+  return success;
 }
 
 void build_ack(const xway_package_t package, uint8_t request[MAXOCTETS]) {

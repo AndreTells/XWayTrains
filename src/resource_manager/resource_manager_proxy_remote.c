@@ -6,9 +6,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "resource_manager_proxy.h"
-#include "model_info.h"
 #include "comm_resource.h"
+#include "model_info.h"
+#include "resource_manager_proxy.h"
 
 #define MAX_NUM_REGISTRABLE_TRAINS 4
 
@@ -66,7 +66,6 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr) {
   // create socket & connect
 
   resManager->finished = false;
-
 
   // Initialize the output file descriptors to -1 (invalid)
   for (int i = 0; i < MAX_NUM_REGISTRABLE_TRAINS; i++) {
@@ -208,7 +207,7 @@ void* resManagerMsgReceiverThread(void* resourceManagerProxy) {
     int resp;
     (void)scanf("%d,%d", &target, &resp);
     (void)printf("reader read: %d %d\n", target, resp);
-    //recv
+    // recv
 
     if (resManagerTryRegisterClient(resManager, target) != 0) {
       // TODO(andre): treat silent error ??

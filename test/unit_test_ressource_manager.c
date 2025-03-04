@@ -39,8 +39,7 @@ int main(void) {
 
 int ressource_database_test(void) {
   RessourceDataBase_t* database = initRessourceDataBase();
-  CHECK_LOG("ressource Database init function ... ",
-            !(database));
+  CHECK_LOG("ressource Database init function ... ", !(database));
   CHECK_LOG("attempt to lock random ressource ... ",
             !(attemptLockRessource(database, 10) == 0));
   CHECK_LOG("attempt to lock first ressource ... ",
@@ -61,8 +60,7 @@ int ressource_database_test(void) {
 
 int ressource_database_proxy_test(void) {
   RessourceDataBaseProxy_t* database_proxy = initRessourceDatabaseProxy();
-  CHECK_LOG("ressource Database Proxy init function ... ",
-            !(database_proxy));
+  CHECK_LOG("ressource Database Proxy init function ... ", !(database_proxy));
   return 0;
 }
 int train_manager_proxy_test(void) { return 0; }

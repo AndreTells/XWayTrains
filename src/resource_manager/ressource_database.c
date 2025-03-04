@@ -1,9 +1,9 @@
-#include "resource_database.h"
-
 #include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "resource_database.h"
 
 RessourceDataBase_t *initRessourceDataBase() {
   RessourceDataBase_t *database =

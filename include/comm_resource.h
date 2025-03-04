@@ -8,11 +8,13 @@ typedef struct ResourceRequest_t ResourceRequest_t;
 
 typedef struct ResourceRequestResponse_t ResourceRequestResponse_t;
 
-ResourceRequest_t* createResourceRequest(enum TrainId_e trainId, int ressourceId);
+ResourceRequest_t* createResourceRequest(enum TrainId_e trainId,
+                                         int ressourceId);
 
 void destroyResourceRequest(ResourceRequest_t* req);
 
-ResourceRequestResponse_t* createResourceRequestResponse(enum TrainId_e trainId, int ressourceId);
+ResourceRequestResponse_t* createResourceRequestResponse(enum TrainId_e trainId,
+                                                         int ressourceId);
 
 void destroyResourceRequestResponse(ResourceRequestResponse_t* resp);
 
@@ -30,4 +32,4 @@ typedef struct {
 } RessourceRequestAnswer_t;
 */
 
-#endif // COMM_RESSOURCE_H_
+#endif  // COMM_RESSOURCE_H_

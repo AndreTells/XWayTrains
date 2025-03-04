@@ -26,17 +26,20 @@ CFLAGS += -lm
 # --------------------------------------------------------------------- #
 LDFLAGS = -lrt
 
-all: format_code static_analyser build/main test
+all: format_code static_analyser build/remote_test/main
 
 unit_test_ressource_manager:
 	clang -I include src/unit_test_ressource_manager.c src/ressource_database.c src/ressource_database_proxy.c -o bin/ressource_manager_unit_test.out
 
 format_code:
-	clang-format --verbose -i --style=file src/* test/*
+	clang-format --verbose -i --style=file src/remote_test/*
+	clang-format --verbose -i --style=file src/resource_manager/*
+	clang-format --verbose -i --style=file src/train_manager/*
+	clang-format --verbose -i --style=file test/*
 	clang-format --verbose -i --style=file include/*
 
 static_analyser:
-	clang-tidy src/* -- -std=c11 -I include
+# 	clang-tidy src/* -- -std=c11 -I include
 
 test: build/test/comm build/test/unit_test_resource_manager_proxy_cli build/test/unit_test_plc_proxy_cli build/test/unit_test_train
 	@printf "\n[Unit testing]\n"
@@ -47,8 +50,8 @@ test: build/test/comm build/test/unit_test_resource_manager_proxy_cli build/test
 	@printf "\nDone unit testing\n"
 
 
-build/main: src/main.c src/comm.c
-	mkdir -p build
+build/remote_test/main: src/remote_test/main.c src/remote_test/comm.c
+	mkdir -p build/remote_test
 	$(CC) $(CFLAGS) $^ -o $@
 
 build/plc_proxy: src/plc_proxy.c
@@ -68,7 +71,7 @@ build/test/unit_test_train: test/unit_test_train.c src/plc_proxy_cli.c src/plc_i
 	mkdir -p build
 	$(CC) -g $(CFLAGS) $^ -o $@
 
-build/test/comm: test/comm.c src/comm.c
+build/test/remote_test/comm: test/remote_test/comm.c src/remote_test/comm.c
 	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
 

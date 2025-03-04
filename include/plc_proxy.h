@@ -48,6 +48,6 @@ int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg);
  * @return Pointer to the received message, or NULL on failure
  * @note the caller is in charge of freeing memory of the received message
  */
-PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc,int cliendtId);
+PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int cliendtId);
 
 #endif  // PLC_PROXY_H_

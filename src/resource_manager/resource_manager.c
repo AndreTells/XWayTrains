@@ -4,30 +4,29 @@
 
 int connectSocket();
 
-int main(){
+int main() {
   int socketFd = connectSocket();
 
   // connect socket
   RessourceDataBaseProxy_t* safeDatabase = initRessourceDatabaseProxy();
 
-  while(1){
+  while (1) {
     // read message from socket
     // create thread to answer
-        // check availability
-        // if error re add to queue
-        // award or not resource (create response)
-        // return response
-
+    // check availability
+    // if error re add to queue
+    // award or not resource (create response)
+    // return response
   }
 
   return 0;
 }
 
-int connectSocket(char* ipAddress){
+int connectSocket(char* ipAddress) {
   // Create UDP socket:
   int socketFd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
-  if(socketFd < 0){
+  if (socketFd < 0) {
     return socketFd;
   }
 
@@ -39,10 +38,9 @@ int connectSocket(char* ipAddress){
   server_addr.sin_addr.s_addr = inet_addr(ipAddress);
 
   // Bind to the set port and IP:
-  int bindRes = bind(socket_fd, (struct sockaddr*)&addr, sizeof(addr))
-  if ( bindRes < 0) {
+  int bindRes =
+      bind(socket_fd, (struct sockaddr*)&addr, sizeof(addr)) if (bindRes < 0) {
     printf("Couldn't bind to the port\n");
     return -1;
   }
-
 }

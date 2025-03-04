@@ -46,6 +46,7 @@ int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg);
  * @param[in] plc Proxy instance handle
  * @param[in] clientId id of who is attempting to read as message
  * @return Pointer to the received message, or NULL on failure
+ * @note the caller is in charge of freeing memory of the received message
  */
 PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc,int cliendtId);
 

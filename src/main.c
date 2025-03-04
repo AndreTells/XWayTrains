@@ -23,6 +23,7 @@
 int main(int argc, char *argv[]) {
   // init request
   uint8_t requete[MAXOCTETS];
+
   xway_package_t paquet;
   xway_address_t local = {EMETTEUR_STATION_ID, EMETTEUR_RESEAU_ID,
                           EMETTEUR_PORT_ID};
@@ -98,8 +99,13 @@ int main(int argc, char *argv[]) {
 
   // STEP 4 - Send the ACK signal
   build_ack(paquet, requete);
-
+  nbbytes = send(sd1, requete, nbbytes_expected, 0);
+  if (nbbytes < nbbytes_expected) {
+    perror("send: error on initial connection");
+    exit(EXIT_FAILURE);
+  }
   // cleanup
   close(sd1);
+
   return EXIT_SUCCESS;
 }

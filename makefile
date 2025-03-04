@@ -48,6 +48,10 @@ build/main: src/main.c src/comm.c
 	mkdir -p build
 	$(CC) $(CFLAGS) $^ -o $@
 
+build/plc_proxy: src/plc_proxy.c
+	mkdir -p build
+	$(CC) $(CFLAGS) $^ -o $@
+
 
 build/test/unit_test_resource_manager_proxy_cli: test/unit_test_resource_manager_proxy.c src/resource_manager_proxy_cli.c
 	mkdir -p build

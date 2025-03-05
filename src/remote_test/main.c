@@ -6,6 +6,7 @@
 /* Usage : ./clientUdpc [adrIPserv] [portServ]   [adrIPcli] */
 /****************************************************/
 #include <arpa/inet.h>
+#include <errno.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,12 +16,12 @@
 #include "comm.h"
 
 #define CHECKERROR(var, val, msg) \
-  if (var == val) {               \
+  if ((var) == (val)) {           \
     perror(msg);                  \
     exit(1);                      \
   }
 
-int send_command(const int port, const in_addr_t addr, const word_t train,
+int send_command(const in_port_t port, const in_addr_t addr, const word_t train,
                  const word_t section_id, const word_t switch_id) {
   // init request
   uint8_t requete[MAXOCTETS];
@@ -59,13 +60,12 @@ int send_command(const int port, const in_addr_t addr, const word_t train,
 
   uint8_t reponse[MAXOCTETS];
   ssize_t nbbytes = 0;
-  ssize_t nbbytes_expected = requete[5] + 6;
+  size_t nbbytes_expected = requete[5] + 6;
   uint8_t port_number;
 
   // STEP 1 - Start actual communication
   printf("Send\n");
-  nbbytes = send(sd1, requete, nbbytes_expected, 0);
-  if (nbbytes < nbbytes_expected) {
+  if (send(sd1, requete, nbbytes_expected, 0) == -1) {
     perror("send: error on initial connection");
     return 3;
   }
@@ -96,8 +96,7 @@ int send_command(const int port, const in_addr_t addr, const word_t train,
   // make sure it is correct
   word_t new_switch_id;
   if (!is_read_successful(reponse, requete, &port_number, &new_switch_id)) {
-    perror("Unsucceful response");
-    return 5;
+    perror("Unsucceful response, sending ACK anyways");
   }
   paquet.addresses.port_ack = port_number;
 
@@ -107,8 +106,7 @@ int send_command(const int port, const in_addr_t addr, const word_t train,
   printf("Send the ACK\n");
   build_ack(paquet, requete);
   nbbytes_expected = requete[5] + 6;
-  nbbytes = send(sd1, requete, nbbytes_expected, 0);
-  if (nbbytes < nbbytes_expected) {
+  if (send(sd1, requete, nbbytes_expected, 0) == -1) {
     perror("send: error on initial connection");
     return 6;
   }
@@ -118,18 +116,31 @@ int send_command(const int port, const in_addr_t addr, const word_t train,
   return 0;
 }
 
+static bool str_to_uint16(const char *str, uint16_t *res) {
+  long int val = strtol(str, NULL, 10);
+  if (errno == ERANGE || val > UINT16_MAX || val < 0) return false;
+  *res = (uint16_t)val;
+  return true;
+}
+
 int main(int argc, char *argv[]) {
-  int port;
+  in_port_t port;
   in_addr_t addr;
 
   if (argc >= 3) {
-    port = htons(atoi(argv[2]));
+    uint16_t port_number;
+    const bool success = str_to_uint16(argv[2], &port_number);
+    if (!success) {
+      fprintf(stderr, "Invalid port or out of uint16_t range\n");
+      exit(EXIT_FAILURE);
+    }
+    port = htons(port_number);
     addr = inet_addr(argv[1]);
   } else {
     port = htons(REMOTEPORT);
     addr = inet_addr(REMOTEIP);
   }
-
+  exit(EXIT_FAILURE);
   send_command(port, addr, TRAIN1, UNCHANGED, 3);
   return EXIT_SUCCESS;
 }

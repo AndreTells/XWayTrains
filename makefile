@@ -42,11 +42,7 @@ unit_test_ressource_manager:
 	clang -I include src/unit_test_ressource_manager.c src/ressource_database.c src/ressource_database_proxy.c -o bin/ressource_manager_unit_test.out
 
 format_code:
-	clang-format --verbose -i --style=file src/remote_test/*
-	clang-format --verbose -i --style=file src/resource_manager/*
-	clang-format --verbose -i --style=file src/train_manager/*
-	clang-format --verbose -i --style=file test/*
-	clang-format --verbose -i --style=file include/*
+	find src test include -type f -name '*.[hc]' -exec clang-format --verbose -i --style=file {} \+
 
 static_analyser:
 # 	clang-tidy src/* -- $(STD) -I include

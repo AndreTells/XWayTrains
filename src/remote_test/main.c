@@ -75,7 +75,7 @@ int send_command(const int port, const in_addr_t addr, const word_t train,
   nbbytes = recvfrom(sd1, reponse, MAXOCTETS, 0, (struct sockaddr *)&addr_serv,
                      &adr_len);
   if (nbbytes > 0) {
-    perror("Response : \n");
+    printf("Response : \n");
     print_data_hex(reponse);
   }
 
@@ -131,6 +131,6 @@ int main(int argc, char *argv[]) {
     addr = inet_addr(REMOTEIP);
   }
 
-  send_command(port, addr, TRAIN1, 29, UNCHANGED);
+  send_command(port, addr, TRAIN1, UNCHANGED, 3);
   return EXIT_SUCCESS;
 }

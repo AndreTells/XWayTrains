@@ -96,8 +96,7 @@ bool is_write_ack_successful(const uint8_t request[MAXOCTETS]);
 
 bool is_read_successful(const uint8_t response[MAXOCTETS],
                         const uint8_t request_bytes[MAXOCTETS],
-                        uint8_t *port_number, const xway_package_t request,
-                        word_t *switch_id);
+                        uint8_t *port_number, word_t *switch_id);
 
 void build_ack(const xway_package_t package, uint8_t request[MAXOCTETS]);
 #endif

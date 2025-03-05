@@ -107,10 +107,7 @@ bool is_write_ack_successful(const uint8_t request[MAXOCTETS]) {
 
 bool is_read_successful(const uint8_t response[MAXOCTETS],
                         const uint8_t request_bytes[MAXOCTETS],
-                        uint8_t *port_number, const xway_package_t request,
-                        word_t *switch_id) {
-  // TODO: emit an error message for each verification ?
-  uint8_t values[2];
+                        uint8_t *port_number, word_t *switch_id) {
   *port_number = response[13];
 
   const bool length_success = response[5] == 0x12;
@@ -126,7 +123,7 @@ bool is_read_successful(const uint8_t response[MAXOCTETS],
 
   const bool success = length_success && reciever_success && emitter_success;
   if (!success)
-    printf("Conditions: %d, %d, %d, %d\n", length_success, reciever_success,
+    printf("Conditions: %d, %d, %d\n", length_success, reciever_success,
            emitter_success);
   return success;
 }

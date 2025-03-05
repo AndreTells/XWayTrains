@@ -95,8 +95,7 @@ int send_command(const int port, const in_addr_t addr, const word_t train,
 
   // make sure it is correct
   word_t new_switch_id;
-  if (!is_read_successful(reponse, requete, &port_number, paquet,
-                          &new_switch_id)) {
+  if (!is_read_successful(reponse, requete, &port_number, &new_switch_id)) {
     perror("Unsucceful response");
     return 5;
   }

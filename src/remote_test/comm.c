@@ -40,6 +40,7 @@ void build_write_request(const xway_package_t package, uint8_t *request) {
   // partie réseau
   request[7] = package.npdu_type;
   request[8] = package.addresses.emitter.station_id;
+
   request[9] = (package.addresses.emitter.network_id << 4) |
                (package.addresses.emitter.porte_id & 0x0F);
   request[10] = package.addresses.reciever.station_id;

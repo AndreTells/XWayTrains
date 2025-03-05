@@ -51,7 +51,7 @@
 typedef uint16_t word_t;
 
 typedef struct {
-  word_t station_id;
+  uint8_t station_id;
   uint8_t network_id;
   uint8_t porte_id;
 } xway_address_t;

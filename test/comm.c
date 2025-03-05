@@ -120,8 +120,8 @@ void test_read_validation() {
 
   uint8_t port_number;
   word_t new_switch_id;
-  const bool result = is_read_successful(reponse, requete, &port_number, paquet,
-                                         &new_switch_id);
+  const bool result =
+      is_read_successful(reponse, requete, &port_number, &new_switch_id);
 
   printf("It validates the sample READ recieved: ");
   fflush(stdout);

@@ -140,7 +140,6 @@ int main(int argc, char *argv[]) {
     port = htons(REMOTEPORT);
     addr = inet_addr(REMOTEIP);
   }
-  exit(EXIT_FAILURE);
   send_command(port, addr, TRAIN1, UNCHANGED, 3);
   return EXIT_SUCCESS;
 }

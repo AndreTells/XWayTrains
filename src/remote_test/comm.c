@@ -41,10 +41,10 @@ void build_write_request(const xway_package_t package, uint8_t *request) {
   request[7] = package.npdu_type;
   request[8] = package.addresses.emitter.station_id;
 
-  request[9] = (package.addresses.emitter.network_id << 4) |
+  request[9] = (uint8_t)((package.addresses.emitter.network_id & 0x0F) << 4) +
                (package.addresses.emitter.porte_id & 0x0F);
   request[10] = package.addresses.reciever.station_id;
-  request[11] = (package.addresses.reciever.network_id << 4) |
+  request[11] = (uint8_t)((package.addresses.reciever.network_id & 0x0F) << 4) |
                 (package.addresses.reciever.porte_id & 0x0F);
 
   // addr extension
@@ -115,7 +115,7 @@ bool is_read_successful(const uint8_t response[MAXOCTETS],
 
   // reponse[18, 19] have an obscure meaning
   // reponse[20, 21] = 0x0100
-  *switch_id = ((uint16_t)response[23] << 8) + response[22];
+  *switch_id = (uint16_t)((uint16_t)response[23] << 8) + response[22];
 
   const bool reciever_success =
       response[8] == request_bytes[10] && response[9] == request_bytes[11];
@@ -136,10 +136,10 @@ void build_ack(const xway_package_t package, uint8_t request[MAXOCTETS]) {
   // partie réseau
   request[7] = package.npdu_type;
   request[8] = package.addresses.emitter.station_id;
-  request[9] = (package.addresses.emitter.network_id << 4) |
+  request[9] = (uint8_t)((package.addresses.emitter.network_id & 0x0F) << 4) |
                (package.addresses.emitter.porte_id & 0x0F);
   request[10] = package.addresses.reciever.station_id;
-  request[11] = (package.addresses.reciever.network_id << 4) |
+  request[11] = (uint8_t)((package.addresses.reciever.network_id & 0x0F) << 4) |
                 (package.addresses.reciever.porte_id & 0x0F);
 
   request[12] = CODE_RECEIVE;

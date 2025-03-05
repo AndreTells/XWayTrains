@@ -10,7 +10,7 @@
 #define GREEN "\033[1;32m"
 #define NOCOLOR "\033[1;0m"
 
-void test_write_req() {
+void test_write_req(void) {
   uint8_t requete[MAXOCTETS];
 
   xway_package_t paquet;
@@ -55,7 +55,7 @@ void test_write_req() {
   printf(GREEN " passed.\n" NOCOLOR);
 }
 
-void test_write_ack_validation() {
+void test_write_ack_validation(void) {
   uint8_t reponse[MAXOCTETS];
   reponse[0] = 0x00;
   reponse[1] = 0x00;
@@ -81,7 +81,7 @@ void test_write_ack_validation() {
   printf(GREEN " passed.\n" NOCOLOR);
 }
 
-void test_read_validation() {
+void test_read_validation(void) {
   uint8_t requete[MAXOCTETS];
 
   xway_package_t paquet;
@@ -131,7 +131,7 @@ void test_read_validation() {
   printf(GREEN " passed.\n" NOCOLOR);
 }
 
-void test_ack() {
+void test_ack(void) {
   uint8_t requete[MAXOCTETS];
 
   xway_package_t paquet;
@@ -164,7 +164,7 @@ void test_ack() {
   printf(GREEN " passed.\n" NOCOLOR);
 }
 
-int main() {
+int main(void) {
   test_write_req();
   test_write_ack_validation();
   test_read_validation();

@@ -14,10 +14,20 @@ OBJ_DIR = $(BIN_DIR)/obj
 #       -std=c99        : respect the ISO C99 standard                  #
 #       -pedantic       : enforces the C standard as much as possible   #
 # --------------------------------------------------------------------- #
+STD = -std=gnu23
+CFLAGS += $(STD)
 CFLAGS  = -Wall
-CFLAGS += -std=gnu23
 CFLAGS += -Wextra
 CFLAGS += -pedantic
+CFLAGS += -Wshadow
+CFLAGS += -Wdouble-promotion
+CFLAGS += -Wformat=2
+CFLAGS += -Wformat-truncation
+CFLAGS += -Wundef
+CFLAGS += -fno-common
+# generate files that analyse stack usage
+CFLAGS += -fstack-usage
+CFLAGS += -Wconversion
 CFLAGS += -I$(INCLUDE_DIR)
 CFLAGS += -lm
 
@@ -39,7 +49,7 @@ format_code:
 	clang-format --verbose -i --style=file include/*
 
 static_analyser:
-# 	clang-tidy src/* -- -std=c11 -I include
+# 	clang-tidy src/* -- $(STD) -I include
 
 test: build/test/comm build/test/unit_test_resource_manager_proxy_cli build/test/unit_test_plc_proxy_cli build/test/unit_test_train
 	@printf "\n[Unit testing]\n"

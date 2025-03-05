@@ -6,20 +6,20 @@
 #include "resource_database.h"
 #include "resource_database_proxy.h"
 
-typedef struct {
+struct ResourceDataBaseProxy_t{
   ResourceDataBase_t* database;
   sem_t lock;
-} ResourceDataBaseProxy_t;
+};
 
-RessourceDataBaseProxy_t* initRessourceDatabaseProxy() {
-  RessourceDataBaseProxy_t* db_proxy =
-      (RessourceDataBaseProxy_t*)malloc(sizeof(RessourceDataBaseProxy_t));
+ResourceDataBaseProxy_t* initResourceDatabaseProxy() {
+  ResourceDataBaseProxy_t* db_proxy =
+      (ResourceDataBaseProxy_t*)malloc(sizeof(ResourceDataBaseProxy_t));
 
   if (db_proxy == NULL) {
     err(EXIT_FAILURE, "malloc");
   }
 
-  db_proxy->database = initRessourceDataBase();
+  db_proxy->database = initResourceDataBase();
 
   if (sem_init(&db_proxy->lock, 0, 1) != 0) {
     err(EXIT_FAILURE, "sem_init");
@@ -29,18 +29,19 @@ RessourceDataBaseProxy_t* initRessourceDatabaseProxy() {
 }
 
 int endResourceDataBaseProxy(ResourceDataBaseProxy_t* dbProxy){
-  resDb = endResourceDataBase(dbProxy.database);
+  int resDb = endResourceDataBase(dbProxy->database);
   if(resDb != 0){
     return resDb;
   }
-  free(database);
+  free(dbProxy);
 
+  return 0;
 }
 
-int attemptLockRessourceProxy(RessourceDataBaseProxy_t* db_proxy,
+int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy,
                               int ressourceId) {
   sem_wait(&db_proxy->lock);
-  if (!attemptLockRessource(db_proxy->database, ressourceId)) {
+  if (!attemptLockResource(db_proxy->database, ressourceId)) {
     return -1;
   }
 
@@ -48,13 +49,11 @@ int attemptLockRessourceProxy(RessourceDataBaseProxy_t* db_proxy,
   return 0;
 }
 
-int releaseRessourceProxy(RessourceDataBaseProxy_t* db_proxy, int ressourceId) {
+int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId) {
   sem_wait(&db_proxy->lock);
 
-  if (!releaseRessource(db_proxy->database, ressourceId)) {
-    return -1;
-  }
+  int res = releaseResource(db_proxy->database, ressourceId);
 
   sem_post(&db_proxy->lock);
-  return 0;
+  return res;
 }

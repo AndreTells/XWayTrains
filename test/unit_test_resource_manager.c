@@ -21,46 +21,46 @@
     printf("\n");                  \
   }
 
-int ressource_database_test(void);
-int ressource_database_proxy_test(void);
+int resource_database_test(void);
+int resource_database_proxy_test(void);
 int train_manager_proxy_test(void);
 
 int main(void) {
-  CHECK_LOG("Ressource Database Test ... ", ressource_database_test());
+  CHECK_LOG("Resource Database Test ... ", resource_database_test());
   printf("\n");
 
-  CHECK_LOG("Ressource Database Proxy Test ... ",
-            ressource_database_proxy_test());
+  CHECK_LOG("Resource Database Proxy Test ... ",
+            resource_database_proxy_test());
 
   CHECK_LOG("Train Manager Proxy Test ... ", train_manager_proxy_test());
 
   return 0;
 }
 
-int ressource_database_test(void) {
-  RessourceDataBase_t* database = initRessourceDataBase();
-  CHECK_LOG("ressource Database init function ... ", !(database));
-  CHECK_LOG("attempt to lock random ressource ... ",
-            !(attemptLockRessource(database, 10) == 0));
-  CHECK_LOG("attempt to lock first ressource ... ",
-            !(attemptLockRessource(database, 0) == 0));
-  CHECK_LOG("attempt to lock last ressource ... ",
-            !(attemptLockRessource(database, MAX_RESSOURCE_ID - 1) == 0));
-  CHECK_LOG("attempt to lock invalid ressource ... ",
-            !(attemptLockRessource(database, -1) == -1));
-  CHECK_LOG("attempt to lock invalid ressource ... ",
-            !(attemptLockRessource(database, MAX_RESSOURCE_ID) == -1));
+int resource_database_test(void) {
+  ResourceDataBase_t* database = initResourceDataBase();
+  CHECK_LOG("resource Database init function ... ", !(database));
+  CHECK_LOG("attempt to lock random resource ... ",
+            !(attemptLockResource(database, 10) == 0));
+  CHECK_LOG("attempt to lock first resource ... ",
+            !(attemptLockResource(database, 0) == 0));
+  CHECK_LOG("attempt to lock last resource ... ",
+            !(attemptLockResource(database, 10 - 1) == 0));
+  CHECK_LOG("attempt to lock invalid resource ... ",
+            !(attemptLockResource(database, -1) == -1));
+  CHECK_LOG("attempt to lock invalid resource ... ",
+            !(attemptLockResource(database, 10) == -1));
 
-  CHECK_LOG("attempt to unlock locked ressource ... ",
-            !(releaseRessource(database, 10) == 0));
-  CHECK_LOG("attempt to unlock unlocked ressource ... ",
-            !(releaseRessource(database, 3) == -1));
+  CHECK_LOG("attempt to unlock locked resource ... ",
+            !(releaseResource(database, 10) == 0));
+  CHECK_LOG("attempt to unlock unlocked resource ... ",
+            !(releaseResource(database, 3) == -1));
   return 0;
 }
 
-int ressource_database_proxy_test(void) {
-  RessourceDataBaseProxy_t* database_proxy = initRessourceDatabaseProxy();
-  CHECK_LOG("ressource Database Proxy init function ... ", !(database_proxy));
+int resource_database_proxy_test(void) {
+  ResourceDataBaseProxy_t* database_proxy = initResourceDatabaseProxy();
+  CHECK_LOG("resource Database Proxy init function ... ", !(database_proxy));
   return 0;
 }
 int train_manager_proxy_test(void) { return 0; }

@@ -2,17 +2,14 @@
 #define RESSOURCE_DATABASE_H_
 #include <semaphore.h>
 
-#define MAX_RESSOURCE_ID 50
+typedef struct ResourceDataBase_t ResourceDataBase_t;
 
-typedef struct {
-  int registered[MAX_RESSOURCE_ID];
-  sem_t* availability[MAX_RESSOURCE_ID];
-} RessourceDataBase_t;
+ResourceDataBase_t* initResourceDataBase(void);
 
-RessourceDataBase_t* initRessourceDataBase(void);
+int endResourceDataBase(ResourceDataBase_t* database);
 
-int attemptLockRessource(RessourceDataBase_t* database, int ressourceId);
+int attemptLockResource(ResourceDataBase_t* database, int ressourceId);
 
-int releaseRessource(RessourceDataBase_t* database, int ressourceId);
+int releaseResource(ResourceDataBase_t* database, int ressourceId);
 
 #endif  // RESSOURCE_DATABASE_H_

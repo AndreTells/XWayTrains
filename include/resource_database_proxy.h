@@ -4,16 +4,15 @@
 
 #include "resource_database.h"
 
-typedef struct {
-  RessourceDataBase_t* database;
-  sem_t lock;
-} RessourceDataBaseProxy_t;
+typedef struct ResourceDataBaseProxy_t ResourceDataBaseProxy_t;
 
-RessourceDataBaseProxy_t* initRessourceDatabaseProxy(void);
+ResourceDataBaseProxy_t* initResourceDatabaseProxy(void);
 
-int attemptLockRessourceProxy(RessourceDataBaseProxy_t* db_proxy,
+int endResourceDataBaseProxy(ResourceDataBaseProxy_t* dbProxy);
+
+int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy,
                               int ressourceId);
 
-int releaseRessourceProxy(RessourceDataBaseProxy_t* db_proxy, int ressourceId);
+int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId);
 
 #endif  // RESSOURCE_DATABASE_PROXY_H_

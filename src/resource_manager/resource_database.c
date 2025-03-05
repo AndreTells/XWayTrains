@@ -7,26 +7,27 @@
 
 #define MAX_RESSOURCE_ID 50
 
-struct {
+struct ResourceDataBase_t{
   int registered[MAX_RESSOURCE_ID];
-  sem_t* availability[MAX_RESSOURCE_ID];
-} ResourceDataBase_t;
+  int availability[MAX_RESSOURCE_ID];
+};
 
 ResourceDataBase_t *initResourceDataBase() {
   ResourceDataBase_t *database =
-      (ResourceDataBase_t *)malloc(sizeof(RessourceDataBase_t));
+      (ResourceDataBase_t *)malloc(sizeof(ResourceDataBase_t));
 
   if (database == NULL) {
     err(EXIT_FAILURE, "malloc");
   }
 
   memset(database->registered, 0, MAX_RESSOURCE_ID);
+  memset(database->availability, 0, MAX_RESSOURCE_ID);
   return database;
 }
 
 int endResourceDataBase(ResourceDataBase_t* database){
-  res = free(database);
-  return res;
+  free(database);
+  return 0;
 }
 
 int attemptLockResource(ResourceDataBase_t *database, int ressourceId) {
@@ -38,16 +39,15 @@ int attemptLockResource(ResourceDataBase_t *database, int ressourceId) {
   // if ressource is not registered, register it
   if (!database->registered[ressourceId]) {
     database->registered[ressourceId] = 1;
-    fflush(stdout);
-    database->availability[ressourceId] = (sem_t *)malloc(sizeof(sem_t));
-    sem_init(database->availability[ressourceId], 0, 1);
+    database->availability[ressourceId] = 1;
   }
 
-  // TODO: not necessarily a sem_wait()
-  // if not possible return erro
-  // check if ressource is available
-  int res = sem_wait(database->availability[ressourceId]);
-  return res;
+  if(database->availability[ressourceId] < 1){
+    return -1;
+  }
+
+  database->availability[ressourceId] -= 1;
+  return 0;
 }
 
 int releaseResource(ResourceDataBase_t *database, int ressourceId) {
@@ -55,6 +55,6 @@ int releaseResource(ResourceDataBase_t *database, int ressourceId) {
   if (!database->registered[ressourceId]) {
     return -1;
   }
-
-  return sem_post(database->availability[ressourceId]);
+  database->availability[ressourceId] +=1;
+  return 0;
 }

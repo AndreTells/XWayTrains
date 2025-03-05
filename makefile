@@ -28,8 +28,6 @@ LDFLAGS = -lrt
 
 all: format_code static_analyser build/remote_test/main
 
-unit_test_ressource_manager:
-	clang -I include src/unit_test_ressource_manager.c src/ressource_database.c src/ressource_database_proxy.c -o bin/ressource_manager_unit_test.out
 
 format_code:
 	clang-format --verbose -i --style=file src/remote_test/*
@@ -54,21 +52,20 @@ build/remote_test/main: src/remote_test/main.c src/remote_test/comm.c
 	mkdir -p build/remote_test
 	$(CC) $(CFLAGS) $^ -o $@
 
-build/plc_proxy: src/plc_proxy.c
-	mkdir -p build
+build/test/unit_test_resource_manager: test/unit_test_resource_manager.c src/resource_manager/resource_database.c src/resource_manager/resource_database_proxy.c
+	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
 
-
 build/test/unit_test_resource_manager_proxy_cli: test/unit_test_resource_manager_proxy.c src/resource_manager_proxy_cli.c
-	mkdir -p build
+	mkdir -p build/test
 	$(CC) -g $(CFLAGS) $^ -o $@
 
 build/test/unit_test_plc_proxy_cli: test/unit_test_plc_proxy.c src/plc_proxy_cli.c src/plc_info_test.c
-	mkdir -p build
+	mkdir -p build/test
 	$(CC) -g $(CFLAGS) $^ -o $@
 
 build/test/unit_test_train: test/unit_test_train.c src/plc_proxy_cli.c src/plc_info_test.c src/resource_manager_proxy_cli.c src/train.c
-	mkdir -p build
+	mkdir -p build/test
 	$(CC) -g $(CFLAGS) $^ -o $@
 
 build/test/remote_test/comm: test/remote_test/comm.c src/remote_test/comm.c

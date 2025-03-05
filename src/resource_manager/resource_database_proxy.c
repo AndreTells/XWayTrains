@@ -6,6 +6,11 @@
 #include "resource_database.h"
 #include "resource_database_proxy.h"
 
+typedef struct {
+  ResourceDataBase_t* database;
+  sem_t lock;
+} ResourceDataBaseProxy_t;
+
 RessourceDataBaseProxy_t* initRessourceDatabaseProxy() {
   RessourceDataBaseProxy_t* db_proxy =
       (RessourceDataBaseProxy_t*)malloc(sizeof(RessourceDataBaseProxy_t));
@@ -21,6 +26,15 @@ RessourceDataBaseProxy_t* initRessourceDatabaseProxy() {
   }
 
   return db_proxy;
+}
+
+int endResourceDataBaseProxy(ResourceDataBaseProxy_t* dbProxy){
+  resDb = endResourceDataBase(dbProxy.database);
+  if(resDb != 0){
+    return resDb;
+  }
+  free(database);
+
 }
 
 int attemptLockRessourceProxy(RessourceDataBaseProxy_t* db_proxy,

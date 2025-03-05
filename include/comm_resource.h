@@ -11,25 +11,19 @@ typedef struct ResourceRequestResponse_t ResourceRequestResponse_t;
 ResourceRequest_t* createResourceRequest(enum TrainId_e trainId,
                                          int ressourceId);
 
-void destroyResourceRequest(ResourceRequest_t* req);
+int destroyResourceRequest(ResourceRequest_t* req);
 
 ResourceRequestResponse_t* createResourceRequestResponse(enum TrainId_e trainId,
                                                          int ressourceId);
 
-void destroyResourceRequestResponse(ResourceRequestResponse_t* resp);
+int destroyResourceRequestResponse(ResourceRequestResponse_t* resp);
 
-/*
+unsigned char* serializeResourceRequest(ResourceRequest_t* request);
 
-typedef struct {
-  int trainId;
-  int* ressourceId;
-  struct sockaddr* trainAddress;
-} RessourceRequest_t;
+ResourceRequest_t* unserializeResourceRequest(unsigned char* request);
 
-typedef struct {
-  int trainId;
-  enum RequestResponse_e resp;
-} RessourceRequestAnswer_t;
-*/
+unsigned char* serializeResourceRequestResponse(ResourceRequestResponse_t* request);
+
+ResourceRequestResponse_t* unserializeResourceRequestResponse(unsigned char* request);
 
 #endif  // COMM_RESSOURCE_H_

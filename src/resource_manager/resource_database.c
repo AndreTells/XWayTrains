@@ -5,9 +5,16 @@
 
 #include "resource_database.h"
 
-RessourceDataBase_t *initRessourceDataBase() {
-  RessourceDataBase_t *database =
-      (RessourceDataBase_t *)malloc(sizeof(RessourceDataBase_t));
+#define MAX_RESSOURCE_ID 50
+
+struct {
+  int registered[MAX_RESSOURCE_ID];
+  sem_t* availability[MAX_RESSOURCE_ID];
+} ResourceDataBase_t;
+
+ResourceDataBase_t *initResourceDataBase() {
+  ResourceDataBase_t *database =
+      (ResourceDataBase_t *)malloc(sizeof(RessourceDataBase_t));
 
   if (database == NULL) {
     err(EXIT_FAILURE, "malloc");
@@ -17,7 +24,12 @@ RessourceDataBase_t *initRessourceDataBase() {
   return database;
 }
 
-int attemptLockRessource(RessourceDataBase_t *database, int ressourceId) {
+int endResourceDataBase(ResourceDataBase_t* database){
+  res = free(database);
+  return res;
+}
+
+int attemptLockResource(ResourceDataBase_t *database, int ressourceId) {
   // ressource Id out of bounds
   if (ressourceId < 0 || ressourceId >= MAX_RESSOURCE_ID) {
     return -1;
@@ -38,7 +50,7 @@ int attemptLockRessource(RessourceDataBase_t *database, int ressourceId) {
   return res;
 }
 
-int releaseRessource(RessourceDataBase_t *database, int ressourceId) {
+int releaseResource(ResourceDataBase_t *database, int ressourceId) {
   // if ressource is not registered, return error
   if (!database->registered[ressourceId]) {
     return -1;

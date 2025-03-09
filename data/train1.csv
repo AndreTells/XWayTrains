@@ -1,0 +1,5 @@
+Train Id	1
+Actuator	Type (Section, Inversion, Switch)	Resources
+3	Section	[1, 2]
+3	Switch
+10	Inversion

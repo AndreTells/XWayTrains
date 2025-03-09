@@ -4,11 +4,16 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "model_info.h"
 #include "plc_info.h"
 #include "plc_proxy.h"
 #include "resource_manager_proxy.h"
+#include "comm.h"
+
+#define MAX_BUFFER_LEN 256
 
 /**
  * @brief Structure representing a Train instance
@@ -91,8 +96,41 @@ int endTrain(Train_t* train) {
 void* trainThread(void* data) {
   Train_t* train = (Train_t*)data;
   // open route file
+  const char * path = "./data/train1.csv";
+  if(access(path, F_OK) == 0){
+    perror("File does not exist");
+    exit(EXIT_FAILURE);
+  }
+
+  FILE * route = fopen(path, "r+");
+  char buffer[MAX_BUFFER_LEN];
+  memset(buffer, 0, MAX_BUFFER_LEN);
+  fgets(NULL, 0, route); // skip header
+
+  word_t section_id = UNCHANGED;
+  word_t switch_id = UNCHANGED;
+  word_t actuator = UNCHANGED;
+
   while (!train->finished) {
     // read next line of route file
+    while(fgets(buffer, MAX_BUFFER_LEN, route) != NULL){
+      char * token = strtok(buffer, "\t");
+
+      // TODO USE str_to_uint16
+      actuator = atoi(token);
+
+      token=strtok(NULL, "\t");
+      if(strncmp(token, "Section", 10) == 0){
+        section_id = actuator;
+      } else if (strncmp(token, "Switch", 10) == 0) {
+        section_id = switch_id;
+      } else if (strncmp(token, "Inversion", 10) == 0) {
+
+      } else {
+
+      }
+    }
+
     // interpret line
     // interpret message
     // generate appropriate message

@@ -37,7 +37,7 @@ ResourceManager_t* initResourceManager(RessourceDataBaseProxy_t* safeDatabase, c
 
   manager->safeDatabase = safeDatabase;
   manager->finished = false;
- TAILQ_INIT(&(manager->requestQueue));
+  TAILQ_INIT(&(manager->requestQueue))
 
   // initializing semaphores
   int resSemInit = sem_init(&(manager->queueAvailability), 0, 0);

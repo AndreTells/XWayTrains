@@ -54,3 +54,5 @@ dkms.conf
 build/*
 *.kate-swp
 .cache/
+.bear_config.json
+compile_commands.json

@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "resource_database.h"
-#include "resource_database_proxy.h"
+#include "resource_manager/resource_database.h"
+#include "resource_manager/resource_database_proxy.h"
 
 #define KRED "\x1B[31m"
 #define KGRN "\x1B[32m"
@@ -41,20 +41,20 @@ int resource_database_test(void) {
   ResourceDataBase_t* database = initResourceDataBase();
   CHECK_LOG("resource Database init function ... ", !(database));
   CHECK_LOG("attempt to lock random resource ... ",
-            !(attemptLockResource(database, 10) == 0));
+            !(attemptLockResource(database, 10, 0) == 0));
   CHECK_LOG("attempt to lock first resource ... ",
-            !(attemptLockResource(database, 0) == 0));
+            !(attemptLockResource(database, 0, 0) == 0));
   CHECK_LOG("attempt to lock last resource ... ",
-            !(attemptLockResource(database, 10 - 1) == 0));
+            !(attemptLockResource(database, 10 - 1, 0) == 0));
   CHECK_LOG("attempt to lock invalid resource ... ",
-            !(attemptLockResource(database, -1) == -1));
+            !(attemptLockResource(database, -1, 0) == -1));
   CHECK_LOG("attempt to lock invalid resource ... ",
-            !(attemptLockResource(database, 10) == -1));
+            !(attemptLockResource(database, 10, 0) == -1));
 
   CHECK_LOG("attempt to unlock locked resource ... ",
-            !(releaseResource(database, 10) == 0));
+            !(releaseResource(database, 10, 0) == 0));
   CHECK_LOG("attempt to unlock unlocked resource ... ",
-            !(releaseResource(database, 3) == -1));
+            !(releaseResource(database, 3, 0) == -1));
   return 0;
 }
 

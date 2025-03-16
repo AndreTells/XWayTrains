@@ -1,14 +1,14 @@
-#include "train.h"
+#include "train_manager/train.h"
 
 #include <pthread.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "model_info.h"
-#include "plc_info.h"
-#include "plc_proxy.h"
-#include "resource_manager_proxy.h"
+#include "plc/model_info.h"
+#include "plc/plc_info.h"
+#include "plc/plc_proxy.h"
+#include "train_manager/resource_manager_proxy.h"
 
 /**
  * @brief Structure representing a Train instance

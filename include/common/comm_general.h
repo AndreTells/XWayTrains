@@ -9,4 +9,4 @@ int tcpConnectWrapper(int sockFd, char* ipAddress, int port);
 
 int tcpAcceptWrapper(int sockFd);
 
-#endif // COMM_GENERAL_H_
+#endif  // COMM_GENERAL_H_

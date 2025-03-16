@@ -1,9 +1,10 @@
+#include "resource_manager/resource_database_proxy.h"
+
 #include <err.h>
 #include <semaphore.h>
 #include <stdlib.h>
 
-#include "resource_database.hpp"
-#include "resource_database_proxy.hpp"
+#include "resource_manager/resource_database.h"
 
 /**
  * @brief simple wrapper around the array implementation of the resource
@@ -12,7 +13,7 @@
  * @param database Database being protected
  * @param lock Semaphore used to protect the database
  */
-struct ResourceDataBaseProxy_t{
+struct ResourceDataBaseProxy_t {
   ResourceDataBase_t* database;
   sem_t lock;
 };
@@ -22,7 +23,8 @@ struct ResourceDataBaseProxy_t{
  *
  * Allocates and initializes a new instance of the resource database proxy.
  *
- * @return Pointer to the initialized ResourceDataBaseProxy_t instance, or NULL on failure.
+ * @return Pointer to the initialized ResourceDataBaseProxy_t instance, or NULL
+ * on failure.
  */
 ResourceDataBaseProxy_t* initResourceDatabaseProxy(void) {
   ResourceDataBaseProxy_t* db_proxy =
@@ -49,9 +51,9 @@ ResourceDataBaseProxy_t* initResourceDatabaseProxy(void) {
  * @param[in] dbProxy Pointer to the resource database proxy instance.
  * @return 0 on success, or a negative value on failure.
  */
-int endResourceDataBaseProxy(ResourceDataBaseProxy_t* dbProxy){
+int endResourceDataBaseProxy(ResourceDataBaseProxy_t* dbProxy) {
   int resDb = endResourceDataBase(dbProxy->database);
-  if(resDb != 0){
+  if (resDb != 0) {
     return resDb;
   }
   free(dbProxy);
@@ -67,10 +69,11 @@ int endResourceDataBaseProxy(ResourceDataBaseProxy_t* dbProxy){
  * @param[in] db_proxy Pointer to the resource database proxy instance.
  * @param[in] ressourceId ID of the resource to lock.
  * @param[in] requesterId ID of who is requesting the resource
- * @return 0 if the lock was acquired successfully, or a negative value on failure.
+ * @return 0 if the lock was acquired successfully, or a negative value on
+ * failure.
  */
-int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy,
-                              int ressourceId, int requesterId) {
+int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId,
+                             int requesterId) {
   sem_wait(&db_proxy->lock);
   int res = 0;
   if (attemptLockResource(db_proxy->database, ressourceId, requesterId) != 0) {
@@ -91,7 +94,8 @@ int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy,
  * @param[in] requesterId ID of who is requesting the resource
  * @return 0 on success, or a negative value on failure.
  */
-int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId, int requesterId) {
+int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId,
+                         int requesterId) {
   sem_wait(&db_proxy->lock);
 
   int res = releaseResource(db_proxy->database, ressourceId, requesterId);
@@ -107,9 +111,10 @@ int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId, int
  *
  * @param[in] database Pointer to the resource database proxy instance.
  * @param[in] ressourceId ID of the resource to wait for.
- * @return 0 when the resource becomes available, or a negative value on failure.
+ * @return 0 when the resource becomes available, or a negative value on
+ * failure.
  */
-int waitResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId){
+int waitResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId) {
   return waitResource(database->database, ressourceId);
 }
 
@@ -118,11 +123,14 @@ int waitResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId){
  *
  * @param[in] database Pointer to the resource database instance.
  * @param[in] ressourceId ID of the resource to lock.
- * @param[in] ammount The ammount of times this resource can be unlocked without consequences
- * @return 0 if the lock was acquired successfully, or a negative value on failure.
+ * @param[in] ammount The ammount of times this resource can be unlocked without
+ * consequences
+ * @return 0 if the lock was acquired successfully, or a negative value on
+ * failure.
  * @note does not manage access to the database
  */
-int registerResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId, int ammount){
-    registerResource(database->database, ressourceId, ammount);
-    return 0;
+int registerResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId,
+                          int ammount) {
+  registerResource(database->database, ressourceId, ammount);
+  return 0;
 }

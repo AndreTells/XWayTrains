@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "resource_manager_proxy.h"
+#include "train_manager/resource_manager_proxy.h"
 
 int main(void) {
   ResourceManagerProxy_t* resMan = initResourceManagerProxy(" ");

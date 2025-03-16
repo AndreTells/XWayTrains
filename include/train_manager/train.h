@@ -6,9 +6,9 @@
 #define TRAIN_H_
 #include <pthread.h>
 
-#include "model_info.h"
-#include "plc_proxy.h"
-#include "resource_manager_proxy.h"
+#include "plc/model_info.h"
+#include "plc/plc_proxy.h"
+#include "train_manager/resource_manager_proxy.h"
 
 /**
  * @brief Opaque handle for the Train instance

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "resource_manager_proxy.h"
+#include "train_manager/resource_manager_proxy.h"
 
 #define MAX_NUM_REGISTRABLE_TRAINS 4
 

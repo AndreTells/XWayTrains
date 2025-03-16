@@ -22,8 +22,10 @@ unsigned char* serializeResourceRequest(ResourceRequest_t* request);
 
 ResourceRequest_t* unserializeResourceRequest(unsigned char* request);
 
-unsigned char* serializeResourceRequestResponse(ResourceRequestResponse_t* request);
+unsigned char* serializeResourceRequestResponse(
+    ResourceRequestResponse_t* request);
 
-ResourceRequestResponse_t* unserializeResourceRequestResponse(unsigned char* request);
+ResourceRequestResponse_t* unserializeResourceRequestResponse(
+    unsigned char* request);
 
 #endif  // COMM_RESSOURCE_H_

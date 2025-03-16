@@ -5,7 +5,7 @@
  */
 #ifndef RESOURCE_MANAGER_H_
 #define RESOURCE_MANAGER_H_
-#include "resource_database_proxy"
+#include "resource_manager/resource_database_proxy"
 
 /**
  * @brief Opaque handle for the Resource Database Proxy instance
@@ -21,4 +21,4 @@ int endResourceManager(ResourceManager_t* manager);
 
 int acceptTrainManager(ResourceManager_t* manager);
 
-#endif // RESOURCE_MANAGER_H_
+#endif  // RESOURCE_MANAGER_H_

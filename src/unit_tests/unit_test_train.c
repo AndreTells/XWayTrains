@@ -1,9 +1,9 @@
 #include <stdio.h>
 
-#include "model_info.h"
-#include "plc_proxy.h"
-#include "resource_manager_proxy.h"
-#include "train.h"
+#include "plc/model_info.h"
+#include "plc/plc_proxy.h"
+#include "train_manager/resource_manager_proxy.h"
+#include "train_manager/train.h"
 
 int main(void) {
   ResourceManagerProxy_t* resMan = initResourceManagerProxy(" ");

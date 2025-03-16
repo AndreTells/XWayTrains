@@ -6,9 +6,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "comm_resource.h"
-#include "model_info.h"
-#include "resource_manager_proxy.h"
+#include "common/comm_resource.h"
+#include "plc/model_info.h"
+#include "resource_manager/resource_manager_proxy.h"
 
 #define MAX_NUM_REGISTRABLE_TRAINS 4
 

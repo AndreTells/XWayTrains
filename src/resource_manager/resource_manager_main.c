@@ -1,6 +1,6 @@
 
-#include "resource_database_proxy"
-#include "resource_manager.h"
+#include "resource_manager/resource_database_proxy"
+#include "resource_manager/resource_manager.h"
 
 int main() {
   int socketFd = connectSocket();
@@ -9,9 +9,9 @@ int main() {
 
   ResourceManager_t* manager = initResourceManager(safeDatabase);
 
-  //TODO: add a way so the program can actually terminate
+  // TODO: add a way so the program can actually terminate
 
-  while(!manager->finished){
+  while (!manager->finished) {
     (void)acceptTrainManager(manager);
   }
 
@@ -19,4 +19,3 @@ int main() {
   (void)endResourceDataBaseProxy(safeDatabase);
   return 0;
 }
-

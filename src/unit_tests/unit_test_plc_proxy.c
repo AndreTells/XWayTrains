@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "plc_info.h"
-#include "plc_proxy.h"
+#include "plc/plc_info.h"
+#include "plc/plc_proxy.h"
 
 int main(void) {
   PlcProxy_t* plc = initPlcProxy(" ");

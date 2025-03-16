@@ -1,12 +1,13 @@
+#include "resource_manager/resource_manager.h"
+
+#include <semaphore.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <semaphore.h>
-#include <sys/queue.h> // struct with queue, see man tailq
+#include <sys/queue.h>  // struct with queue, see man tailq
 
-#include "resource_manager.h"
-#include "comm_general.h"
+#include "common/comm_general.h"
 
-struct ResourceRequestQueueEntry_t{
+struct ResourceRequestQueueEntry_t {
   RessourceRequest_t* req;
   TAILQ_ENTRY(ResourceRequestQueueEntry_t) entries;
 }
@@ -21,17 +22,18 @@ struct ResourceManager_t {
   TAILQ_HEAD(, ResourceRequestEntry) requestQueue;
 };
 
-//TODO: define struct for producer thread  data
-//TODO: define struct for consumer thread  data
+// TODO: define struct for producer thread  data
+// TODO: define struct for consumer thread  data
 
 void* producerThread(void* data);
 void* consumerThread(void* data);
 
-ResourceManager_t* initResourceManager(RessourceDataBaseProxy_t* safeDatabase, char* ipAddress, int port){
+ResourceManager_t* initResourceManager(RessourceDataBaseProxy_t* safeDatabase,
+                                       char* ipAddress, int port) {
+  ResourceManager_t* manager =
+      (ResourceManager_t*)malloc(sizeof(ResourceManager_t));
 
-  ResourceManager_t* manager = (ResourceManager_t*) malloc(sizeof(ResourceManager_t));
-
-  if(manager == NULL){
+  if (manager == NULL) {
     return NULL;
   }
 
@@ -67,7 +69,7 @@ ResourceManager_t* initResourceManager(RessourceDataBaseProxy_t* safeDatabase, c
   // opening socket
   int listenFd = tcpCreateSocketWrapper(true, ipAddress, port);
 
-  if(listenFd < 0){
+  if (listenFd < 0) {
     sem_destroy(&(manager->queueAvailability));
     sem_destroy(&(manager->queueAccess));
     sem_destroy(&(manager->sendAccess));
@@ -82,8 +84,7 @@ ResourceManager_t* initResourceManager(RessourceDataBaseProxy_t* safeDatabase, c
   return manager;
 }
 
-int endResourceManager(ResourceManager_t* manager){
-
+int endResourceManager(ResourceManager_t* manager) {
   manager->finished = true;
   // join all threads
 
@@ -96,9 +97,9 @@ int endResourceManager(ResourceManager_t* manager){
   return 0;
 }
 
-int acceptTrainManager(ResourceManager_t* manager){
+int acceptTrainManager(ResourceManager_t* manager) {
   int connectionFd = tcpAcceptWrapper(manager->listenFd);
-  if(connectionFd < 0){
+  if (connectionFd < 0) {
     return -1;
   }
 
@@ -108,10 +109,6 @@ int acceptTrainManager(ResourceManager_t* manager){
   return 0;
 }
 
-void* producerThread(void* data){
-  pthread_exit(NULL);
-}
+void* producerThread(void* data) { pthread_exit(NULL); }
 
-void* consumerThread(void* data){
-  pthread_exit(NULL);
-}
+void* consumerThread(void* data) { pthread_exit(NULL); }

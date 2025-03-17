@@ -26,6 +26,7 @@ CFLAGS += -Wextra
 CFLAGS += -pedantic
 CFLAGS += -I$(INCLUDE_DIR)
 CFLAGS += -lm
+CFLAGS += -g
 
 # --------------------------------------------------------------------- #
 # Definition of linker options                                          #

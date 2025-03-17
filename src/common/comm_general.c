@@ -6,6 +6,8 @@
 #include <string.h>
 #include <sys/socket.h>
 
+#define MAX_BACKLOG 10
+
 int tcpCreateSocketWrapper(bool server, char* ipAddress, int port) {
   // Create TCP socket:
   int socketFd = socket(AF_INET, SOCK_STREAM, 0);
@@ -36,6 +38,8 @@ int tcpCreateSocketWrapper(bool server, char* ipAddress, int port) {
   if (bindRes < 0) {
     return -1;
   }
+
+  listen(socketFd, MAX_BACKLOG);
 
   return socketFd;
 }

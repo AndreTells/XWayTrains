@@ -150,7 +150,7 @@ PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int clientId) {
     return NULL;
   }
 
-  printf("%d received %x with size %d from %d \n", clientId, res, res_size,
+  printf("%d received %x with size %zd from %d \n", clientId, res, res_size,
          plc->outputFd[clientId][0]);
   return res;
 }

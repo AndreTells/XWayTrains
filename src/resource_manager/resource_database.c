@@ -9,17 +9,6 @@
 
 #define MAX_RESOURCE_ID 50
 
-/**
- * @brief simple array implementation of the resource database
- *
- * @param registered boolean array to indicate whether
- * @param availability int array indicating the ammount available of each
- * resource
- * @param interest semaphores blocking the threads interested in a given
- * resource
- *
- * TODO(andre): Convert this into an interface.
- */
 struct ResourceDataBase_t {
   bool registered[MAX_RESOURCE_ID];
   int availability[MAX_RESOURCE_ID];
@@ -27,14 +16,6 @@ struct ResourceDataBase_t {
   sem_t interest[MAX_RESOURCE_ID];
 };
 
-/**
- * @brief Initializes the resource database.
- *
- * Allocates and initializes a new instance of the resource database.
- *
- * @return Pointer to the initialized ResourceDataBase_t instance, or NULL on
- * failure.
- */
 ResourceDataBase_t *initResourceDataBase() {
   ResourceDataBase_t *database =
       (ResourceDataBase_t *)malloc(sizeof(ResourceDataBase_t));
@@ -53,14 +34,6 @@ ResourceDataBase_t *initResourceDataBase() {
   return database;
 }
 
-/**
- * @brief Shuts down and deallocates the resource database.
- *
- * Releases any resources associated with the given resource database.
- *
- * @param[in] database Pointer to the resource database instance.
- * @return 0 on success, or a negative value on failure.
- */
 int endResourceDataBase(ResourceDataBase_t *database) {
   // destroy semaphores
   for (int i = 0; i < MAX_RESOURCE_ID; i++) {
@@ -71,15 +44,6 @@ int endResourceDataBase(ResourceDataBase_t *database) {
   return 0;
 }
 
-/**
- * @brief Attempts to lock a specific resource.
- *
- * @param[in] database Pointer to the resource database instance.
- * @param[in] ressourceId ID of the resource to lock.
- * @return 0 if the lock was acquired successfully, or a negative value on
- * failure.
- * @note does not manage access to the database
- */
 int attemptLockResource(ResourceDataBase_t *database, int ressourceId,
                         int requesterId) {
   // ressource Id out of bounds
@@ -101,15 +65,6 @@ int attemptLockResource(ResourceDataBase_t *database, int ressourceId,
   return 0;
 }
 
-/**
- * @brief Releases a locked resource.
- *
- * Unlocks the resource identified by ressourceId.
- *
- * @param[in] database Pointer to the resource database instance.
- * @param[in] ressourceId ID of the resource to release.
- * @return 0 on success, or a negative value on failure.
- */
 int releaseResource(ResourceDataBase_t *database, int ressourceId,
                     int requesterId) {
   // only the owner can unlock it
@@ -128,33 +83,10 @@ int releaseResource(ResourceDataBase_t *database, int ressourceId,
   return 0;
 }
 
-/**
- * @brief Waits for a resource to become available.
- *
- * Blocks until the resource identified by ressourceId is available.
- *
- * @param[in] database Pointer to the resource database instance.
- * @param[in] ressourceId ID of the resource to wait for.
- * @param[in] ammount The ammount of times this resource can be unlocked without
- * consequences
- * @return 0 when the resource becomes available, or a negative value on
- * failure.
- */
 int waitResource(ResourceDataBase_t *database, int ressourceId) {
   return sem_wait(&(database->interest[ressourceId]));
 }
 
-/**
- * @brief Register a resource that HAS NOT YET been initialized
- *
- * @param[in] database Pointer to the resource database instance.
- * @param[in] ressourceId ID of the resource to lock.
- * @param[in] ammount The ammount of times this resource can be unlocked without
- * consequences
- * @return 0 if the lock was acquired successfully, or a negative value on
- * failure.
- * @note does not manage access to the database
- */
 int registerResource(ResourceDataBase_t *database, int ressourceId,
                      int ammount) {
   database->registered[ressourceId] = true;

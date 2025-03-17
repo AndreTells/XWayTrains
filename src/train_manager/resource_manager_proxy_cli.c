@@ -149,7 +149,7 @@ int requestResource(ResourceManagerProxy_t* resManager, int ressourceId,
   if (res_size == 0) {
     return -1;
   }
-  printf("%d received %d with size %d from %d \n", clientId, res, res_size,
+  printf("%d received %d with size %zd from %d \n", clientId, res, res_size,
          resManager->outputFd[clientId][0]);
 
   return 0;
@@ -179,7 +179,7 @@ int releaseResource(ResourceManagerProxy_t* resManager, int ressourceId,
   if (res_size == 0) {
     return -1;
   }
-  printf("%d received %d with size %d from %d \n", clientId, res, res_size,
+  printf("%d received %d with size %zd from %d \n", clientId, res, res_size,
          resManager->outputFd[clientId][0]);
 
   return 0;

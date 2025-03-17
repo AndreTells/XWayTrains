@@ -107,6 +107,7 @@ build/resource_manager: $(RESOURCE_MANAGER_SRC_DIR)/resource_manager_main.c \
 						$(RESOURCE_MANAGER_SRC_DIR)/request_queue.c \
 						$(RESOURCE_MANAGER_SRC_DIR)/resource_database_proxy.c \
 						$(COMMON_SRC_DIR)/comm_general.c \
+						$(COMMON_SRC_DIR)/verbose.c \
 						$(COMMON_SRC_DIR)/resource_request.c
 	mkdir -p build
 	$(CC) -g $(CFLAGS) $^ -o $@

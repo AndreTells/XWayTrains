@@ -9,6 +9,7 @@
 
 #include "common/comm_general.h"
 #include "common/resource_request.h"
+#include "common/verbose.h"
 #include "resource_manager/request_queue.h"
 
 #define MAX_CLIENTS 4

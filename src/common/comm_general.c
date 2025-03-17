@@ -54,4 +54,6 @@ int tcpConnectWrapper(int sockFd, char* ipAddress, int port) {
   return resConnect;
 }
 
-int tcpAcceptWrapper(int sockFd) { return accept(sockFd, NULL, NULL); }
+int tcpAcceptWrapper(int sockFd) {
+  return accept(sockFd, NULL, NULL);
+}

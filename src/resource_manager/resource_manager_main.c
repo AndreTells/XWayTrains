@@ -1,18 +1,17 @@
-
-#include "resource_manager/resource_database_proxy"
+#include "resource_manager/resource_database_proxy.h"
 #include "resource_manager/resource_manager.h"
+#include <unistd.h>
 
 int main() {
-  int socketFd = connectSocket();
+  // TODO: get actual IP
 
-  RessourceDataBaseProxy_t* safeDatabase = initRessourceDatabaseProxy();
+  ResourceDataBaseProxy_t* safeDatabase = initResourceDatabaseProxy();
 
-  ResourceManager_t* manager = initResourceManager(safeDatabase);
+  ResourceManager_t* manager = initResourceManager(safeDatabase, "127.0.0.1", 8080);
 
   // TODO: add a way so the program can actually terminate
-
-  while (!manager->finished) {
-    (void)acceptTrainManager(manager);
+  while (true) {
+//    (void)acceptTrainManager(manager);
   }
 
   (void)endResourceManager(manager);

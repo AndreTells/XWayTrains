@@ -1,9 +1,11 @@
 #include "resource_manager/resource_manager.h"
 
+
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "common/comm_general.h"
 #include "common/resource_request.h"
@@ -14,7 +16,7 @@
 struct ResourceManager_t {
   bool finished;
   int listenFd;
-  RessourceDataBaseProxy_t* safeDatabase;
+  ResourceDataBaseProxy_t* safeDatabase;
 
   ResourceRequestQueue_t* queue;
 
@@ -28,19 +30,19 @@ struct ResourceManager_t {
 typedef struct{
   int inputFd; // were it's getting the requests from
   ResourceManager_t* parent;
-  resourcerequestqueue_t* queue;
+  ResourceRequestQueue_t* queue;
 }RequestProducerThread_t;
 
 typedef struct{
   ResourceManager_t* parent;
-  resourcerequestqueue_t* queue;
+  ResourceRequestQueue_t* queue;
 }RequestConsumerThread_t;
 
 void* producerThread(void* data);
 
 void* consumerThread(void* data);
 
-ResourceManager_t* initResourceManager(RessourceDataBaseProxy_t* safeDatabase,
+ResourceManager_t* initResourceManager(ResourceDataBaseProxy_t* safeDatabase,
                                        char* ipAddress, int port) {
   ResourceManager_t* manager =
       (ResourceManager_t*)malloc(sizeof(ResourceManager_t));
@@ -51,19 +53,11 @@ ResourceManager_t* initResourceManager(RessourceDataBaseProxy_t* safeDatabase,
   manager->finished = false;
   manager->queue = initQueue();
 
-  // initializing semaphores
-  (void)sem_init(&(manager->queueAvailability), 0, 0);
-
-  (void)sem_init(&(manager->queueAccess), 0, 1);
-
   // opening socket
   int listenFd = tcpCreateSocketWrapper(true, ipAddress, port);
 
   if (listenFd < 0) {
-    sem_destroy(&(manager->queueAvailability));
-    sem_destroy(&(manager->queueAccess));
-    sem_destroy(&(manager->sendAccess));
-    free(resManager);
+    free(manager);
     return NULL;
   }
 
@@ -72,9 +66,9 @@ ResourceManager_t* initResourceManager(RessourceDataBaseProxy_t* safeDatabase,
   // create consumer thread
   RequestConsumerThread_t* typedData = (RequestConsumerThread_t*) malloc(sizeof(RequestConsumerThread_t));
   typedData->parent = manager;
-  typedData->queue = queue;
+  typedData->queue = manager->queue;
 
-  pthread_create(&(manager->consumerThread),NULL,consumerThread, (void*)threadData);
+  pthread_create(&(manager->consumerThread),NULL,consumerThread, (void*)typedData);
 
   return manager;
 }
@@ -82,17 +76,15 @@ ResourceManager_t* initResourceManager(RessourceDataBaseProxy_t* safeDatabase,
 int endResourceManager(ResourceManager_t* manager) {
   manager->finished = true;
 
-  pthread_join(manager->consumerThread);
+  pthread_join(manager->consumerThread, NULL);
 
   for(int i=0; i<manager->lastClientIndex; i++){
-    (void)pthread_join(managre->clients[i]);
+    (void)pthread_join(manager->clients[i], NULL);
     // not checking if the join is failing
   }
 
   (void)destroyQueue(manager->queue);
-  close(listenFd);
-  sem_destroy(&(manager->queueAvailability));
-  sem_destroy(&(manager->queueAccess));
+  close(manager->listenFd);
 
   (void)free(manager);
   return 0;
@@ -105,7 +97,7 @@ int acceptTrainManager(ResourceManager_t* manager) {
     return -1;
   }
   manager->lastClientIndex +=1;
-  i = manager->lastClientIndex; // id of the client
+  int i = manager->lastClientIndex; // id of the client
 
   manager->clientsFd[i] = connectionFd;
   RequestProducerThread_t* threadData = (RequestProducerThread_t*) malloc(sizeof(RequestProducerThread_t*));
@@ -121,7 +113,7 @@ int acceptTrainManager(ResourceManager_t* manager) {
 void* producerThread(void* data) {
   RequestProducerThread_t* typedData = (RequestProducerThread_t*) data;
   ResourceManager_t* manager = typedData->parent;
-  resourcerequestqueue_t* queue = typedData->queue;
+  ResourceRequestQueue_t* queue = typedData->queue;
   int inputFd = typedData->inputFd;
 
   while(!manager->finished){
@@ -136,7 +128,7 @@ void* producerThread(void* data) {
 void* consumerThread(void* data) {
   RequestConsumerThread_t* typedData = (RequestConsumerThread_t*) data;
   ResourceManager_t* manager = typedData->parent;
-  resourcerequestqueue_t* queue = typedData->queue;
+  ResourceRequestQueue_t* queue = typedData->queue;
 
   while(!manager->finished){
     ResourceRequest_t* req = popQueue(queue);
@@ -144,8 +136,8 @@ void* consumerThread(void* data) {
     int res = -1;
     switch(req->reqType){
       case LOCK_RESOURCE:
-        (void)waitResourceProxy(manager->safeDatabase, req->resourceId, req->requesterId);
-        (void)attemptLockResource(manager->safeDatabase, req->resourceId, req->requesterId);
+        (void)waitResourceProxy(manager->safeDatabase, req->resourceId);
+        (void)attemptLockResourceProxy(manager->safeDatabase, req->resourceId, req->requesterId);
         res = 0;
         break;
 

@@ -5,7 +5,7 @@
 // thread safe implementation of a queue
 // allows for a blocking read and
 // automatically 'serializes' the pushes
-typedef struct ResourceRequestQueue_t;
+typedef struct ResourceRequestQueue_t ResourceRequestQueue_t;
 
 ResourceRequestQueue_t* initQueue();
 

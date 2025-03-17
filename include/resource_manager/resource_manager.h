@@ -5,7 +5,7 @@
  */
 #ifndef RESOURCE_MANAGER_H_
 #define RESOURCE_MANAGER_H_
-#include "resource_manager/resource_database_proxy"
+#include "resource_manager/resource_database_proxy.h"
 
 /**
  * @brief Opaque handle for the Resource Database Proxy instance
@@ -15,7 +15,8 @@
  */
 typedef struct ResourceManager_t ResourceManager_t;
 
-ResourceManager_t* initResourceManager(RessourceDataBaseProxy_t* safeDatabase);
+ResourceManager_t* initResourceManager(ResourceDataBaseProxy_t* safeDatabase,
+                                       char* ipAddress, int port);
 
 int endResourceManager(ResourceManager_t* manager);
 

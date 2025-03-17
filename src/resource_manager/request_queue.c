@@ -2,22 +2,26 @@
 #include "common/resource_request.h"
 
 #include <stdlib.h>
+#include <semaphore.h>
 
-typedef sturct ResourceRequestQueueEntry_t{
+typedef struct ResourceRequestQueueEntry_t{
   ResourceRequest_t* req;
-  ResourceRequestQueueEntry_t* next;
-  ResourceRequestQueueEntry_t* prev;
-};
+  struct ResourceRequestQueueEntry_t* next;
+  struct ResourceRequestQueueEntry_t* prev;
+}ResourceRequestQueueEntry_t;
 
 struct ResourceRequestQueue_t{
   sem_t lock;
+  sem_t availability;
   ResourceRequestQueueEntry_t* tail;
   ResourceRequestQueueEntry_t* head;
-}
+};
 
 ResourceRequestQueue_t* initQueue(){
-    ResourceRequestQueue_t* queue = (ResourceRequestQueue_t*) malloc(sizeof(ResourceRequest_t));
+    ResourceRequestQueue_t* queue = malloc(sizeof(ResourceRequestQueue_t));
+
     (void)sem_init(&(queue->lock),0,1);
+    (void)sem_init(&(queue->availability),0,0);
     queue->tail = NULL;
     queue->head = NULL;
 
@@ -32,15 +36,15 @@ int destroyQueue(ResourceRequestQueue_t* queue){
     answerResourceRequest(req, -1);
   }
 
-  //TODO: destroy semaphore
-
+  sem_destroy(&(queue->lock));
+  sem_destroy(&(queue->availability));
   return 0;
 }
 
 int pushQueue(ResourceRequestQueue_t* queue, ResourceRequest_t* req){
-  ResourceRequestQueueEntry_t* newEntry = (ResourceRequestQueueEntry_t*) malloc(sizeof(ResourceRequestQueueEntry_t));
   sem_wait(&(queue->lock));
 
+  ResourceRequestQueueEntry_t* newEntry = (ResourceRequestQueueEntry_t*) malloc(sizeof(ResourceRequestQueueEntry_t));
   if(newEntry == NULL){
     return -1;
   }
@@ -49,20 +53,24 @@ int pushQueue(ResourceRequestQueue_t* queue, ResourceRequest_t* req){
   // place element at the end of the queue
   newEntry->prev = NULL;
   newEntry->next = queue->tail;
-  queue->tail->prev = newEntry;
-
-  queue->tail = newEntry; // updating the end of the queue marker
 
   // checking the edge case where the queue is empty
   if(queue->head == NULL){
     queue->head = newEntry;
   }
+  if(queue->tail != NULL){
+    queue->tail->prev = newEntry;
+  }
+
+  queue->tail = newEntry; // updating the end of the queue marker
 
   sem_post(&(queue->lock));
+  sem_post(&(queue->availability));
   return 0;
 }
 
 ResourceRequest_t* popQueue(ResourceRequestQueue_t* queue){
+  sem_wait(&(queue->availability));
   sem_wait(&(queue->lock));
   // checking edge case where queue is already emtpy
   if(queue->head == NULL){

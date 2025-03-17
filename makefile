@@ -49,11 +49,13 @@ format_code:
 static_analyser:
 # 	clang-tidy src/* -- -std=c11 -I include
 
-test:build/test/remote build/test/resource_manager \
+test:build/test/remote build/test/resource_database\
 		build/test/resource_manager_proxy build/test/plc_proxy \
-		build/test/train
+		build/test/train build/test/request_queue
 
 	@printf "\n[Unit testing]\n"
+	build/test/resource_database
+	build/test/request_queue
 # 	build/test/unit_test_resource_manager_proxy_cli
 # 	build/test/unit_test_plc_proxy_cli
 # 	build/test/unit_test_train
@@ -66,7 +68,14 @@ build/test/remote: $(RTEST_SRC_DIR)/main.c \
 	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
 
-build/test/resource_manager: $(TEST_SRC_DIR)/unit_test_resource_manager.c \
+build/test/request_queue: $(TEST_SRC_DIR)/unit_test_request_queue.c \
+								$(RESOURCE_MANAGER_SRC_DIR)/request_queue.c \
+								$(COMMON_SRC_DIR)/resource_request.c
+
+	mkdir -p build/test
+	$(CC) $(CFLAGS) $^ -o $@
+
+build/test/resource_database: $(TEST_SRC_DIR)/unit_test_resource_manager.c \
 								$(RESOURCE_MANAGER_SRC_DIR)/resource_database.c \
 								$(RESOURCE_MANAGER_SRC_DIR)/resource_database_proxy.c
 
@@ -90,6 +99,16 @@ build/test/train: $(TEST_SRC_DIR)/unit_test_train.c \
 					$(TRAIN_MANAGER_SRC_DIR)/resource_manager_proxy_cli.c \
 					$(TRAIN_MANAGER_SRC_DIR)/train.c
 	mkdir -p build/test
+	$(CC) -g $(CFLAGS) $^ -o $@
+
+build/resource_manager: $(RESOURCE_MANAGER_SRC_DIR)/resource_manager_main.c \
+						$(RESOURCE_MANAGER_SRC_DIR)/resource_manager.c \
+						$(RESOURCE_MANAGER_SRC_DIR)/resource_database.c \
+						$(RESOURCE_MANAGER_SRC_DIR)/request_queue.c \
+						$(RESOURCE_MANAGER_SRC_DIR)/resource_database_proxy.c \
+						$(COMMON_SRC_DIR)/comm_general.c \
+						$(COMMON_SRC_DIR)/resource_request.c
+	mkdir -p build
 	$(CC) -g $(CFLAGS) $^ -o $@
 
 clean:

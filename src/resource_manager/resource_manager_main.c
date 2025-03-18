@@ -3,13 +3,37 @@
 #include "common/verbose.h"
 #include <unistd.h>
 #include <stdbool.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+ResourceDataBaseProxy_t* safeDatabase = NULL;
+ResourceManager_t* manager = NULL;
+void handle_sigint(int sig) {
+  if(sig != SIGINT){
+    return;
+  }
+  verbose("\n[RESOURCE_MANAGER_MAIN]: Ctr-C Captured. Exiting Program \n");
+  if(manager != NULL){
+    (void)endResourceManager(manager);
+  }
+  if(safeDatabase != NULL){
+    (void)endResourceDataBaseProxy(safeDatabase);
+  }
+  exit(0);
+}
+
 
 int main() {
+  signal(SIGINT, handle_sigint);
   // TODO: get actual IP
   setVerbose(true);
 
+  verbose("[RESOURCE_MANAGER_MAIN]: Utilize Ctr-C to end this program\n");
+
   verbose("[RESOURCE_MANAGER_MAIN]: Database ... \n");
-  ResourceDataBaseProxy_t* safeDatabase = initResourceDatabaseProxy();
+  safeDatabase = initResourceDatabaseProxy();
+
   if(safeDatabase == NULL){
     verbose("[RESOURCE_MANAGER_MAIN]: Database ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
     return -1;
@@ -17,7 +41,8 @@ int main() {
   verbose("[RESOURCE_MANAGER_MAIN]: Database ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
   verbose("[RESOURCE_MANAGER_MAIN]: Initializing Resource Manager ... \n");
-  ResourceManager_t* manager = initResourceManager(safeDatabase, "127.0.0.1", 8080);
+  manager = initResourceManager(safeDatabase, "127.0.0.1", 8080);
+
   if(manager == NULL){
     verbose("[RESOURCE_MANAGER_MAIN]: Initializing Resource Manager ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
     return -1;
@@ -34,8 +59,4 @@ int main() {
     }
     verbose("[RESOURCE_MANAGER_MAIN]: Waiting for a Train Manager Connection ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
   }
-
-  (void)endResourceManager(manager);
-  (void)endResourceDataBaseProxy(safeDatabase);
-  return 0;
 }

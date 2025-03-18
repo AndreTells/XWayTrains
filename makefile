@@ -141,7 +141,8 @@ build/resource_manager: $(RESOURCE_MANAGER_SRC_DIR)/resource_manager_main.c \
 						$(COMMON_SRC_DIR)/comm_general.c \
 						$(COMMON_SRC_DIR)/verbose.c \
 						$(COMMON_SRC_DIR)/resource_request.c \
-						$(COMMON_SRC_DIR)/time_out.c
+						$(COMMON_SRC_DIR)/time_out.c \
+						$(COMMON_SRC_DIR)/flags.c
 	mkdir -p build
 	$(CC) -g $(CFLAGS) $^ -o $@
 

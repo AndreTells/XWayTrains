@@ -1,6 +1,8 @@
 #include "resource_manager/resource_database_proxy.h"
 #include "resource_manager/resource_manager.h"
 #include "common/verbose.h"
+#include "common/flags.h"
+
 #include <unistd.h>
 #include <stdbool.h>
 #include <signal.h>
@@ -24,10 +26,20 @@ void handle_sigint(int sig) {
 }
 
 
-int main() {
+int main(int argc, char *argv[]) {
+  // setting up signal handling
   signal(SIGINT, handle_sigint);
-  // TODO: get actual IP
-  setVerbose(true);
+
+  // checking command line arguments
+  bool verbose_mode = get_flag_value(argc,argv, VERBOSE_FLAG, NULL);
+  setVerbose(verbose_mode);
+
+  char* ip_address;
+  bool ip_received = get_flag_value(argc,argv,IP_ADDRESS_FLAG,&ip_address);
+  if(!ip_received){
+    verbose("[RESOURCE_MANAGER_MAIN]: ERROR No Ip Address Received\n");
+    return -1;
+  }
 
   verbose("[RESOURCE_MANAGER_MAIN]: Utilize Ctr-C to end this program\n");
 
@@ -41,7 +53,7 @@ int main() {
   verbose("[RESOURCE_MANAGER_MAIN]: Database ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
   verbose("[RESOURCE_MANAGER_MAIN]: Initializing Resource Manager ... \n");
-  manager = initResourceManager(safeDatabase, "127.0.0.1", 8080);
+  manager = initResourceManager(safeDatabase, ip_address, 8080);
 
   if(manager == NULL){
     verbose("[RESOURCE_MANAGER_MAIN]: Initializing Resource Manager ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
@@ -49,7 +61,6 @@ int main() {
   }
   verbose("[RESOURCE_MANAGER_MAIN]: Initializing Resource Manager ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
-  // TODO: add a way so the program can actually terminate
   while (true) {
     verbose("[RESOURCE_MANAGER_MAIN]: Waiting for a Train Manager Connection ... \n");
     int res = acceptTrainManager(manager);

@@ -56,10 +56,10 @@ test:build/test/remote build/test/resource_database\
 		build/test/resource_manager
 
 	@printf "\n[Unit testing]\n"
-	build/test/resource_database
-	build/test/request_queue
-	build/test/resource_manager
-	build/test/resource_manager_proxy
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_database -s
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/request_queue -s
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_manager -s
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_manager_proxy -s
 # 	build/test/unit_test_plc_proxy_cli
 # 	build/test/unit_test_train
 	@printf "\nDone unit testing\n"

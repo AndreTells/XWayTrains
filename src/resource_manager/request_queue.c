@@ -37,11 +37,8 @@ int destroyQueue(ResourceRequestQueue_t* queue){
   }
 
   // clear out all requests still in the queue
-  while(true){
+  while(queue->head){
     ResourceRequest_t* req = popQueue(queue);
-    if(req == NULL){
-      break;
-    }
 
     int fd = req->returnFd;
     ResourceRequestResponse_t* resp = createResourceRequestResponse(req, RESOURCE_REFUSED);

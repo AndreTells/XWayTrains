@@ -55,12 +55,15 @@ int resource_database_test(void) {
             !(releaseResource(database, 10, 0) == 0));
   CHECK_LOG("attempt to unlock unlocked resource ... ",
             !(releaseResource(database, 3, 0) == -1));
+
+  endResourceDataBase(database);
   return 0;
 }
 
 int resource_database_proxy_test(void) {
   ResourceDataBaseProxy_t* database_proxy = initResourceDatabaseProxy();
   CHECK_LOG("resource Database Proxy init function ... ", !(database_proxy));
+  endResourceDataBaseProxy(database_proxy);
   return 0;
 }
 int train_manager_proxy_test(void) { return 0; }

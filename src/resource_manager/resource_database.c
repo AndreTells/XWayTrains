@@ -1,5 +1,5 @@
-
 #include "resource_manager/resource_database.h"
+#include "common/time_out.h"
 
 #include <err.h>
 #include <semaphore.h>
@@ -84,11 +84,17 @@ int releaseResource(ResourceDataBase_t *database, int ressourceId,
 }
 
 int waitResource(ResourceDataBase_t *database, int ressourceId) {
-  return sem_wait(&(database->interest[ressourceId]));
+  struct timespec ts;
+  loadTimeSpec(&ts);
+  return sem_timedwait(&(database->interest[ressourceId]),&ts);
 }
 
 int registerResource(ResourceDataBase_t *database, int ressourceId,
                      int ammount) {
+  if(ammount > 1){
+    // TODO: implement
+    return -1;
+  }
   database->registered[ressourceId] = true;
   database->availability[ressourceId] = ammount;
   sem_init(&(database->interest[ressourceId]), 0, ammount);

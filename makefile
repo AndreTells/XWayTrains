@@ -51,14 +51,17 @@ static_analyser:
 # 	clang-tidy src/* -- -std=c11 -I include
 
 test:build/test/remote build/test/resource_database\
-		build/test/resource_manager_proxy build/test/plc_proxy \
-		build/test/train build/test/request_queue \
+		build/test/resource_manager_proxy \
+		build/test/request_queue \
 		build/test/resource_manager
 
 	@printf "\n[Unit testing]\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_database -s
+	@printf "\n\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/request_queue -s
+	@printf "\n\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_manager -s
+	@printf "\n\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_manager_proxy -s
 	@printf "\nDone unit testing\n"
 
@@ -76,6 +79,7 @@ build/test/request_queue: $(TEST_SRC_DIR)/unit_test_request_queue.c \
 								$(RESOURCE_MANAGER_SRC_DIR)/request_queue.c \
 								$(COMMON_SRC_DIR)/resource_request.c \
 								$(COMMON_SRC_DIR)/verbose.c \
+								$(COMMON_SRC_DIR)/flags.c \
 								$(COMMON_SRC_DIR)/time_out.c
 
 	mkdir -p build/test
@@ -85,6 +89,7 @@ build/test/resource_database: $(TEST_SRC_DIR)/unit_test_resource_database.c \
 								$(RESOURCE_MANAGER_SRC_DIR)/resource_database.c \
 								$(RESOURCE_MANAGER_SRC_DIR)/resource_database_proxy.c \
 								$(COMMON_SRC_DIR)/verbose.c \
+								$(COMMON_SRC_DIR)/flags.c \
 								$(COMMON_SRC_DIR)/time_out.c
 	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
@@ -97,6 +102,7 @@ build/test/resource_manager: $(TEST_SRC_DIR)/unit_test_resource_manager.c \
 						$(COMMON_SRC_DIR)/mock_comm_general.c \
 						$(COMMON_SRC_DIR)/mock_resource_request.c \
 						$(COMMON_SRC_DIR)/verbose.c \
+						$(COMMON_SRC_DIR)/flags.c \
 						$(COMMON_SRC_DIR)/time_out.c
 
 	mkdir -p build/test
@@ -109,7 +115,8 @@ build/test/resource_manager: $(TEST_SRC_DIR)/unit_test_resource_manager.c \
 build/test/resource_manager_proxy: $(TEST_SRC_DIR)/unit_test_resource_manager_proxy.c \
 									$(TRAIN_MANAGER_SRC_DIR)/resource_manager_proxy.c \
 									$(COMMON_SRC_DIR)/mock_resource_request.c \
-									$(COMMON_SRC_DIR)/verbose.c
+									$(COMMON_SRC_DIR)/verbose.c \
+									$(COMMON_SRC_DIR)/flags.c
 	mkdir -p build/test
 	$(CC) -g $(CFLAGS) $^ -o $@
 

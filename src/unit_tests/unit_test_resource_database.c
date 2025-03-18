@@ -1,69 +1,63 @@
 #include <stdio.h>
+#include <assert.h>
 
 #include "resource_manager/resource_database.h"
 #include "resource_manager/resource_database_proxy.h"
-
-#define KRED "\x1B[31m"
-#define KGRN "\x1B[32m"
-#define RESET "\x1B[0m"
-
-#define ALIGNMENT 43
-
-// TODO(andre): refactor to a separate file
-#define CHECK_LOG(str, expr)       \
-  if ((expr) != 0) {               \
-    printf("%*s", ALIGNMENT, str); \
-    printf(KRED "Failed" RESET);   \
-    printf("\n");                  \
-  } else {                         \
-    printf("%*s", ALIGNMENT, str); \
-    printf(KGRN "Sucess" RESET);   \
-    printf("\n");                  \
-  }
+#include "common/flags.h"
+#include "common/verbose.h"
 
 int resource_database_test(void);
 int resource_database_proxy_test(void);
-int train_manager_proxy_test(void);
 
-int main(void) {
-  CHECK_LOG("Resource Database Test ... ", resource_database_test());
-  printf("\n");
+int main(int argc, char* argv[]) {
+  bool verbose_mode = get_flag_value(argc,argv, VERBOSE_FLAG, NULL);
+  setVerbose(verbose_mode);
+  verbose("[Unit Testing] Resource Manager ... \n\n");
 
-  CHECK_LOG("Resource Database Proxy Test ... ",
-            resource_database_proxy_test());
+  resource_database_test();
+  resource_database_proxy_test();
 
-  CHECK_LOG("Train Manager Proxy Test ... ", train_manager_proxy_test());
-
+  verbose("\n[Unit Testing] Resource Manager ... Done \n");
   return 0;
 }
 
 int resource_database_test(void) {
+  verbose("[Resource Database] Init ... \n");
   ResourceDataBase_t* database = initResourceDataBase();
-  CHECK_LOG("resource Database init function ... ", !(database));
-  CHECK_LOG("attempt to lock random resource ... ",
-            !(attemptLockResource(database, 10, 0) == 0));
-  CHECK_LOG("attempt to lock first resource ... ",
-            !(attemptLockResource(database, 0, 0) == 0));
-  CHECK_LOG("attempt to lock last resource ... ",
-            !(attemptLockResource(database, 10 - 1, 0) == 0));
-  CHECK_LOG("attempt to lock invalid resource ... ",
-            !(attemptLockResource(database, -1, 0) == -1));
-  CHECK_LOG("attempt to lock invalid resource ... ",
-            !(attemptLockResource(database, 10, 0) == -1));
+  assert(database != NULL);
 
-  CHECK_LOG("attempt to unlock locked resource ... ",
-            !(releaseResource(database, 10, 0) == 0));
-  CHECK_LOG("attempt to unlock unlocked resource ... ",
-            !(releaseResource(database, 3, 0) == -1));
+  // Test resource registration
+  assert(registerResource(database, 5, 2) == -1);
+  assert(registerResource(database, 5, 1) == 0);
+  assert(attemptLockResource(database, 5, 1) == 0);
+  assert(attemptLockResource(database, 5, 2) == -1);
+  assert(attemptLockResource(database, 5, 3) == -1); // No availability left
+
+  // Test unlock behavior
+  assert(releaseResource(database, 5, 1) == 0);
+  assert(attemptLockResource(database, 5, 3) == 0); // Now should succeed
+  assert(releaseResource(database, 5, 3) == 0);
+
+  // Test invalid locks/unlocks
+  assert(attemptLockResource(database, -1, 0) == -1);
+  assert(attemptLockResource(database, 51, 0) == -1);
+  assert(releaseResource(database, 5, 99) == -1); // Invalid owner
+
+  // Test waiting for a resource
+  assert(registerResource(database, 6, 1) == 0);
+  assert(waitResource(database, 6) == 0); // Should block until released
 
   endResourceDataBase(database);
+  verbose("[Resource Database] Init ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
   return 0;
 }
 
 int resource_database_proxy_test(void) {
+  verbose("[Resource Database Proxy] Init ... \n");
   ResourceDataBaseProxy_t* database_proxy = initResourceDatabaseProxy();
-  CHECK_LOG("resource Database Proxy init function ... ", !(database_proxy));
+  assert(database_proxy != NULL);
+
   endResourceDataBaseProxy(database_proxy);
+  verbose("[Resource Database Proxy] Init ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
   return 0;
 }
-int train_manager_proxy_test(void) { return 0; }

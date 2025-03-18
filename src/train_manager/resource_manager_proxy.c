@@ -163,10 +163,12 @@ int requestResource(ResourceManagerProxy_t* resManager, int resourceId,
 
   verbose("[RESOURCE MANAGER PROXY]: Waiting For Response ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
+  free(req);
   if(resp->respType != RESOURCE_GRANTED){
     verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
     return -1;
   }
+  free(resp);
 
   verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
   return 0;
@@ -211,10 +213,12 @@ int releaseResource(ResourceManagerProxy_t* resManager, int resourceId,
 
   verbose("[RESOURCE MANAGER PROXY]: Waiting For Response ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
+  free(req);
   if(resp->respType != RESOURCE_GRANTED){
     verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
     return -1;
   }
+  free(resp);
 
   verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
   return 0;

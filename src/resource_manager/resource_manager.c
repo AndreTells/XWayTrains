@@ -75,12 +75,19 @@ ResourceManager_t* initResourceManager(ResourceDataBaseProxy_t* safeDatabase,
 }
 
 int endResourceManager(ResourceManager_t* manager) {
+  // considering edge cases
+  if(manager == NULL){
+    return -1;
+  }
   manager->finished = true;
 
   pthread_join(manager->consumerThread, NULL);
 
-  for(int i=0; i<manager->lastClientIndex; i++){
-    (void)pthread_join(manager->clients[i], NULL);
+  for(int i=0; i<manager->lastClientIndex + 1; i++){
+    int res = pthread_join(manager->clients[i], NULL);
+    if(res <0){
+      return -1;
+    }
     // not checking if the join is failing
   }
 
@@ -101,7 +108,7 @@ int acceptTrainManager(ResourceManager_t* manager) {
   int i = manager->lastClientIndex; // id of the client
 
   manager->clientsFd[i] = connectionFd;
-  RequestProducerThread_t* threadData = malloc(sizeof(RequestProducerThread_t*));
+  RequestProducerThread_t* threadData = malloc(sizeof(RequestProducerThread_t));
   threadData->inputFd = connectionFd;
   threadData->parent = manager;
   threadData->queue = manager->queue;
@@ -114,10 +121,22 @@ int acceptTrainManager(ResourceManager_t* manager) {
 void* producerThread(void* data) {
   RequestProducerThread_t* typedData = (RequestProducerThread_t*) data;
   ResourceManager_t* manager = typedData->parent;
+
+  if(manager == NULL){
+    free(typedData);
+    pthread_exit(NULL);
+  }
+
   ResourceRequestQueue_t* queue = typedData->queue;
+
+  if(queue == NULL){
+    free(typedData);
+    pthread_exit(NULL);
+  }
+
   int inputFd = typedData->inputFd;
 
-  while(!manager->finished){
+  while(!(manager->finished)){
     ResourceRequest_t* req = recvResourceRequest(inputFd);
     pushQueue(queue,req);
   }
@@ -138,21 +157,24 @@ void* consumerThread(void* data) {
       continue;
     }
 
-    int res = -1;
+    ResourceRequestResponseType_e res = RESOURCE_REFUSED;
     switch(req->reqType){
       case LOCK_RESOURCE:
         (void)waitResourceProxy(manager->safeDatabase, req->resourceId);
         (void)attemptLockResourceProxy(manager->safeDatabase, req->resourceId, req->requesterId);
-        res = 0;
+        res = RESOURCE_GRANTED;
         break;
 
       case RELEASE_RESOURCE:
         (void)releaseResourceProxy(manager->safeDatabase, req->resourceId, req->requesterId);
-        res = 0;
+        res = RESOURCE_GRANTED;
         break;
     }
 
-    answerResourceRequest(req, res);
+    int fd = req->returnFd;
+    ResourceRequestResponse_t* resp = createResourceRequestResponse(req, res);
+    answerResourceRequest(fd, resp);
+
   }
 
   free(typedData);

@@ -32,14 +32,28 @@ ResourceRequestQueue_t* initQueue(){
 
 int destroyQueue(ResourceRequestQueue_t* queue){
 
+  if(queue == NULL){
+    return -1;
+  }
+
   // clear out all requests still in the queue
-  while(queue->head != NULL){
+  while(true){
     ResourceRequest_t* req = popQueue(queue);
-    answerResourceRequest(req, -1);
+    if(req == NULL){
+      break;
+    }
+
+    int fd = req->returnFd;
+    ResourceRequestResponse_t* resp = createResourceRequestResponse(req, RESOURCE_REFUSED);
+    answerResourceRequest(fd, resp);
+    free(req);
+    free(resp);
   }
 
   sem_destroy(&(queue->lock));
   sem_destroy(&(queue->availability));
+
+  free(queue);
   return 0;
 }
 

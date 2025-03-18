@@ -16,6 +16,11 @@ typedef enum {
   RELEASE_RESOURCE
 }ResourceRequestType_e;
 
+typedef enum {
+  RESOURCE_GRANTED,
+  RESOURCE_REFUSED
+}ResourceRequestResponseType_e;
+
 /**
  * @brief Structure representing a resource request.
  */
@@ -27,9 +32,24 @@ typedef struct {
 }ResourceRequest_t;
 
 /**
+ * @brief Structure representing a response to a resource request.
+ */
+typedef struct {
+  int requesterId;
+  int resourceId;
+  ResourceRequestResponseType_e respType;
+}ResourceRequestResponse_t;
+
+/**
  * @brief Structure representing a resource request.
  */
 int sendResourceRequest(int fd, ResourceRequest_t* req);
+
+/**
+ * @brief Sends a response to a resource request.
+ *
+ */
+int answerResourceRequest(int fd, ResourceRequestResponse_t* resp);
 
 /**
  * @brief Receives a resource request from a given file descriptor.
@@ -40,14 +60,7 @@ int sendResourceRequest(int fd, ResourceRequest_t* req);
  */
 ResourceRequest_t* recvResourceRequest(int fd);
 
-/**
- * @brief Sends a response to a resource request.
- *
- * @param req Pointer to the resource request structure.
- * @param resp Response value to send.
- * @return 0 on success, or a negative value on failure.
- */
-int answerResourceRequest(ResourceRequest_t* req, int resp);
+ResourceRequestResponse_t* recvResourceRequestResponse(int fd);
 
 /**
  * @brief Creates a new resource request structure.
@@ -68,5 +81,10 @@ ResourceRequest_t* createResourceRequest( int requesterId,int resourceId,
  * @return 0 on success, or a negative value on failure.
  */
 int destroyResourceRequest(ResourceRequest_t* req);
+
+ResourceRequestResponse_t* createResourceRequestResponse( ResourceRequest_t*req,
+                                             ResourceRequestResponseType_e respType);
+
+int destroyResourceRequestResponse(ResourceRequestResponse_t* req);
 
 #endif // RESOURCE_REQUEST_H_

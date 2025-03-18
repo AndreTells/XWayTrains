@@ -6,9 +6,6 @@
 void test_init_destroy_queue() {
     ResourceRequestQueue_t* queue = initQueue();
 
-    int res = destroyQueue(queue);
-    assert(res == 0);
-
     int destroyRes = destroyQueue(queue);
     assert(destroyRes == 0);
 
@@ -31,8 +28,6 @@ void test_push_pop_queue() {
     // Pop second request
     poppedReq = popQueue(queue);
     assert(poppedReq == &req2);
-
-    destroyQueue(queue);
 
     int destroyRes = destroyQueue(queue);
     assert(destroyRes == 0);

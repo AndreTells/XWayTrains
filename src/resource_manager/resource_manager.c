@@ -101,7 +101,7 @@ int acceptTrainManager(ResourceManager_t* manager) {
   int i = manager->lastClientIndex; // id of the client
 
   manager->clientsFd[i] = connectionFd;
-  RequestProducerThread_t* threadData = (RequestProducerThread_t*) malloc(sizeof(RequestProducerThread_t*));
+  RequestProducerThread_t* threadData = malloc(sizeof(RequestProducerThread_t*));
   threadData->inputFd = connectionFd;
   threadData->parent = manager;
   threadData->queue = manager->queue;
@@ -119,7 +119,7 @@ void* producerThread(void* data) {
 
   while(!manager->finished){
     ResourceRequest_t* req = recvResourceRequest(inputFd);
-    (void)pushQueue(queue,req);
+    pushQueue(queue,req);
   }
 
   free(typedData);
@@ -133,6 +133,10 @@ void* consumerThread(void* data) {
 
   while(!manager->finished){
     ResourceRequest_t* req = popQueue(queue);
+
+    if(req == NULL){
+      continue;
+    }
 
     int res = -1;
     switch(req->reqType){

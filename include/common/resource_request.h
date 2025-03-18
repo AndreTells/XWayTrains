@@ -19,4 +19,9 @@ ResourceRequest_t* recvResourceRequest(int fd);
 
 int answerResourceRequest(ResourceRequest_t* req, int resp);
 
+ResourceRequest_t* createResourceRequest( int requesterId,int resourceId,
+                                    ResourceRequestType_e reqType, int fd);
+
+int destroyResourceRequest(ResourceRequest_t* req);
+
 #endif // RESOURCE_REQUEST_H_

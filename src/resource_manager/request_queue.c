@@ -1,8 +1,10 @@
 #include "resource_manager/request_queue.h"
 #include "common/resource_request.h"
+#include "common/time_out.h"
 
 #include <stdlib.h>
 #include <semaphore.h>
+#include <time.h>
 
 typedef struct ResourceRequestQueueEntry_t{
   ResourceRequest_t* req;
@@ -42,7 +44,15 @@ int destroyQueue(ResourceRequestQueue_t* queue){
 }
 
 int pushQueue(ResourceRequestQueue_t* queue, ResourceRequest_t* req){
-  sem_wait(&(queue->lock));
+  struct timespec ts;
+  loadTimeSpec(&ts);
+  int res;
+
+  res = sem_timedwait(&(queue->lock),&ts);
+  if(res < 0){
+    return res;
+  }
+
 
   ResourceRequestQueueEntry_t* newEntry = (ResourceRequestQueueEntry_t*) malloc(sizeof(ResourceRequestQueueEntry_t));
   if(newEntry == NULL){
@@ -70,8 +80,20 @@ int pushQueue(ResourceRequestQueue_t* queue, ResourceRequest_t* req){
 }
 
 ResourceRequest_t* popQueue(ResourceRequestQueue_t* queue){
-  sem_wait(&(queue->availability));
-  sem_wait(&(queue->lock));
+  struct timespec ts;
+  loadTimeSpec(&ts);
+  int res;
+
+  res = sem_timedwait(&(queue->availability), &ts);
+  if(res<0){
+    return NULL;
+  }
+
+  res = sem_timedwait(&(queue->lock), &ts);
+  if(res<0){
+    return NULL;
+  }
+
   // checking edge case where queue is already emtpy
   if(queue->head == NULL){
     return NULL;
@@ -97,6 +119,9 @@ ResourceRequest_t* popQueue(ResourceRequestQueue_t* queue){
 
   free(head);
 
-  sem_post(&(queue->lock));
+  res = sem_post(&(queue->lock));
+  if(res < 0){
+    return NULL;
+  }
   return req;
 }

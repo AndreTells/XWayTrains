@@ -1,36 +1,24 @@
 #include "common/resource_request.h"
-#include "common/time_out.h"
 #include <stdlib.h>
 #include <sys/socket.h>
 
+
 int sendResourceRequest(int fd,ResourceRequest_t* req){
-  (void)send(fd,&req,sizeof(ResourceRequest_t),0);
   return 0;
 }
 
 ResourceRequest_t* recvResourceRequest(int fd){
 
-  int res;
-  res = fileDescriptorTimedWait(fd);
-  if(res <=0 ){
-    return NULL;
-  }
-
   ResourceRequest_t* req = malloc(sizeof(ResourceRequest_t));
-  res = recv(fd, req, sizeof(ResourceRequest_t), 0);
-
-  if(res == -1){
-    free(req);
-    return NULL;
-  }
-
+  req->requesterId = 0;
+  req->resourceId = 0;
+  req->reqType = LOCK_RESOURCE;
   req->returnFd = fd;
 
   return req;
 }
 
 int answerResourceRequest(ResourceRequest_t* req, int resp){
-  (void)send(req->returnFd,&resp,sizeof(int),0);
   return 0;
 }
 

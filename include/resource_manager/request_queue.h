@@ -1,6 +1,7 @@
 #ifndef REQUEST_QUEUE_H_
 #define REQUEST_QUEUE_H_
 #include "common/resource_request.h"
+#define WAIT_TIMEOUT 5
 
 // thread safe implementation of a queue
 // allows for a blocking read and

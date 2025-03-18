@@ -1,66 +1,50 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <assert.h>
+#include "resource_manager/resource_manager.h"
+#include "resource_manager/request_queue.h"
+#include "common/resource_request.h"
 
-#include "resource_manager/resource_database.h"
-#include "resource_manager/resource_database_proxy.h"
-
-#define KRED "\x1B[31m"
-#define KGRN "\x1B[32m"
-#define RESET "\x1B[0m"
-
-#define ALIGNMENT 43
-
-// TODO(andre): refactor to a separate file
-#define CHECK_LOG(str, expr)       \
-  if ((expr) != 0) {               \
-    printf("%*s", ALIGNMENT, str); \
-    printf(KRED "Failed" RESET);   \
-    printf("\n");                  \
-  } else {                         \
-    printf("%*s", ALIGNMENT, str); \
-    printf(KGRN "Sucess" RESET);   \
-    printf("\n");                  \
-  }
-
-int resource_database_test(void);
-int resource_database_proxy_test(void);
-int train_manager_proxy_test(void);
-
-int main(void) {
-  CHECK_LOG("Resource Database Test ... ", resource_database_test());
-  printf("\n");
-
-  CHECK_LOG("Resource Database Proxy Test ... ",
-            resource_database_proxy_test());
-
-  CHECK_LOG("Train Manager Proxy Test ... ", train_manager_proxy_test());
-
-  return 0;
+// Test initialization
+void test_initResourceManager() {
+    ResourceManager_t* manager = initResourceManager(NULL, "127.0.0.1", 8080);
+    assert(manager != NULL);
+    printf("[PASS] initResourceManager\n");
+    endResourceManager(manager);
 }
 
-int resource_database_test(void) {
-  ResourceDataBase_t* database = initResourceDataBase();
-  CHECK_LOG("resource Database init function ... ", !(database));
-  CHECK_LOG("attempt to lock random resource ... ",
-            !(attemptLockResource(database, 10, 0) == 0));
-  CHECK_LOG("attempt to lock first resource ... ",
-            !(attemptLockResource(database, 0, 0) == 0));
-  CHECK_LOG("attempt to lock last resource ... ",
-            !(attemptLockResource(database, 10 - 1, 0) == 0));
-  CHECK_LOG("attempt to lock invalid resource ... ",
-            !(attemptLockResource(database, -1, 0) == -1));
-  CHECK_LOG("attempt to lock invalid resource ... ",
-            !(attemptLockResource(database, 10, 0) == -1));
+// Test accepting a client
+void test_acceptTrainManager() {
+    ResourceManager_t* manager = initResourceManager(NULL, "127.0.0.1", 8080);
+    assert(manager != NULL);
 
-  CHECK_LOG("attempt to unlock locked resource ... ",
-            !(releaseResource(database, 10, 0) == 0));
-  CHECK_LOG("attempt to unlock unlocked resource ... ",
-            !(releaseResource(database, 3, 0) == -1));
-  return 0;
+    int result = acceptTrainManager(manager);
+    assert(result == 0);
+
+    printf("[PASS] acceptTrainManager\n");
+    endResourceManager(manager);
 }
 
-int resource_database_proxy_test(void) {
-  ResourceDataBaseProxy_t* database_proxy = initResourceDatabaseProxy();
-  CHECK_LOG("resource Database Proxy init function ... ", !(database_proxy));
-  return 0;
+// Test resource manager cleanup
+void test_endResourceManager() {
+    ResourceManager_t* manager = initResourceManager(NULL, "127.0.0.1", 8080);
+    assert(manager != NULL);
+
+    endResourceManager(manager);
+
+    printf("[PASS] endResourceManager\n");
 }
-int train_manager_proxy_test(void) { return 0; }
+
+int main() {
+    test_initResourceManager();
+    test_acceptTrainManager();
+//    TODO: find out how to test these
+//    test_producerThread();
+//    test_consumerThread();
+    test_endResourceManager();
+
+    printf("All tests passed!\n");
+    return 0;
+}

@@ -60,8 +60,6 @@ test:build/test/remote build/test/resource_database\
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/request_queue -s
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_manager -s
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_manager_proxy -s
-# 	build/test/unit_test_plc_proxy_cli
-# 	build/test/unit_test_train
 	@printf "\nDone unit testing\n"
 
 
@@ -115,23 +113,6 @@ build/test/resource_manager_proxy: $(TEST_SRC_DIR)/unit_test_resource_manager_pr
 	mkdir -p build/test
 	$(CC) -g $(CFLAGS) $^ -o $@
 
-build/test/plc_proxy: $(TEST_SRC_DIR)/unit_test_plc_proxy.c \
-						$(TRAIN_MANAGER_SRC_DIR)/plc_proxy.c \
-						$(TRAIN_MANAGER_SRC_DIR)/plc_info.c
-	mkdir -p build/test
-	$(CC) -g $(CFLAGS) $^ -o $@
-
-
-
-build/test/train: $(TEST_SRC_DIR)/unit_test_train.c \
-					$(TRAIN_MANAGER_SRC_DIR)/plc_proxy.c \
-					$(TRAIN_MANAGER_SRC_DIR)/plc_info.c \
-					$(TRAIN_MANAGER_SRC_DIR)/resource_manager_proxy.c \
-					$(COMMON_SRC_DIR)/mock_resource_request.c \
-					$(COMMON_SRC_DIR)/verbose.c \
-					$(TRAIN_MANAGER_SRC_DIR)/train.c
-	mkdir -p build/test
-	$(CC) -g $(CFLAGS) $^ -o $@
 
 # --------------------------------------------------------------------- #
 # Building Final Version                                                #

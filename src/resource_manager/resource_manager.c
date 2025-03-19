@@ -153,6 +153,7 @@ void* consumerThread(void* data) {
   while(!manager->finished){
     ResourceRequest_t* req = popQueue(queue);
 
+    //TODO: make one thread per request
     if(req == NULL){
       continue;
     }

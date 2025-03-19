@@ -38,6 +38,7 @@ all: format_code static_analyser build/remote_test/main
 
 format_code:
 	clang-format --verbose -i --style=file src/common/*
+	clang-format --verbose -i --style=file src/plc/*
 	clang-format --verbose -i --style=file src/remote_test/*
 	clang-format --verbose -i --style=file src/resource_manager/*
 	clang-format --verbose -i --style=file src/train_manager/*

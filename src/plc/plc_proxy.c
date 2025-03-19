@@ -8,14 +8,10 @@
 
 #include "plc/plc_message.h"
 #include "plc/plc_proxy.h"
+#include "common/verbose.h"
 
 #define MAX_NUM_REGISTRABLE_TRAINS 4
 
-/**
- * @brief Structure representing a PLC Proxy instance
- * @details Encapsulates all state and functionality for communicating with the
- * PLC.
- */
 struct PlcProxy_t {
   pthread_t readerThreadTid;
   sem_t mutex;
@@ -39,20 +35,20 @@ void* plcProxyMsgReceiverThread(void* plcProxy);
  */
 int plcProxyTryRegisterClient(PlcProxy_t* plcProxy, int clientId);
 
-/**
- * @brief Initialize a new PLC Proxy instance
- * @param plcIpAddr IP Address of the plc
- * @return Pointer to the newly created PlcProxy_t instance
- * @note The caller is responsible for gracefully terminating the instance using
- *       `endPlcProxy()`.
- */
 PlcProxy_t* initPlcProxy(char* plcIpAddr) {
   // check if it's a valid IP address
+  verbose("[PLC PROXY]: Initializing ... \n");
   if (plcIpAddr == NULL) {
+    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
     return NULL;
   }
 
   PlcProxy_t* plcProxy = (PlcProxy_t*)malloc(sizeof(PlcProxy_t));
+
+  if(plcProxy == NULL){
+    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+    return NULL;
+  }
 
   // TODO(felipe): connect to remote plc
 
@@ -68,10 +64,12 @@ PlcProxy_t* initPlcProxy(char* plcIpAddr) {
   // check if sem_init failed
   if (resSemInit != 0) {
     free(plcProxy);
+    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
     return NULL;
   }
 
   // create reader thread
+  verbose("[PLC PROXY]: Initializing Reader Thread ... \n");
   int resPthreadCreate =
       pthread_create(&(plcProxy->readerThreadTid), NULL,
                      plcProxyMsgReceiverThread, (void*)plcProxy);
@@ -79,33 +77,39 @@ PlcProxy_t* initPlcProxy(char* plcIpAddr) {
   // check if pthread_create
   if (resPthreadCreate != 0) {
     free(plcProxy);
+    verbose("[PLC PROXY]: Initializing Reader Thread ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
     return NULL;
   }
 
   return plcProxy;
 }
 
-/**
- * @brief Gracefully terminate a PLC Proxy instance
- * @param[in] plc Proxy instance handle to terminate
- * @return 0 on success, non-zero error code on failure
- */
 int endPlcProxy(PlcProxy_t* plc) {
+  verbose("[PLC PROXY]: Ending ... \n");
   if (plc == NULL) {
+    verbose("[PLC PROXY]: Ending ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
     return -1;
   }
 
+  verbose("[PLC PROXY]: Ending Reader Thread ... \n");
   plc->finished = true;
   int retVal = 0;
   pthread_kill(plc->readerThreadTid, SIGINT);
+
   (void)pthread_join(plc->readerThreadTid, (void*)&retVal);
   // check if the join failed
   if (retVal != 0) {
+    verbose("[PLC PROXY]: Ending Reader Thread ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+    verbose("[PLC PROXY]: Ending ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
     return -1;
   }
+
+  verbose("[PLC PROXY]: Ending Reader Thread ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
   sem_destroy(&(plc->mutex));
 
   // closing all open pipes
+  verbose("[PLC PROXY]:Closing Pipes ... \n");
   for (int i = 0; i < MAX_NUM_REGISTRABLE_TRAINS; i++) {
     if (plc->outputFd[i][0] == -1) {
       continue;
@@ -114,16 +118,12 @@ int endPlcProxy(PlcProxy_t* plc) {
     close(plc->outputFd[i][1]);
   }
 
+  verbose("[PLC PROXY]: Closing Pipes ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
+
   free(plc);
   return 0;
 }
 
-/**
- * @brief Send a message to the PLC
- * @param[in] plc Proxy instance handle
- * @param[in] msg Pointer to the message to send
- * @return 0 on success, non-zero error code on failure
- */
 int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
   sem_wait(&(plc->mutex));
   printf("msg %x sent to plc\n", msg);
@@ -131,12 +131,6 @@ int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
   return 0;
 }
 
-/**
- * @brief Read a message from the PLC
- * @param[in] plc Proxy instance handle
- * @param[in] clientId id of who is attempting to read as message
- * @return Pointer to the received message, or NULL on failure
- */
 PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int clientId) {
   if (plcProxyTryRegisterClient(plc, clientId) != 0) {
     return NULL;
@@ -155,11 +149,6 @@ PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int clientId) {
   return res;
 }
 
-/**
- * @brief Entry point for the PLC message receiver thread
- * @param[in] plcProxy Pointer to the PlcProxy_t instance
- * @return Thread exit status (always NULL)
- */
 void* plcProxyMsgReceiverThread(void* plcProxy) {
   PlcProxy_t* plc = (PlcProxy_t*)plcProxy;
   while (!plc->finished) {
@@ -186,12 +175,6 @@ void* plcProxyMsgReceiverThread(void* plcProxy) {
   pthread_exit(NULL);
 }
 
-/**
- * @brief Attempt to register a client with the plc proxy
- * @param[in] resManager Proxy instance handle
- * @param[in] clientId ID of the client to register
- * @return 0 on success, non-zero error code on failure
- */
 int plcProxyTryRegisterClient(PlcProxy_t* plcProxy, int clientId) {
   // index out of range
   if (clientId < 0 || clientId > MAX_NUM_REGISTRABLE_TRAINS - 1) {

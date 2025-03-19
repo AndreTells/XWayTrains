@@ -23,35 +23,47 @@ void test_write_req() {
   print_data_hex(requete);
   printf("Test the WRITE_OBJECTS is identical: ");
   fflush(stdout);
+  // checking the modbus preamble
   assert(requete[0] == 0x00);
   assert(requete[1] == 0x00);
   assert(requete[2] == 0x00);
   assert(requete[3] == 0x01);
   assert(requete[4] == 0x00);
-  assert(requete[5] == 0x16);
 
-  assert(requete[6] == 0x00);
+  assert(requete[5] == 0x16); // checking the message length
+  assert(requete[6] == 0x00); // separator
+
+  // checking the npdu
   assert(requete[7] == 0xF1);
-  assert(requete[8] == 0x28);
-  assert(requete[9] == 0x10);
-  assert(requete[10] == 0x0E);
-  assert(requete[11] == 0x10);
-  assert(requete[12] == 0x09);
-  assert(requete[13] == 0x10);
-  assert(requete[14] == 0x37);
-  assert(requete[15] == 0x06);
-  assert(requete[16] == 0x68);
-  assert(requete[17] == 0x07);
-  assert(requete[18] == 0x27);
-  assert(requete[19] == 0x00);
-  assert(requete[20] == 0x03);
-  assert(requete[21] == 0x00);
-  assert(requete[22] == 0x28);
-  assert(requete[23] == 0x00);
-  assert(requete[24] == 0xFF);
-  assert(requete[25] == 0xFF);
-  assert(requete[26] == 0x1F);
-  assert(requete[27] == 0x00);
+
+  // checking sendner info
+  assert(requete[8] == 0x28); // sender station
+  assert(requete[9] == 0x10); // sender port
+
+  // checking receiver info
+  assert(requete[10] == 0x0E);// receiver station
+  assert(requete[11] == 0x10);// receiver port
+
+  // checking extended addr
+  assert(requete[12] == 0x09); // module number
+  assert(requete[13] == 0x10); // module number
+
+  // checking APDU
+  assert(requete[14] == 0x37); // req code
+  assert(requete[15] == 0x06); // machine category
+  assert(requete[16] == 0x68); // memory segment to write as per table
+  assert(requete[17] == 0x07); // obj type
+  assert(requete[18] == 0x27); // addr of first element[1]
+  assert(requete[19] == 0x00); // addr of first element[2]
+  assert(requete[20] == 0x03); // len data[1]
+  assert(requete[21] == 0x00); // len data[2]
+  assert(requete[22] == 0x28); // data 1[1]
+  assert(requete[23] == 0x00); // data 1[2]
+  assert(requete[24] == 0xFF); // data 2[1]
+  assert(requete[25] == 0xFF); // data 2[2]
+  assert(requete[26  == 0x1F); // data 3[2]
+  assert(requete[27] == 0x00); // data 3[2]
+
   printf(GREEN " passed.\n" NOCOLOR);
 }
 

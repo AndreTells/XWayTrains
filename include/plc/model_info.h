@@ -29,6 +29,7 @@ typedef enum RailId_e {
  * @brief Enumeration of powered rail identifiers
  */
 typedef enum PoweredRailId_e {
+  UNKNOWN_P_RAIL,
   P_RAIL1,
   // TODO(andre): chechk ammount of rail Ids
 }PoweredRailId_e;
@@ -37,6 +38,7 @@ typedef enum PoweredRailId_e {
  * @brief Enumeration of switch identifiers
  */
 typedef enum SwitchId_e {
+  UNKNOWN_SWITCH,
   SWITCH1,
   // TODO(andre): chechk ammount of rail Ids
 }SwitchId_e;

@@ -138,6 +138,21 @@ build/test/interpreter: $(TEST_SRC_DIR)/unit_test_interpreter.c \
 	mkdir -p build/test
 	$(CC) -g $(CFLAGS) $^ -o $@
 
+build/test/plc_message: $(TEST_SRC_DIR)/unit_test_plc_message.c \
+									$(PLC_MANAGER_SRC_DIR)/plc_message.c \
+									$(COMMON_SRC_DIR)/verbose.c \
+									$(COMMON_SRC_DIR)/flags.c
+	mkdir -p build/test
+	$(CC) -g $(CFLAGS) $^ -o $@
+
+build/test/plc_proxy: $(TEST_SRC_DIR)/unit_test_plc_proxy.c \
+									$(PLC_MANAGER_SRC_DIR)/plc_proxy.c \
+									$(PLC_MANAGER_SRC_DIR)/mock_plc_message.c \
+									$(PLC_MANAGER_SRC_DIR)/mock_plc_facade.c \
+									$(COMMON_SRC_DIR)/verbose.c \
+									$(COMMON_SRC_DIR)/flags.c
+	mkdir -p build/test
+	$(CC) -g $(CFLAGS) $^ -o $@
 # --------------------------------------------------------------------- #
 # Building Final Version                                                #
 # --------------------------------------------------------------------- #

@@ -50,7 +50,6 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr) {
 
   //TODO: create socket & connect
 
-
   resManager->finished = false;
 
   // Initialize the output file descriptors to -1 (invalid)

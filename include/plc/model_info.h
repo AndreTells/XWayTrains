@@ -13,40 +13,40 @@
 /**
  * @brief Enumeration of train identifiers
  */
-enum TrainId_e { TRAIN_1, TRAIN_2, TRAIN_3, TRAIN_4 };
+typedef enum TrainId_e {UNKNOWN_TRAIN, TRAIN_1, TRAIN_2, TRAIN_3, TRAIN_4 }TrainId_e;
 
 /**
  * @brief Enumeration of rail identifiers
  * @details Contains all constants regarding the physical train model rails.
  */
-enum RailId_e {
-  UNKOWN_RAIL,
+typedef enum RailId_e {
+  UNKNOWN_RAIL,
   RAIL1,
   // TODO(andre): chechk ammount of rail Ids
-};
+}RailId_e;
 
 /**
  * @brief Enumeration of powered rail identifiers
  */
-enum PoweredRailId_e {
+typedef enum PoweredRailId_e {
   P_RAIL1,
   // TODO(andre): chechk ammount of rail Ids
-};
+}PoweredRailId_e;
 
 /**
  * @brief Enumeration of switch identifiers
  */
-enum SwitchId_e {
+typedef enum SwitchId_e {
   SWITCH1,
   // TODO(andre): chechk ammount of rail Ids
-};
+}SwitchId_e;
 
 /**
  * @brief Enumeration of reversible rail identifiers
  */
-enum InversibleRailId_e {
+typedef enum InversibleRailId_e {
   I_RailId1,
   // TODO(andre): chechk ammount of rail Ids
-};
+}InversibleRailId_e;
 
 #endif  // MODEL_INFO_H_

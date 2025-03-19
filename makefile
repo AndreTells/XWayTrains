@@ -7,6 +7,7 @@ TEST_SRC_DIR = ./src/unit_tests
 RTEST_SRC_DIR = ./src/remote_test
 RESOURCE_MANAGER_SRC_DIR = ./src/resource_manager
 TRAIN_MANAGER_SRC_DIR = ./src/train_manager
+PLC_MANAGER_SRC_DIR = ./src/plc
 
 INCLUDE_DIR = ./include
 
@@ -55,6 +56,7 @@ test:build/test/remote build/test/resource_database\
 		build/test/resource_manager_proxy \
 		build/test/request_queue \
 		build/test/resource_manager
+		build/test/interpreter
 
 	@printf "\n[Unit testing]\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_database -s
@@ -64,6 +66,8 @@ test:build/test/remote build/test/resource_database\
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_manager -s
 	@printf "\n\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_manager_proxy -s
+	@printf "\n\n"
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/interpreter -s
 	@printf "\nDone unit testing\n"
 
 
@@ -121,6 +125,18 @@ build/test/resource_manager_proxy: $(TEST_SRC_DIR)/unit_test_resource_manager_pr
 	mkdir -p build/test
 	$(CC) -g $(CFLAGS) $^ -o $@
 
+build/test/interpreter: $(TEST_SRC_DIR)/unit_test_interpreter.c \
+									$(TRAIN_MANAGER_SRC_DIR)/interpreter.c \
+									$(TRAIN_MANAGER_SRC_DIR)/mock_resource_manager_proxy.c \
+									$(TRAIN_MANAGER_SRC_DIR)/mock_train.c \
+									$(PLC_MANAGER_SRC_DIR)/mock_plc_message.c \
+									$(PLC_MANAGER_SRC_DIR)/mock_plc_proxy.c \
+									$(PLC_MANAGER_SRC_DIR)/mock_plc_facade.c \
+									$(COMMON_SRC_DIR)/mock_resource_request.c \
+									$(COMMON_SRC_DIR)/verbose.c \
+									$(COMMON_SRC_DIR)/flags.c
+	mkdir -p build/test
+	$(CC) -g $(CFLAGS) $^ -o $@
 
 # --------------------------------------------------------------------- #
 # Building Final Version                                                #

@@ -8,8 +8,8 @@
 #ifndef PLC_FACADE_H_
 #define PLC_FACADE_H_
 
-#include "model_info.h"
-#include "plc_info.h"
+#include "plc/model_info.h"
+#include "plc/plc_message.h"
 
 /**
  * @brief Create a message to toggle the state of a powered rail

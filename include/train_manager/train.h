@@ -19,7 +19,6 @@ typedef struct Train_t Train_t;
 
 /**
  * @brief Initialize a new Train instance
- * @param[in] trainId Identifier for the train (from the TrainId_e enum)
  * @param[in] plc Proxy instance for communication with the PLC
  * @param[in] resManager Proxy instance for communication with the Resource
  * Manager
@@ -28,8 +27,8 @@ typedef struct Train_t Train_t;
  * @note The caller is responsible for gracefully terminating the instance using
  *       `endTrain()`.
  */
-Train_t* initTrain(enum TrainId_e trainId, PlcProxy_t* plc,
-                   ResourceManagerProxy_t* resManager, char* routeFilePath);
+Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
+                   char* routeFilePath);
 
 /**
  * @brief Gracefully terminate a Train instance

@@ -1,9 +1,11 @@
 #include "train_manager/interpreter.h"
 #include "train_manager/train.h"
+#include "plc/model_info.h"
 #include "plc/plc_message.h"
 #include "plc/plc_facade.h"
 #include "common/verbose.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define MAX_LINE_SIZE 50
@@ -23,13 +25,13 @@ static const KeywordToken plcMsgTypeTable[] = {
 };
 static const int plcMsgTypeTableSize = 3;
 
-static const KeywordToken resReqTable[] = {
+static const KeywordToken resReqTypeTable[] = {
     {"lock", LOCK_RESOURCE},
     {"release", RELEASE_RESOURCE}
 };
-static const int resReqTableSize = 2;
+static const int resReqTypeTableSize = 2;
 
-int getTokenType(const char *word, const KeyWordToken* keyword_table, const int size) {
+int getTokenType(const char *word, const KeywordToken* keyword_table, const int size) {
     for (int i = 0; i<size; i++) {
         if (strcmp(keyword_table[i].keyword, word) == 0) {
             return keyword_table[i].token;
@@ -62,9 +64,8 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
 
   verbose("[Interpreter]: Parsing Line Command ... \n");
   // split string in a thread safe way
-  rsize_t strMax = sizeof(cmdLine);
   char* nextToken;
-  char* cmdStr = strtok_r(cmdLine, &strMax, " ", &nextToken);
+  char* cmdStr = strtok_r(cmdLine, " ", &nextToken);
   if(cmdStr == NULL){
     verbose("[Interpreter]: Parsing Line Command ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
     verbose("[Interpreter]: Executing Command ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
@@ -87,12 +88,14 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
       res = 0;
       verbose("[Interpreter]: Setting Train Id ... \n");
 
-      char* idStr = strtok_r(NULL, &strMax, " ", &nextToken);
+      char* idStr = strtok_r(NULL, " ", &nextToken);
       if(idStr == NULL){
         verbose("[Interpreter]: Setting Train Id  ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+        res = -1;
         break;
       }
-      int id = atoi(idStr):
+
+      int id = atoi(idStr);
       res = setTrainId(state,id);
 
       if(res == -1){
@@ -106,11 +109,12 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
     case(CMD_SET):
       res = 0;
       verbose("[Interpreter]: Contacting the PLC ... \n");
-      char* plcMsgTypeStr = strtok_r(NULL,&strMax, " ", &nextToken);
-      char* targetIdStr = strtok_r(NULL,&strMax, " ", &nextToken);
+      char* plcMsgTypeStr = strtok_r(NULL, " ", &nextToken);
+      char* targetIdStr = strtok_r(NULL, " ", &nextToken);
 
       if(plcMsgTypeStr == NULL || targetIdStr == NULL){
         verbose("[Interpreter]: Contacting the PLC ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+        res = -1;
         break;
       }
 
@@ -118,6 +122,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
 
       if(plcMsgTypeInt == -1){
         verbose("[Interpreter]: Contacting the PLC ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+        res = -1;
         break;
       }
 
@@ -125,7 +130,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
 
       int targetId = atoi(targetIdStr);
 
-      PlcMessage_t* msg;
+      PlcMessage_t* msg = NULL;
       switch(plcMsgType){
         case TOGGLE_RAIL:
           res = createToggleRailStateMessage(msg,getTrainId(state),targetId);
@@ -152,11 +157,12 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
         break;
       }
 
-      PlcMessage_t* plcResp = sendMessagePlcProxy(plc, msg);
+      PlcMessage_t* plcResp = readMessagePlcProxy(plc, getTrainId(state));
 
       if(plcResp == NULL){
         verbose("[Interpreter]: Contacting the PLC ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
         free(msg);
+        res = -1;
         break;
       }
 
@@ -173,9 +179,10 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
     case(CMD_RESOURCE):
       res = 0;
       verbose("[Interpreter]: Contacting the Resource Manager ... \n");
-      char* reqTypeStr = strtok_r(NULL,&strMax, " ", &nextToken);
+      char* reqTypeStr = strtok_r(NULL, " ", &nextToken);
       if(reqTypeStr == NULL){
         verbose("[Interpreter]: Contacting the Resource Manager ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+        res = -1;
         break;
       }
 
@@ -183,48 +190,66 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
 
       if(reqTypeInt == -1){
         verbose("[Interpreter]: Contacting the Resource Manager ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+        res = -1;
         break;
       }
 
       ResourceRequestType_e reqType = (ResourceRequestType_e)reqTypeInt;
 
       int resourceList[MAX_RESOURCE_REQUEST_AMM];
+      memset(resourceList,0,MAX_RESOURCE_REQUEST_AMM*sizeof(int));
       int len = 0;
-      char* resIdStr = strtok_r(NULL,&strMax, " ", &nextToken);
+      char* resIdStr = strtok_r(NULL, " ", &nextToken);
 
       // enforces that atleast one resource must be requested
       if(resIdStr == NULL){
         verbose("[Interpreter]: Contacting the Resource Manager ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+        res = -1;
         break;
       }
 
       while(resIdStr){
-        resourceList[len] = atoi(resIdStr);
+        int tmp = atoi(resIdStr);
+        if(!(tmp > 0 && tmp < MAX_RESOURCE)){
+          res = -1;
+          break;
+        }
+
+        resourceList[len] = tmp;
+
         len+=1;
         if(len >= MAX_RESOURCE_REQUEST_AMM){
           break;
         }
-        resIdStr = strtok_r(NULL,&strMax, " ", &nextToken);
+
+        resIdStr = strtok_r(NULL, " ", &nextToken);
+      }
+
+      if(res == -1){
+        verbose("[Interpreter]: Contacting the Resource Manager ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
+        break;
       }
 
       qsort(resourceList,len,sizeof(int),compare_ints);
 
-      int reqRes = 0;
       for(int i=0; i<len; i++){
-         reqRes = requestResource(resManager,reqType, resourceList[i], getTrainId(state));
+         res = requestResource(resManager,reqType, resourceList[i], getTrainId(state));
 
-        if(reqRes == -1){
+        if(res == -1){
           verbose("[Interpreter]: Contacting the Resource Manager ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
           break;
         }
 
       }
 
-      res = reqRes;
       if(res == 0){
         verbose("[Interpreter]: Contacting the Resource Manager ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
       }
       break;
+    case UNKNOWN:
+        verbose("[Interpreter]: Invalid command \n");
+      break;
+
   }
 
   if(res == -1){
@@ -237,7 +262,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
 
 Path_t initPath(char* filePath){
   //TODO: check file extension
-  FILE* fp = fopen(filePath);
+  FILE* fp = fopen(filePath, "r");
   return fp;
 }
 

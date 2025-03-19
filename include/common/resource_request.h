@@ -8,6 +8,15 @@
 #ifndef RESOURCE_REQUEST_H_
 #define RESOURCE_REQUEST_H_
 
+typedef enum {
+  RESOURCE0,
+  RESOURCE1,
+  RESOURCE2,
+  RESOURCE4
+}Resource_e;
+
+static const Resource_e MAX_RESOURCE = RESOURCE4;
+
 /**
  * @brief Enumeration for resource request types.
  */

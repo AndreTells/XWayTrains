@@ -6,15 +6,31 @@ typedef struct PlcMessage_t {
   int a;
 } PlcMessage_t;
 
-PlcMessage_t* getNullMessage(void) {
-  PlcMessage_t* msg = (PlcMessage_t*)malloc(sizeof(PlcMessage_t));
-  msg->a = 0;
-  return msg;
+
+PlcMessage_t* createPlcMessage(){
+  return malloc(sizeof(PlcMessage_t));
 }
 
-size_t getMessageSize(PlcMessage_t* msg) { return sizeof(PlcMessage_t); }
-
-int freeMessage(PlcMessage_t* msg) {
-  (void)free(msg);
+int setAPDU(PlcMessage_t* msg, XwayAPDUCode_e code, uint8_t* data, int dataLen){
   return 0;
 }
+
+int setNPDU(PlcMessage_t* msg, XwayNPDUType_e code, XwayAddr sender, XwayAddr receiver, uint8_t* extendedAddr){
+  return 0;
+}
+
+XwayAddr createXwayAddr(int8_t station, int8_t network, int8_t port)){
+  return 0;
+}
+
+// returns the msg size
+size_t serializePlcMessage_t(PlcMessage_t* msg, uint8_t* serMsg){
+  return 0;
+}
+
+// returns the msg
+PlcMessage_t* deserializePlcMessage_t( uint8_t* serMsg, size_t msgSize){
+  return 0;
+}
+
+int freeMessage(PlcMessage_t* msg);

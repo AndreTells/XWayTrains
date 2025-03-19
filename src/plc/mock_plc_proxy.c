@@ -77,5 +77,5 @@ int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
  * @return Pointer to the received message, or NULL on failure
  */
 PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int clientId) {
-  return getNullMessage();
+  return createPlcMessage();
 }

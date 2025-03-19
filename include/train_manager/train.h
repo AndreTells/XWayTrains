@@ -38,4 +38,9 @@ Train_t* initTrain(enum TrainId_e trainId, PlcProxy_t* plc,
  */
 int endTrain(Train_t* train);
 
+//TODO: implement + change id to train enum
+int setTrainId(Train_t* train, int id);
+
+int getTrainId(Train_t* train);
+
 #endif  // TRAIN_H_

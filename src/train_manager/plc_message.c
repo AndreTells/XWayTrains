@@ -1,4 +1,4 @@
-#include "plc/plc_info.h"
+#include "plc/plc_message.h"
 
 #include <stdlib.h>
 

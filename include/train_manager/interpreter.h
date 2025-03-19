@@ -2,22 +2,32 @@
 #define INTERPRETER_H_
 #include "train_manager/train.h"
 
-typedef struct Path_t Path_t;
+typedef FILE* Path_t;
 
-typedef struct Interpreter_t Interpreter_t;
+typedef enum {
+  CMD_SET_TRAIN_ID, // 1 in data: id
+  CMD_SET, // 2 in data: PlcMessageType, id
+  CMD_RESOURCE, // at least 2 in: data ResourceRequestType_e, resourceId1, resourceId2 ...
+  UNKOWN
+}InterpreterCommandType_e ;
 
-char* readPathLine(Path_t* path);
+typedef struct {
+    const char *keyword;
+    int token;
+} KeywordToken;
 
-int parseCommand(char* pathLine);
 
-int executeCommand(Interpreter_t* interpreter, InterpreterCommand_t* cmd, Train_t* state);
+char* readPathLine(Path_t path);
 
-Interpreter_t* initInterpreter();
+int executeCommand(char* cmd, Train_t* state, PlcProxy_t* plc,
+                   ResourceManagerProxy_t* resManager);
 
-int destroyInterpreter(Interpreter_t* interpreter);
+Path_t initPath(char* filePath);
 
-Path_t* initPath(char* filePath);
+int destroyInterpreter(Path_t path);
 
-int destroyInterpreter(Path_t* path);
+int executePlcCommand(PlcMessageType_e plcCommandType, int targetId);
+
+int executeResourceManagerCommand(ResourceManagerProxy_t* resManager, int* resList, int listLen);
 
 #endif // INTERPRETER_H_

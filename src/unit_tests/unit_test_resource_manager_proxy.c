@@ -39,19 +39,19 @@ int resource_manager_proxy_test(void) {
   verbose("[Resource Manager Proxy] End with NULL ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
   verbose("[Resource Manager Proxy] Request Resource Invalid Client ... \n");
-  assert(requestResource(proxy, 42, 87) == -1);
+  assert(requestResource(proxy,LOCK_RESOURCE, 42, 87) == -1);
   verbose("[Resource Manager Proxy] Request Resource Invalid Client ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
   verbose("[Resource Manager Proxy] Release Resource Invalid Client ... \n");
-  assert(releaseResource(proxy, 42, 32) == -1);
+  assert(requestResource(proxy,RELEASE_RESOURCE, 42, 32) == -1);
   verbose("[Resource Manager Proxy] Release Resource Invalid Client ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
   verbose("[Resource Manager Proxy] Request Resource Success ... \n");
-  assert(requestResource(proxy, 42, 0) == 0);
+  assert(requestResource(proxy,LOCK_RESOURCE, 42, 0) == 0);
   verbose("[Resource Manager Proxy] Request Resource Success ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
   verbose("[Resource Manager Proxy] Release Resource Success ... \n");
-  assert(releaseResource(proxy, 42, 0) == 0);
+  assert(requestResource(proxy,RELEASE_RESOURCE, 42, 0) == 0);
   verbose("[Resource Manager Proxy] Release Resource Success ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
   endResourceManagerProxy(proxy);

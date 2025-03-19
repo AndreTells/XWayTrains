@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "plc/plc_info.h"
+#include "plc/plc_message.h"
 #include "plc/plc_proxy.h"
 
 #define MAX_NUM_REGISTRABLE_TRAINS 4

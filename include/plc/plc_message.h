@@ -2,6 +2,12 @@
 #define PLC_INFO_H_
 #include <stdlib.h>
 
+typedef enum {
+  TOGGLE_RAIL,
+  TOGGLE_SWITCH,
+  TOGGLE_TRAIN_DIR
+}PlcMessageType_e;
+
 // TODO(andre): replace with actual Plc Message format
 typedef struct PlcMessage_t PlcMessage_t;
 

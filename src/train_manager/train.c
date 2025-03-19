@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 #include "plc/model_info.h"
-#include "plc/plc_info.h"
+#include "plc/plc_message.h"
 #include "plc/plc_proxy.h"
 #include "train_manager/resource_manager_proxy.h"
 
@@ -16,7 +16,7 @@
  */
 struct Train_t {
   pthread_t trainTid;
-  enum TrainId_e trainId;
+  enum TrainId_e trainId; // TODO: move to train state
   PlcProxy_t* plc;
   ResourceManagerProxy_t* resManager;
   bool finished;

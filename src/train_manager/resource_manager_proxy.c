@@ -124,8 +124,9 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
   return 0;
 }
 
-int requestResource(ResourceManagerProxy_t* resManager, int resourceId,
-                    int clientId) {
+int requestResource(ResourceManagerProxy_t* resManager,
+                    ResourceRequestType_e reqType, int resourceId,
+                    int clientId){
   int res;
   verbose("[RESOURCE MANAGER PROXY]: Resource Request ... \n");
   verbose("[RESOURCE MANAGER PROXY]: Checking if client is registered ... \n");
@@ -136,57 +137,7 @@ int requestResource(ResourceManagerProxy_t* resManager, int resourceId,
   }
   verbose("[RESOURCE MANAGER PROXY]: Checking if client is registered ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
-  ResourceRequest_t* req = createResourceRequest(clientId, resourceId, LOCK_RESOURCE, -1 );
-
-  verbose("[RESOURCE MANAGER PROXY]: Sending Request ... \n");
-  sem_wait(&(resManager->mutex));
-
-  res = sendResourceRequest(resManager->sock_fd, req);
-  if(res < 0){
-    verbose("[RESOURCE MANAGER PROXY]: Sending Request ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
-    verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
-    return -1;
-  }
-  // send message via socket
-
-  sem_post(&(resManager->mutex));
-  verbose("[RESOURCE MANAGER PROXY]: Sending Request ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
-
-  verbose("[RESOURCE MANAGER PROXY]: Waiting For Response ... \n");
-  ResourceRequestResponse_t* resp = recvResourceRequestResponse(resManager->outputFd[clientId][0]);
-
-  if (resp == NULL){
-    verbose("[RESOURCE MANAGER PROXY]: Waiting For Response ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
-    verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
-    return -1;
-  }
-
-  verbose("[RESOURCE MANAGER PROXY]: Waiting For Response ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
-
-  free(req);
-  if(resp->respType != RESOURCE_GRANTED){
-    verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
-    return -1;
-  }
-  free(resp);
-
-  verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
-  return 0;
-}
-
-int releaseResource(ResourceManagerProxy_t* resManager, int resourceId,
-                    int clientId) {
-  int res;
-  verbose("[RESOURCE MANAGER PROXY]: Resource Request ... \n");
-  verbose("[RESOURCE MANAGER PROXY]: Checking if client is registered ... \n");
-  if (resManagerTryRegisterClient(resManager, clientId) != 0) {
-    verbose("[RESOURCE MANAGER PROXY]: Checking if client is registered ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
-    verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
-    return -1;
-  }
-  verbose("[RESOURCE MANAGER PROXY]: Checking if client is registered ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
-
-  ResourceRequest_t* req = createResourceRequest(clientId, resourceId, RELEASE_RESOURCE, -1 );
+  ResourceRequest_t* req = createResourceRequest(clientId, resourceId, reqType, -1 );
 
   verbose("[RESOURCE MANAGER PROXY]: Sending Request ... \n");
   sem_wait(&(resManager->mutex));

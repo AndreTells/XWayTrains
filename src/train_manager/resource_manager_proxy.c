@@ -48,7 +48,8 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr) {
     return NULL;
   }
 
-  // create socket & connect
+  //TODO: create socket & connect
+
 
   resManager->finished = false;
 

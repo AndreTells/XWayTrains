@@ -131,17 +131,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
       int targetId = atoi(targetIdStr);
 
       PlcMessage_t* msg = NULL;
-      switch(plcMsgType){
-        case TOGGLE_RAIL:
-          res = createToggleRailStateMessage(msg,getTrainId(state),targetId);
-          break;
-        case TOGGLE_SWITCH:
-          res = createToggleSwitchStateMessage(msg,getTrainId(state),targetId);
-          break;
-        case TOGGLE_TRAIN_DIR:
-          res = createInvertDirectionMessage(msg,getTrainId(state),targetId);
-          break;
-      }
+      configWritePlcMessage(msg,plcMsgType, 0, getTrainId(state), targetId); //TODO: get station from proxy
 
       if(res == -1){
         verbose("[Interpreter]: Contacting the PLC ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);

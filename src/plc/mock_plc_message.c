@@ -19,7 +19,7 @@ int setNPDU(PlcMessage_t* msg, XwayNPDUType_e code, XwayAddr sender, XwayAddr re
   return 0;
 }
 
-XwayAddr createXwayAddr(int8_t station, int8_t network, int8_t port)){
+XwayAddr createXwayAddr(uint8_t station, uint8_t network, uint8_t port){
   return 0;
 }
 
@@ -33,4 +33,6 @@ PlcMessage_t* deserializePlcMessage_t( uint8_t* serMsg){
   return 0;
 }
 
-int freeMessage(PlcMessage_t* msg);
+int freeMessage(PlcMessage_t* msg){
+  return 0;
+}

@@ -1,10 +1,11 @@
 #include "plc/plc_message.h"
+#include <byteswap.h>
 #include <stdint.h>
 #include <string.h>
 
 #define MAX_DATA_SIZE 254
 #define MODBUS_ID_SIZE 5
-#define MIN_EMPTY_NPDU_SIZE 9
+#define MIN_NPDU_SIZE 7
 #define BYTE_SIZE 8
 
 typedef struct {
@@ -40,7 +41,7 @@ PlcMessage_t* createPlcMessage(){
   PlcMessage_t* msg = malloc(sizeof(PlcMessage_t));
 
   memcpy(&(msg->modbusId), &(ModBusIdDict[MODBUS_ETHWAY]), 5*sizeof(uint8_t));
-  msg->npduLen = MIN_EMPTY_NPDU_SIZE;
+  msg->npduLen = MIN_NPDU_SIZE;
   msg->sep = 0x00;
 
   return msg;
@@ -82,8 +83,8 @@ int setNPDU(PlcMessage_t* msg, XwayNPDUType_e code, XwayAddr sender,
   return 0;
 }
 
-XwayAddr createXwayAddr(int8_t station, int8_t network, int8_t port){
-  int16_t expandedStation = (int16_t)station;
+XwayAddr createXwayAddr(uint8_t station, uint8_t network, uint8_t port){
+  uint16_t expandedStation = (int16_t)station;
   return (expandedStation << BYTE_SIZE) + (network << (BYTE_SIZE/2)) + (port & 0x0F);
 }
 
@@ -103,14 +104,17 @@ size_t serializePlcMessage_t(PlcMessage_t* msg, uint8_t* serMsg){
   //setting npdu
   XwayNPDU_t* npdu = &(msg->npdu);
   serMsg[0] = (uint8_t)npdu->type;
-  memcpy(serMsg+1,&(npdu->sender), 2*sizeof(uint8_t));
-  memcpy(serMsg+2,&(npdu->receiver), 2*sizeof(uint8_t));
+  uint16_t senderNet = bswap_16(npdu->sender);
+  uint16_t receiverNet = bswap_16(npdu->receiver);
+  memcpy(serMsg+1,&(senderNet), sizeof(uint16_t));
+  memcpy(serMsg+3,&(receiverNet), sizeof(uint16_t));
 
-  serMsg += 3;
+  serMsg += 5;
 
   // setting addr extension if present
   if(npdu->type == NPDU_5WAY){
-    memcpy(serMsg,&(npdu->extendedAddr), 2*sizeof(uint8_t));
+    serMsg[0] = npdu->extendedAddr[0];
+    serMsg[1] = npdu->extendedAddr[1];
 
     serMsg += 2;
   }
@@ -129,13 +133,57 @@ size_t serializePlcMessage_t(PlcMessage_t* msg, uint8_t* serMsg){
   }
 
 
-  return sizeof(uint8_t)*(serMsg - initSerMsg);
+  return sizeof(uint8_t)*(serMsg - initSerMsg - 1);
 }
 
 // returns the msg
-PlcMessage_t* deserializePlcMessage_t( uint8_t* serMsg, size_t msgSize){
-  // TODO: implement
-  return NULL;
+PlcMessage_t* deserializePlcMessage_t( uint8_t* serMsg){
+  PlcMessage_t* msg = createPlcMessage();
+  serMsg+=7;
+
+  // reading npdu
+  XwayNPDUType_e npduType = serMsg[0];
+
+  XwayAddr sender;
+  XwayAddr receiver;
+
+  memcpy(&sender, serMsg+1, sizeof(uint16_t));
+  memcpy(&receiver, serMsg+3, sizeof(uint16_t));
+  serMsg+=5;
+
+  // reading npdu extensions
+  uint8_t extension[2] = {0,0};
+  if(npduType == NPDU_5WAY){
+    extension[0] = serMsg[0];
+    extension[1] = serMsg[1];
+
+    serMsg+=2;
+  }
+
+  setNPDU(msg, npduType, bswap_16(sender), bswap_16(receiver), extension);
+
+  // reading apdu
+  XwayAPDUCode_e apduCode = serMsg[0];
+  serMsg+=1;
+
+  uint16_t len = 0;
+  uint8_t data[MAX_DATA_SIZE];
+  memset(&data,0,sizeof(data));
+
+  if(apduCode == APDU_WRITE_REQ){
+    len += 7;
+    uint16_t msgDataLen = 0;
+    memcpy(&msgDataLen, serMsg+5, sizeof(uint16_t)); // implicitly inverts the bit order
+    len += msgDataLen*2;
+
+    for(int i=0;i<len;i++){
+      data[i] = serMsg[i];
+    }
+  }
+
+  setAPDU(msg, apduCode, data, len);
+
+  return msg;
 }
 
 int freeMessage(PlcMessage_t* msg){

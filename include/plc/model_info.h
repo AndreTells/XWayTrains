@@ -9,46 +9,19 @@
 
 #ifndef MODEL_INFO_H_
 #define MODEL_INFO_H_
+#include <stdint.h>
 
 /**
  * @brief Enumeration of train identifiers
  */
 typedef enum TrainId_e {UNKNOWN_TRAIN, TRAIN_1, TRAIN_2, TRAIN_3, TRAIN_4 }TrainId_e;
 
-/**
- * @brief Enumeration of rail identifiers
- * @details Contains all constants regarding the physical train model rails.
- */
-typedef enum RailId_e {
-  UNKNOWN_RAIL,
-  RAIL1,
-  // TODO(andre): chechk ammount of rail Ids
-}RailId_e;
+uint16_t getTrainAddr(TrainId_e trainId);
 
-/**
- * @brief Enumeration of powered rail identifiers
- */
-typedef enum PoweredRailId_e {
-  UNKNOWN_P_RAIL,
-  P_RAIL1,
-  // TODO(andre): chechk ammount of rail Ids
-}PoweredRailId_e;
+uint16_t getRailAddr(TrainId_e trainId, int railId);
 
-/**
- * @brief Enumeration of switch identifiers
- */
-typedef enum SwitchId_e {
-  UNKNOWN_SWITCH,
-  SWITCH1,
-  // TODO(andre): chechk ammount of rail Ids
-}SwitchId_e;
+uint16_t getSwitchAddr(TrainId_e trainId, int railId);
 
-/**
- * @brief Enumeration of reversible rail identifiers
- */
-typedef enum InversibleRailId_e {
-  I_RailId1,
-  // TODO(andre): chechk ammount of rail Ids
-}InversibleRailId_e;
+uint16_t getInverterAddr(TrainId_e trainId, int railId);
 
 #endif  // MODEL_INFO_H_

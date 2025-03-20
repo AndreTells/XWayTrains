@@ -18,9 +18,7 @@ typedef enum {
   TOGGLE_TRAIN_DIR
 }PlcMessageType_e;
 
-int configWritePlcMessage(PlcMessage_t* msg, enum TrainId_e trainId,
-                                 int target, XwayAddr sender, XwayAddr receiver);
-
-int configAckMessage(PlcMessage_t* msg, PlcMessage_t* req, bool success);
+int configWritePlcMessage(PlcMessage_t* msg, PlcMessageType_e msgType,
+                          uint8_t station, enum TrainId_e trainId, int target);
 
 #endif  // PLC_FACADE_H_

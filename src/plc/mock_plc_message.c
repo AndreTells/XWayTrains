@@ -29,7 +29,7 @@ size_t serializePlcMessage_t(PlcMessage_t* msg, uint8_t* serMsg){
 }
 
 // returns the msg
-PlcMessage_t* deserializePlcMessage_t( uint8_t* serMsg, size_t msgSize){
+PlcMessage_t* deserializePlcMessage_t( uint8_t* serMsg){
   return 0;
 }
 

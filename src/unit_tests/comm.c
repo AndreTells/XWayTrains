@@ -50,18 +50,26 @@ void test_write_req() {
 
   // checking APDU
   assert(requete[14] == 0x37); // req code
+
   assert(requete[15] == 0x06); // machine category
+
   assert(requete[16] == 0x68); // memory segment to write as per table
+
   assert(requete[17] == 0x07); // obj type
+
   assert(requete[18] == 0x27); // addr of first element[1]
   assert(requete[19] == 0x00); // addr of first element[2]
+
   assert(requete[20] == 0x03); // len data[1]
   assert(requete[21] == 0x00); // len data[2]
+
   assert(requete[22] == 0x28); // data 1[1]
   assert(requete[23] == 0x00); // data 1[2]
+
   assert(requete[24] == 0xFF); // data 2[1]
   assert(requete[25] == 0xFF); // data 2[2]
-  assert(requete[26  == 0x1F); // data 3[2]
+
+  assert(requete[26] == 0x1F); // data 3[1]
   assert(requete[27] == 0x00); // data 3[2]
 
   printf(GREEN " passed.\n" NOCOLOR);
@@ -74,15 +82,22 @@ void test_write_ack_validation() {
   reponse[2] = 0x00;
   reponse[3] = 0x01;
   reponse[4] = 0x00;
+
   reponse[5] = 0x09;
+
   reponse[6] = 0x00;
+
   reponse[7] = 0xF1;
+
   reponse[8] = 0x0E;
   reponse[9] = 0x10;
+
   reponse[10] = 0x28;
   reponse[11] = 0x10;
+
   reponse[12] = 0x19;
   reponse[13] = 0x00;  // we sent a 00 beforehand
+
   reponse[14] = 0xFE;  // success
 
   const bool result = is_write_ack_successful(reponse);
@@ -110,23 +125,36 @@ void test_read_validation() {
   reponse[2] = 0x00;
   reponse[3] = 0x01;
   reponse[4] = 0x00;
+
   reponse[5] = 0x12;
+
   reponse[6] = 0x00;
+
   reponse[7] = 0xF1;
+
   reponse[8] = 0x0E;
   reponse[9] = 0x10;
+
   reponse[10] = 0x28;
   reponse[11] = 0x10;
+
   reponse[12] = 0x09;
   reponse[13] = 0x34;  // it answers a port_number
+
   reponse[14] = 0x37;
+
   reponse[15] = 0x07;
+
   reponse[16] = 0x68;
+
   reponse[17] = 0x07;
+
   reponse[18] = 0x09;
   reponse[19] = 0x00;
+
   reponse[20] = 0x01;
   reponse[21] = 0x00;
+
   reponse[22] = 0x1F;
   reponse[23] = 0x00;
 
@@ -163,9 +191,10 @@ void test_ack() {
   assert(requete[3] == 0x01);
   assert(requete[4] == 0x00);
   assert(requete[5] == 0x09);
-
   assert(requete[6] == 0x00);
+
   assert(requete[7] == 0xF1);
+
   assert(requete[8] == 0x28);
   assert(requete[9] == 0x10);
   assert(requete[10] == 0x0E);

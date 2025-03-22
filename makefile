@@ -45,12 +45,17 @@ RESOURCE_MANAGER_FILES += src/resource_manager/resource_manager_proxy_remote.c
 RESOURCE_MANAGER_FILES += src/resource_manager/ressource_database.c
 RESOURCE_MANAGER_FILES += src/resource_manager/ressource_database_proxy.c
 
+TRAIN_MANAGER_FILES = src/train_manager/plc_info_test.c
+TRAIN_MANAGER_FILES += src/train_manager/plc_proxy_cli.c
+TRAIN_MANAGER_FILES += src/train_manager/resource_manager_proxy_cli.c
+TRAIN_MANAGER_FILES += src/train_manager/resource_manager_proxy_remote.c
+TRAIN_MANAGER_FILES += src/train_manager/train.c
 
 # --------------------------------------------------------------------- #
 # Build instructions                                                    #
 # --------------------------------------------------------------------- #
 
-all: format_code test build/remote_test/main build/resource_manager
+all: format_code test build
 
 unit_test_ressource_manager:
 	clang -I include src/unit_test_ressource_manager.c src/ressource_database.c src/ressource_database_proxy.c -o bin/ressource_manager_unit_test.out
@@ -69,11 +74,17 @@ test: build/test/comm
 # 	build/test/unit_test_train
 	@printf "\nDone unit testing\n"
 
+build: build/remote_test/main build/resource_manager build/train_manager
+
 build/plc_proxy: src/plc_proxy.c
 	mkdir -p build
 	$(CC) $(CFLAGS) $^ -o $@
 
 build/resource_manager: $(RESOURCE_MANAGER_FILES)
+	mkdir -p build
+	$(CC) $(CFLAGS) $^ -o $@
+
+build/train_manager: $(TRAIN_MANAGER_FILES)
 	mkdir -p build
 	$(CC) $(CFLAGS) $^ -o $@
 

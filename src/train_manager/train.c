@@ -128,7 +128,6 @@ void* trainThread(void* data) {
       } else if (strncmp(token, "Inversion", 10) == 0) {
         section_id = actuator + 40;
       } else {
-        
       }
     }
 

@@ -173,7 +173,7 @@ PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int clientId) {
 void* plcProxyMsgReceiverThread(void* plcProxy) {
   PlcProxy_t* plc = (PlcProxy_t*)plcProxy;
   while (!plc->finished) {
-    printf("plc proxy attempting to get a line: \n");
+    verbose("[PLC PROXY]: Attempting to get a line: \n");
 
     PlcMessage_t* msg = tryGetPlcMessage(plc->sock_fd);
 
@@ -182,16 +182,20 @@ void* plcProxyMsgReceiverThread(void* plcProxy) {
       continue;
     }
 
+    verbose("[PLC PROXY]: read a line \n");
     // things that aren't write
-    if(!compareMsgType(msg, APDU_WRITE_RESP)){
+    if(!compareMsgType(msg, APDU_WRITE_REQ)){
       continue;
     }
+
+    verbose("[PLC PROXY]: the message is a write \n");
 
     // determining who to route the message to
     uint8_t* data = getPlcMessageData(msg);
     TrainId_e target = getTargetedTrain(data);
 
     if (plcProxyTryRegisterClient(plc, target) == 0) {
+      verbose("[PLC PROXY]: rerouted a message \n");
       sendPlcMessageToFd(msg, plc->outputFd[target][1]);
     }
 

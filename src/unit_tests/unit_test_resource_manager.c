@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
 
 int resource_manager_test(void) {
   verbose("[Resource Manager] Init ... \n");
-  ResourceManager_t* manager = initResourceManager(NULL, "127.0.0.1", 8080);
+  ResourceManager_t* manager = initResourceManager(NULL, "127.0.0.1", 3);
   assert(manager != NULL);
   verbose("[Resource Manager] Init ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 

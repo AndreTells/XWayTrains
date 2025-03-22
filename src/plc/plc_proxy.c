@@ -217,7 +217,7 @@ int plcProxyTryRegisterClient(PlcProxy_t* plcProxy, int clientId) {
 }
 
 PlcMessage_t* tryGetPlcMessage(int fd){
-  uint8_t* serMsg = malloc(MAX_MSG_SIZE);
+  uint8_t serMsg[MAX_MSG_SIZE];
 
   int resWait = fileDescriptorTimedWait(fd);
   if(resWait < 0){
@@ -230,18 +230,16 @@ PlcMessage_t* tryGetPlcMessage(int fd){
   }
 
   PlcMessage_t* msg = deserializePlcMessage(serMsg);
-  free(serMsg);
   return msg;
 }
 
 // does not consider the situation where it failed to connect to a server
 int sendPlcMessageToFd(PlcMessage_t* msg, int fd){
-  uint8_t* serMsg = malloc(MAX_MSG_SIZE);
+  uint8_t serMsg[MAX_MSG_SIZE];
 
   size_t serSize = serializePlcMessage(msg, serMsg);
 
   int writeRes = write(fd, serMsg, serSize);
 
-  free(serMsg);
   return writeRes;
 }

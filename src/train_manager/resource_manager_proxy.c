@@ -30,7 +30,7 @@ int resManagerTryRegisterClient(ResourceManagerProxy_t* resManager,
 ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr, int port) {
   // check if it's a valid IP address
   verbose("[RESOURCE MANAGER PROXY]: Initializing ... \n");
-  if (resManagerIpAddr == NULL) {
+  if (resManagerIpAddr == NULL || port < 0) {
     verbose("[RESOURCE MANAGER PROXY]: Initializing ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
     return NULL;
   }
@@ -44,7 +44,6 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr, int por
     return NULL;
   }
 
-  //TODO: create socket & connect
   resManager->sock_fd = tcpCreateSocketWrapper(false, NULL, port);
   tcpConnectWrapper(resManager->sock_fd, resManagerIpAddr, port);
 

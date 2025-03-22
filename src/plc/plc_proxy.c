@@ -11,6 +11,7 @@
 #include "plc/plc_proxy.h"
 #include "common/verbose.h"
 #include "common/time_out.h"
+#include "common/comm_general.h"
 
 #define MAX_NUM_REGISTRABLE_TRAINS 5 // ignore position 0
 
@@ -41,10 +42,10 @@ void* plcProxyMsgReceiverThread(void* plcProxy);
  */
 int plcProxyTryRegisterClient(PlcProxy_t* plcProxy, int clientId);
 
-PlcProxy_t* initPlcProxy(char* plcIpAddr) {
+PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr, int port) {
   // check if it's a valid IP address
   verbose("[PLC PROXY]: Initializing ... \n");
-  if (plcIpAddr == NULL) {
+  if (plcIpAddr == NULL || hostIpAddr == NULL || port < 0) {
     verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
     return NULL;
   }
@@ -56,7 +57,21 @@ PlcProxy_t* initPlcProxy(char* plcIpAddr) {
     return NULL;
   }
 
-  // TODO(felipe): connect to remote plc
+  plcProxy->sock_fd = tcpCreateSocketWrapper(false, hostIpAddr, port);
+
+  if(plcProxy->sock_fd == -1){
+    free(plcProxy);
+    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+    return NULL;
+  }
+
+  int connRes = tcpConnectWrapper(plcProxy->sock_fd, plcIpAddr, port);
+
+  if(connRes == -1){
+    free(plcProxy);
+    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+    return NULL;
+  }
 
   plcProxy->finished = false;
 
@@ -219,11 +234,11 @@ PlcMessage_t* tryGetPlcMessage(int fd){
   return msg;
 }
 
+// does not consider the situation where it failed to connect to a server
 int sendPlcMessageToFd(PlcMessage_t* msg, int fd){
   uint8_t* serMsg = malloc(MAX_MSG_SIZE);
 
   size_t serSize = serializePlcMessage(msg, serMsg);
-
 
   int writeRes = write(fd, serMsg, serSize);
 

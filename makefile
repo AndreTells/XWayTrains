@@ -75,6 +75,8 @@ test:build/test/remote build/test/resource_database\
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_message -s
 	@printf "\n\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_facade -s
+	@printf "\n\n"
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_proxy -s
 	@printf "\nDone unit testing\n"
 
 
@@ -170,6 +172,7 @@ build/test/plc_proxy: $(TEST_SRC_DIR)/unit_test_plc_proxy.c \
 									$(PLC_MANAGER_SRC_DIR)/plc_message.c \
 									$(PLC_MANAGER_SRC_DIR)/plc_facade.c \
 									$(PLC_MANAGER_SRC_DIR)/model_info.c \
+									$(COMMON_SRC_DIR)/mock_comm_general.c \
 									$(COMMON_SRC_DIR)/time_out.c \
 									$(COMMON_SRC_DIR)/verbose.c \
 									$(COMMON_SRC_DIR)/flags.c

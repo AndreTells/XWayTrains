@@ -12,16 +12,20 @@
 #include "common/verbose.h"
 #include "common/flags.h"
 
+#define HOST_ADDR "127.0.0.1"
+#define SERVER_ADDR "10.31.125.14"
+#define PLC_PORT 502
+
 void test_initPlcProxy_invalid() {
   verbose("[Plc Proxy] initPlcProxy Invalid ... \n");
-  PlcProxy_t* proxy = initPlcProxy(NULL);
+  PlcProxy_t* proxy = initPlcProxy(NULL, NULL, -1);
   assert(proxy == NULL);
   verbose("[Plc Proxy] initPlcProxy Invalid ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
 void test_init_endPlcProxy() {
   verbose("[Plc Proxy] init & endPlcProxy ... \n");
-  PlcProxy_t* proxy = initPlcProxy("127.0.0.1");
+  PlcProxy_t* proxy = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
   assert(proxy != NULL);
 
   int ret = endPlcProxy(proxy);
@@ -31,7 +35,7 @@ void test_init_endPlcProxy() {
 
 void test_sendMessagePlcProxy() {
   verbose("[Plc Proxy] sendMessagePlcProxy ... \n");
-  PlcProxy_t* proxy = initPlcProxy("127.0.0.1");
+  PlcProxy_t* proxy = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
   assert(proxy != NULL);
 
   /* making a message */
@@ -67,7 +71,7 @@ void test_sendMessagePlcProxy() {
 
 void test_readMessagePlcProxy() {
   verbose("[Plc Proxy] readMessagePlcProxy ... \n");
-  PlcProxy_t* proxy = initPlcProxy("127.0.0.1");
+  PlcProxy_t* proxy = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
   assert(proxy != NULL);
 
   PlcMessage_t* receivedMsg = readMessagePlcProxy(proxy, 0);

@@ -17,14 +17,7 @@
  */
 typedef struct PlcProxy_t PlcProxy_t;
 
-/**
- * @brief Initialize a new PLC Proxy instance
- * @param plcIpAddr IP Address of the plc
- * @return Pointer to the newly created PlcProxy_t instance
- * @note The caller is responsible for gracefully terminating the instance using
- *       `endPlcProxy()`.
- */
-PlcProxy_t* initPlcProxy(char* plcIpAddr);
+PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr, int port);
 
 /**
  * @brief Gracefully terminate a PLC Proxy instance

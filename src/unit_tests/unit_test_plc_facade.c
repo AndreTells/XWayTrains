@@ -3,60 +3,33 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include "plc/plc_facade.h"  // Contains configWritePlcMessage()
-#include "plc/plc_message.h"  // Contains serializePlcMessage_t() and create/free functions
+#include "plc/plc_facade.h"
+#include "plc/plc_message.h"
 #include "plc/model_info.h"
 #include "common/verbose.h"
 #include "common/flags.h"
 
-/*
- * This test verifies that configWritePlcMessage() constructs the correct
- * message payload. It then serializes the complete message and compares the
- * resulting byte array with expected values.
- *
- * Expected serialized message (byte-by-byte):
- *
- *  Bytes  0-4: Modbus ID            : {0x00, 0x00, 0x00, 0x01, 0x00}
- *  Byte     5  : Message length       : 0x16
- *  Byte     6  : Separator            : 0x00
- *  Byte     7  : NPDU type            : 0xF1
- *  Bytes  8-9: Sender info          : {0x28, 0x10}
- *  Bytes 10-11: Receiver info        : {0x0E, 0x10}
- *  Bytes 12-13: Extended address     : {0x09, 0x10}
- *  Byte    14  : APDU code            : 0x37
- *  Bytes 15-27: APDU payload (13 bytes):
- *              [ 0] = Machine category    : 0x06
- *              [ 1] = Memory segment      : 0x68
- *              [ 2] = Object type         : 0x07
- *              [3-4]= Train address       : {0x27, 0x00}
- *              [5-6]= Data length         : {0x03, 0x00}
- *              [7-8]= First data element  : {0x28, 0x00}
- *              [9-10]= Second data element: {0xFF, 0xFF}
- *              [11-12]= Third data element: {0x1F, 0x00}
- *
- * (Note: The actual positions of the NPDU and APDU parts depend on your serialization
- *  format defined in serializePlcMessage_t(). This test assumes that the above layout
- *  is produced.)
- */
-void test_configWritePlcMessage_toggleRail() {
-  verbose("[Plc Facade] configWritePlcMessage (TOGGLE_RAIL) ... \n");
+void test_configWritePlcMessage_toggleSwitch() {
+  verbose("[Plc Facade] configWritePlcMessage (TOGGLE_SWITCH) ... \n");
 
   /* Create a new message */
   PlcMessage_t* msg = createPlcMessage();
   assert(msg != NULL);
+  int res;
+  uint8_t pc_station = 0x28;
+  uint8_t plc_station = 0x0E;
 
-  /*
-   * Call configWritePlcMessage with the following parameters:
-   * - msgType: TOGGLE_RAIL
-   * - station: 0x28
-   * - trainId: TRAIN_1 (assumed to be defined, e.g. TRAIN_1 == 1)
-   * - target: 2
-   *
-   * Note: The underlying mocks should be set up such that:
-   *   getTrainAddr(TRAIN_1) returns a value that, after htons, results in {0x27, 0x10} in the message.
-   *   getRailAddr(TRAIN_1, 2) returns a value that, after bswap_16, yields {0x10, 0x0E}.
-   */
-  int res = configWritePlcMessage(msg, TOGGLE_RAIL, 0x28, TRAIN_1, 2);
+  uint8_t network = 1;
+  uint8_t port = 0;
+
+   res = configWritePlcMessage(msg, TOGGLE_SWITCH, pc_station , TRAIN_1, SWITCH_GROUP_31);
+  assert(res == 0);
+
+  /* configure the address information */
+  XwayAddr sender = createXwayAddr(pc_station, network, port);
+  XwayAddr receiver = createXwayAddr(plc_station, network, port);
+  uint8_t extAddr[2] = {0x09, 0x10};
+  res = setNPDU(msg, NPDU_5WAY, sender, receiver, extAddr);
   assert(res == 0);
 
   /* Serialize the message into a buffer */
@@ -66,28 +39,6 @@ void test_configWritePlcMessage_toggleRail() {
   size_t serSize = serializePlcMessage_t(msg, serBuf);
   assert(serSize > 0);
 
-  /*
-   * Verify the expected bytes.
-   * The expected layout is:
-   *
-   * [0-4]   : {0x00, 0x00, 0x00, 0x01, 0x00}   -> Modbus ID
-   * [5]     : 0x16                              -> Message length
-   * [6]     : 0x00                              -> Separator
-   * [7]     : 0xF1                              -> NPDU type (NPDU_5WAY)
-   * [8-9]   : {0x28, 0x10}                      -> Sender info
-   * [10-11] : {0x0E, 0x10}                      -> Receiver info
-   * [12-13] : {0x09, 0x10}                      -> Extended address
-   * [14]    : 0x37                              -> APDU code (APDU_WRITE_REQ)
-   * [15-27] : APDU payload (13 bytes) as defined below:
-   *     [15]  : 0x06                          -> Machine category (PLC_CATEGORY)
-   *     [16]  : 0x68                          -> Memory segment (INTERNAL_DATA_SPACE)
-   *     [17]  : 0x07                          -> Object type (UNITE_TYPE_WORD)
-   *     [18-19]: {0x27, 0x00}                  -> Train address (after htons(getTrainAddr()))
-   *     [20-21]: {0x03, 0x00}                  -> Data length (htons(3))
-   *     [22-23]: {0x28, 0x00}                  -> First data element (station, after htons)
-   *     [24-25]: {0xFF, 0xFF}                  -> Second data element (modified by TOGGLE_RAIL)
-   *     [26-27]: {0x1F, 0x00}                  -> Third data element (unchanged)
-   */
   assert(serBuf[0]  == 0x00);
   assert(serBuf[1]  == 0x00);
   assert(serBuf[2]  == 0x00);
@@ -131,7 +82,7 @@ void test_configWritePlcMessage_toggleRail() {
 
   free(serBuf);
   freeMessage(msg);
-  verbose("[Plc Facade] configWritePlcMessage (TOGGLE_RAIL) ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
+  verbose("[Plc Facade] configWritePlcMessage (TOGGLE_SWITCH) ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
 int main(int argc, char* argv[]) {
@@ -140,12 +91,7 @@ int main(int argc, char* argv[]) {
 
   verbose("[Unit Testing] Plc Facade ... \n\n");
 
-  test_configWritePlcMessage_toggleRail();
-
-  /*
-   * Additional tests can be added for TOGGLE_TRAIN_DIR and TOGGLE_SWITCH
-   * by providing the appropriate expected values.
-   */
+  test_configWritePlcMessage_toggleSwitch();
 
   verbose("\n[Unit Testing] Plc Facade ... Done \n");
   return 0;

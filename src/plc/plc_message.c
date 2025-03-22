@@ -47,6 +47,16 @@ PlcMessage_t* createPlcMessage(){
   return msg;
 }
 
+PlcMessage_t* createACK(PlcMessage_t* msg, bool res){
+  // supposes f1 address
+  PlcMessage_t* ack = createPlcMessage();
+
+  setAPDU(ack, APDU_WRITE_RESP, NULL, 0);
+  setNPDU(ack, msg->npdu.type, msg->npdu.receiver, msg->npdu.sender, msg->npdu.extendedAddr);
+
+  return ack;
+}
+
 int setAPDU(PlcMessage_t* msg, XwayAPDUCode_e code, uint8_t* data, int dataLen){
   XwayAPDU_t* apdu = &(msg->npdu.apdu);
 

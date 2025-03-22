@@ -15,7 +15,6 @@
 typedef enum {
   TOGGLE_RAIL,
   TOGGLE_SWITCH,
-  TOGGLE_TRAIN_DIR
 }PlcMessageType_e;
 
 int configWritePlcMessage(PlcMessage_t* msg, PlcMessageType_e msgType,

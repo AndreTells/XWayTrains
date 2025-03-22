@@ -14,16 +14,12 @@ int configWritePlcMessage(PlcMessage_t* msg, PlcMessageType_e msgType,
   data[2] = (uint8_t) UNITE_TYPE_WORD;
 
   uint16_t trainAddr = getTrainAddr(trainId);
-  trainAddr = bswap_16(trainAddr);
-
-  memcpy(data+3, &trainAddr, sizeof(uint16_t));
+  memcpy(data+3, &trainAddr, sizeof(uint16_t)); // implicitly swaps byte order
 
   uint16_t len = 3;
-  len = bswap_16(len);
-  memcpy(data+5, &len, sizeof(uint16_t));
+  memcpy(data+5, &len, sizeof(uint16_t));// implicitly swaps byte order
 
-  station = bswap_16((uint16_t) station);
-  memcpy(data+7, &station, sizeof(uint16_t));
+  memcpy(data+7, &station, sizeof(uint16_t));// implicitly swaps byte order
 
   data[9] = 0xFF;
   data[10] = 0xFF;
@@ -32,20 +28,12 @@ int configWritePlcMessage(PlcMessage_t* msg, PlcMessageType_e msgType,
 
   switch(msgType){
     case(TOGGLE_RAIL):
-      uint16_t railId = bswap_16(getRailAddr(trainId,target));
-      memcpy(data+9, &railId, sizeof(uint16_t));
-      break;
-
-    case (TOGGLE_TRAIN_DIR):
-      uint16_t inverterId = bswap_16(getInverterAddr(trainId,target));
-      memcpy(data+9, &inverterId, sizeof(uint16_t));
+      memcpy(data+9, &target, sizeof(uint16_t)); // implicitly swaps byte order
       break;
 
     case (TOGGLE_SWITCH):
-      uint16_t switchId = bswap_16(getSwitchAddr(trainId,target));
-      memcpy(data+11, &switchId, sizeof(uint16_t));
+      memcpy(data+11, &target, sizeof(uint16_t)); // implicitly swaps byte order
       break;
-
   }
 
   int res = setAPDU(msg, APDU_WRITE_REQ, data, dataLen);

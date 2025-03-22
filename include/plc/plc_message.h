@@ -40,6 +40,8 @@ typedef enum {
 
 PlcMessage_t* createPlcMessage();
 
+PlcMessage_t* createACK(PlcMessage_t* msg, bool res);
+
 int setAPDU(PlcMessage_t* msg, XwayAPDUCode_e code, uint8_t* data, int dataLen);
 
 int setNPDU(PlcMessage_t* msg, XwayNPDUType_e code, XwayAddr sender, XwayAddr receiver, uint8_t* extendedAddr);

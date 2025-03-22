@@ -7,9 +7,6 @@
 #include "common/verbose.h"
 #include "common/flags.h"
 
-/*
- * Test createPlcMessage()
- */
 void test_createPlcMessage() {
   verbose("[Plc Message] createPlcMessage ... \n");
   PlcMessage_t* msg = createPlcMessage();
@@ -18,10 +15,6 @@ void test_createPlcMessage() {
   verbose("[Plc Message] createPlcMessage ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
-/*
- * Test setAPDU with a valid input.
- * For APDU_WRITE_REQ we assume that data is allowed.
- */
 void test_setAPDU_valid() {
   verbose("[Plc Message] setAPDU valid ... \n");
   PlcMessage_t* msg = createPlcMessage();
@@ -35,10 +28,6 @@ void test_setAPDU_valid() {
   verbose("[Plc Message] setAPDU valid ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
-/*
- * Test setAPDU with an invalid case.
- * We assume that for APDU_WRITE_RESP the function returns an error if data is provided.
- */
 void test_setAPDU_invalid() {
   verbose("[Plc Message] setAPDU invalid ... \n");
   PlcMessage_t* msg = createPlcMessage();
@@ -52,10 +41,6 @@ void test_setAPDU_invalid() {
   verbose("[Plc Message] setAPDU invalid ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
-/*
- * Test setNPDU with valid parameters.
- * Since the internal structure is hidden, we simply verify that the API returns success.
- */
 void test_setNPDU_valid() {
   verbose("[Plc Message] setNPDU valid ... \n");
   PlcMessage_t* msg = createPlcMessage();
@@ -72,9 +57,6 @@ void test_setNPDU_valid() {
   verbose("[Plc Message] setNPDU valid ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
-/*
- * Test createXwayAddr.
- */
 void test_createXwayAddr() {
   verbose("[Plc Message] createXwayAddr ... \n");
   XwayAddr addr = createXwayAddr(0x28, 1 , 0);
@@ -85,11 +67,6 @@ void test_createXwayAddr() {
   verbose("[Plc Message] createXwayAddr ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
-/*
- * Test serializePlcMessage_t.
- * This test creates a message, sets an APDU and NPDU, serializes the message,
- * and verifies that a nonzero size is returned.
- */
 void test_serializePlcMessage_t() {
   verbose("[Plc Message] serializePlcMessage_t ... \n");
 
@@ -162,11 +139,6 @@ void test_serializePlcMessage_t() {
   verbose("[Plc Message] serializePlcMessage_t ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
-/*
- * Test deserializePlcMessage_t.
- * Since the function is implemented, we test by creating a message, serializing it,
- * deserializing it back, and then comparing the serialized outputs.
- */
 void test_deserializePlcMessage_t_valid() {
   verbose("[Plc Message] deserializePlcMessage_t valid ... \n");
 
@@ -211,9 +183,65 @@ void test_deserializePlcMessage_t_valid() {
   verbose("[Plc Message] deserializePlcMessage_t valid ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
-/*
- * Test freeMessage.
- */
+void test_ackMessage(){
+  verbose("[Plc Message] ack message ... \n");
+
+  uint8_t response[15];
+  response[0] = 0x00;
+  response[1] = 0x00;
+  response[2] = 0x00;
+  response[3] = 0x01;
+  response[4] = 0x00;
+
+  response[5] = 0x09;
+
+  response[6] = 0x00;
+
+  response[7] = 0xF1;
+
+  response[8] = 0x28;
+  response[9] = 0x10;
+
+  response[10] = 0x0E;
+  response[11] = 0x10;
+
+  response[12] = 0x09;
+  response[13] = 0x34;
+
+  response[14] = 0xFE;
+
+  PlcMessage_t* msg = createPlcMessage();
+  assert(msg != NULL);
+
+  /* Setup a dummy APDU */
+  uint8_t data[] = {PC_CATEGORY, INTERNAL_DATA_SPACE, UNITE_TYPE_WORD, 0x09, 0x00, 0x01, 0x00, 0x1F, 0x00};
+  int ret = setAPDU(msg, APDU_WRITE_REQ, data, sizeof(data) );
+  assert(ret == 0);
+
+  /* Setup NPDU */
+  XwayAddr sender = createXwayAddr( 0x0E, 1, 0);
+  XwayAddr receiver = createXwayAddr(0x28, 1 , 0);
+
+  uint8_t extAddr[2] = {0x09, 0x34};
+  ret = setNPDU(msg, NPDU_5WAY, sender, receiver, extAddr);
+  assert(ret == 0);
+
+  PlcMessage_t* ack = createACK(msg, true);
+
+  size_t bufSize = 512*sizeof(uint8_t);
+  uint8_t* serBuf = malloc(bufSize);
+  assert(serBuf != NULL);
+
+  size_t serSize = serializePlcMessage_t(ack, serBuf);
+  assert(serSize > 0);
+
+  assert(memcmp(serBuf, response, serSize) == 0);
+
+  free(serBuf);
+  freeMessage(msg);
+  verbose("[Plc Message] ack message... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
+}
+
 void test_freeMessage() {
   verbose("[Plc Message] freeMessage ... \n");
   PlcMessage_t* msg = createPlcMessage();
@@ -235,6 +263,7 @@ int main(int argc, char* argv[]) {
   test_createXwayAddr();
   test_serializePlcMessage_t();
   test_deserializePlcMessage_t_valid();
+  test_ackMessage();
   test_freeMessage();
 
   verbose("\n[Unit Testing] Plc Message ... Done \n");

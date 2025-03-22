@@ -56,6 +56,7 @@ test:build/test/remote build/test/resource_database\
 		build/test/resource_manager_proxy \
 		build/test/request_queue \
 		build/test/plc_message \
+		build/test/plc_facade \
 		build/test/resource_manager \
 		build/test/interpreter
 
@@ -71,6 +72,8 @@ test:build/test/remote build/test/resource_database\
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/interpreter -s
 	@printf "\n\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_message -s
+	@printf "\n\n"
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_facade -s
 	@printf "\nDone unit testing\n"
 
 

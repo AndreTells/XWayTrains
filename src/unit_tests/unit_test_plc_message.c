@@ -239,6 +239,7 @@ void test_ackMessage(){
 
   free(serBuf);
   freeMessage(msg);
+  freeMessage(ack);
   verbose("[Plc Message] ack message... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 

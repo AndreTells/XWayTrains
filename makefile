@@ -129,6 +129,8 @@ build/test/resource_manager: $(TEST_SRC_DIR)/unit_test_resource_manager.c \
 build/test/resource_manager_proxy: $(TEST_SRC_DIR)/unit_test_resource_manager_proxy.c \
 									$(TRAIN_MANAGER_SRC_DIR)/resource_manager_proxy.c \
 									$(COMMON_SRC_DIR)/mock_resource_request.c \
+									$(COMMON_SRC_DIR)/mock_comm_general.c \
+									$(COMMON_SRC_DIR)/time_out.c \
 									$(COMMON_SRC_DIR)/verbose.c \
 									$(COMMON_SRC_DIR)/flags.c
 	mkdir -p build/test

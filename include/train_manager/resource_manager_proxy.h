@@ -15,14 +15,7 @@
  */
 typedef struct ResourceManagerProxy_t ResourceManagerProxy_t;
 
-/**
- * @brief Initialize a new Resource Manager Proxy instance
- * @param[in] resManagerIpAddr IP address of the resource Manager
- * @return Pointer to the newly created ResourceManagerProxy_t instance
- * @note The caller is responsible for gracefully terminating the instance using
- *       `endResourceManagerProxy()`.
- */
-ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr);
+ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr, int port);
 
 /**
  * @brief Gracefully terminate a Resource Manager Proxy instance

@@ -22,7 +22,7 @@ void test_executeCommand_nullArguments() {
 
   /* Allocate non-NULL pointers using malloc; actual implementations are provided by mocks. */
   PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
-  ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ");
+  ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
   Train_t* train = initTrain(plc,resMgr," ");
 
   assert(executeCommand(NULL, train, plc, resMgr) == -1);
@@ -43,7 +43,7 @@ void test_executeCommand_setTrainId_success() {
   char cmd[] = "trainId 4";
 
   PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
-  ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ");
+  ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
   Train_t* train = initTrain(plc,resMgr," ");
 
   int ret = executeCommand(cmd, train, plc, resMgr);
@@ -64,7 +64,7 @@ void test_executeCommand_plc_invalidParams() {
   char cmd[] = "plc rail"; // Missing target id parameter
 
   PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
-  ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ");
+  ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
   Train_t* train = initTrain(plc,resMgr," ");
 
   int ret = executeCommand(cmd, train, plc, resMgr);
@@ -83,7 +83,7 @@ void test_executeCommand_resource_invalidParams() {
   char cmd[] = "resource"; // Missing request type and resource IDs
 
   PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
-  ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ");
+  ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
   Train_t* train = initTrain(plc,resMgr," ");
 
   int ret = executeCommand(cmd, train, plc, resMgr);

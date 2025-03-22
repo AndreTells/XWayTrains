@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "common/comm_general.h"
 #include "common/resource_request.h"
 #include "common/verbose.h"
 #include "plc/model_info.h"
@@ -13,11 +14,6 @@
 
 #define MAX_NUM_REGISTRABLE_TRAINS 4
 
-/**
- * @brief Structure representing a Resource Manager Proxy instance
- * @details Encapsulates all state and functionality for communicating with the
- * remote resource manager.
- */
 struct ResourceManagerProxy_t {
   pthread_t readerThreadTid;
   sem_t mutex;
@@ -31,7 +27,7 @@ void* resManagerMsgReceiverThread(void* resourceManagerProxy);
 int resManagerTryRegisterClient(ResourceManagerProxy_t* resManager,
                                 int clientId);
 
-ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr) {
+ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr, int port) {
   // check if it's a valid IP address
   verbose("[RESOURCE MANAGER PROXY]: Initializing ... \n");
   if (resManagerIpAddr == NULL) {
@@ -49,6 +45,8 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr) {
   }
 
   //TODO: create socket & connect
+  resManager->sock_fd = tcpCreateSocketWrapper(false, NULL, port);
+  tcpConnectWrapper(resManager->sock_fd, resManagerIpAddr, port);
 
   resManager->finished = false;
 
@@ -190,19 +188,14 @@ void* resManagerMsgReceiverThread(void* resourceManagerProxy) {
     }
 
     verbose("[RESOURCE MANAGER PROXY READER]: Message Received \n");
-    verbose("[RESOURCE MANAGER PROXY READER]: Routing Message ... \n");
     int target = resp->requesterId;
 
-    if (resManagerTryRegisterClient(resManager, target) != 0) {
-      // TODO(andre): treat silent error ??
-      verbose("[RESOURCE MANAGER PROXY READER]: Routing Message ...  " VERBOSE_KRED "fail \n" VERBOSE_RESET);
-      free(resp);
-      continue;
+    if (resManagerTryRegisterClient(resManager, target) == 0) {
+      verbose("[RESOURCE MANAGER PROXY READER]: Routing Message ... \n");
+      answerResourceRequest(resManager->outputFd[target][1], resp);
     }
 
-    answerResourceRequest(resManager->outputFd[target][1], resp);
     free(resp);
-    verbose("[RESOURCE MANAGER PROXY READER]: Routing Message ...  " VERBOSE_KGRN "success \n" VERBOSE_RESET);
   }
 
   pthread_exit(NULL);

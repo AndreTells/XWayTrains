@@ -17,6 +17,18 @@
  */
 typedef struct PlcProxy_t PlcProxy_t;
 
+/**
+ * @brief Initializes the PLC Proxy.
+ *
+ * This function creates and configures a new PLC Proxy instance for
+ * communication with the PLC.
+ *
+ * @param hostIpAddr The IP address of the host machine.
+ * @param plcIpAddr The IP address of the PLC.
+ * @param port The port number to be used for communication.
+ * @return PlcProxy_t* Pointer to the newly created PLC Proxy instance, or NULL
+ * on failure.
+ */
 PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr, int port);
 
 /**

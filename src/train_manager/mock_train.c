@@ -16,17 +16,6 @@ struct Train_t {
   ResourceManagerProxy_t* resManager;
 };
 
-
-/**
- * @brief Initialize a new Train instance
- * @param[in] trainId Identifier for the train (from the TrainId_e enum)
- * @param[in] plc Proxy instance for communication with the PLC
- * @param[in] resManager Proxy instance for communication with the Resource
- * Manager
- * @return Pointer to the newly created Train_t instance
- * @note The caller is responsible for gracefully terminating the instance using
- *       `endTrain()`.
- */
 Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
                    char* routeFilePath) {
   // accounting for invalid inputs
@@ -43,11 +32,6 @@ Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
   return train;
 }
 
-/**
- * @brief Gracefully terminate a Train instance
- * @param[in] train Train instance handle to terminate
- * @return 0 on success, non-zero error code on failure
- */
 int endTrain(Train_t* train) {
   free(train);
   return 0;

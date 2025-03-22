@@ -18,6 +18,12 @@ typedef enum TrainId_e {
   UNKNOWN_TRAIN, TRAIN_1, TRAIN_2, TRAIN_3, TRAIN_4
 }TrainId_e;
 
+/**
+ * @enum RailId_e
+ * @brief Enumeration of rail identifiers.
+ *
+ * Each constant corresponds to a specific rail in the train model.
+ */
 typedef enum RailId_e {
   RAIL_Tn0   = 0 , RAIL_Tn01   = 1 , RAIL_Tn02   = 2 , RAIL_Tn03   = 3 ,
   RAIL_Tn04  = 4 , RAIL_Tn07h  = 7 , RAIL_Tn07t  = 37, RAIL_Tn09   = 9 ,
@@ -28,6 +34,12 @@ typedef enum RailId_e {
 } RailId_e;
 // obs: inv targets both Ti07 and Ti09
 
+/**
+ * @enum SwitchGroupId_e
+ * @brief Enumeration of switch group identifiers.
+ *
+ * These groups represent clusters of switches identified by their respective labels.
+ */
 typedef enum SwitchGroupId_e {
   SWITCH_GROUP_0 = 0,   // A0d
   SWITCH_GROUP_1 = 1,   // A1d
@@ -45,6 +57,12 @@ typedef enum SwitchGroupId_e {
   SWITCH_GROUP_33 = 33, // Tj3b, Tj3d
 }SwitchGroupId_e;
 
+/**
+ * @enum ACKAddr_e
+ * @brief Enumeration of acknowledgment addresses.
+ *
+ * These addresses correspond to the PLC configuration for rails and switches.
+ */
 typedef enum ACKAddr_e {
   ADDR_ACK_RAIL_1 = 8,
   ADDR_ACK_SWITCH_1 = 9,
@@ -60,8 +78,20 @@ typedef enum ACKAddr_e {
   ADDR_ACK_INV_4 = 14,
 }ACKAddr_e;
 
+/**
+ * @brief Retrieves the PLC address for a given train.
+ *
+ * @param trainId The train identifier.
+ * @return uint16_t The PLC address associated with the train.
+ */
 uint16_t getTrainAddr(TrainId_e trainId);
 
+/**
+ * @brief Determines the targeted train based on provided data.
+ *
+ * @param writeData Pointer to the data used to determine the targeted train.
+ * @return TrainId_e The identified train.
+ */
 TrainId_e getTargetedTrain(uint8_t* writeData);
 
 #endif  // MODEL_INFO_H_

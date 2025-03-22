@@ -37,9 +37,22 @@ Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
  */
 int endTrain(Train_t* train);
 
-//TODO: implement + change id to train enum
+/**
+ * @brief Sets the ID of a train.
+ *
+ * @param[in] train Pointer to the train instance.
+ * @param[in] id Numeric identifier for the train.
+ * @return int Status code (0 on success, non-zero error code on failure).
+ * @todo Update the ID type to use TrainId_e instead of an integer.
+ */
 int setTrainId(Train_t* train, int id);
 
+/**
+ * @brief Retrieves the ID of a train.
+ *
+ * @param[in] train Pointer to the train instance.
+ * @return int The train's ID.
+ */
 int getTrainId(Train_t* train);
 
 #endif  // TRAIN_H_

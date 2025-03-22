@@ -67,8 +67,8 @@ void test_createXwayAddr() {
   verbose("[Plc Message] createXwayAddr ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
-void test_serializePlcMessage_t() {
-  verbose("[Plc Message] serializePlcMessage_t ... \n");
+void test_serializePlcMessage() {
+  verbose("[Plc Message] serializePlcMessage ... \n");
 
   uint8_t response[24];
   response[0] = 0x00;
@@ -129,18 +129,18 @@ void test_serializePlcMessage_t() {
   uint8_t* serBuf = malloc(bufSize);
   assert(serBuf != NULL);
 
-  size_t serSize = serializePlcMessage_t(msg, serBuf);
+  size_t serSize = serializePlcMessage(msg, serBuf);
   assert(serSize > 0);
 
   assert(memcmp(serBuf, response, serSize) == 0);
 
   free(serBuf);
   freeMessage(msg);
-  verbose("[Plc Message] serializePlcMessage_t ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
+  verbose("[Plc Message] serializePlcMessage ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
-void test_deserializePlcMessage_t_valid() {
-  verbose("[Plc Message] deserializePlcMessage_t valid ... \n");
+void test_deserializePlcMessage_valid() {
+  verbose("[Plc Message] deserializePlcMessage valid ... \n");
 
   /* Create and setup an original message */
   PlcMessage_t* origMsg = createPlcMessage();
@@ -160,17 +160,17 @@ void test_deserializePlcMessage_t_valid() {
   size_t bufSize = 512*sizeof(uint8_t);
   uint8_t* serBufOrig = malloc(bufSize);
   assert(serBufOrig != NULL);
-  size_t serSizeOrig = serializePlcMessage_t(origMsg, serBufOrig);
+  size_t serSizeOrig = serializePlcMessage(origMsg, serBufOrig);
   assert(serSizeOrig > 0);
 
   /* Now deserialize the message from the serialized buffer */
-  PlcMessage_t* deserializedMsg = deserializePlcMessage_t(serBufOrig);
+  PlcMessage_t* deserializedMsg = deserializePlcMessage(serBufOrig);
   assert(deserializedMsg != NULL);
 
   /* Re-serialize the deserialized message to compare with the original serialization */
   uint8_t* serBufDeser = malloc(bufSize);
   assert(serBufDeser != NULL);
-  size_t serSizeDeser = serializePlcMessage_t(deserializedMsg, serBufDeser);
+  size_t serSizeDeser = serializePlcMessage(deserializedMsg, serBufDeser);
   assert(serSizeDeser > 0);
 
   /* Compare the sizes and contents */
@@ -180,7 +180,7 @@ void test_deserializePlcMessage_t_valid() {
   free(serBufDeser);
   freeMessage(origMsg);
   freeMessage(deserializedMsg);
-  verbose("[Plc Message] deserializePlcMessage_t valid ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
+  verbose("[Plc Message] deserializePlcMessage valid ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
 void test_ackMessage(){
@@ -232,7 +232,7 @@ void test_ackMessage(){
   uint8_t* serBuf = malloc(bufSize);
   assert(serBuf != NULL);
 
-  size_t serSize = serializePlcMessage_t(ack, serBuf);
+  size_t serSize = serializePlcMessage(ack, serBuf);
   assert(serSize > 0);
 
   assert(memcmp(serBuf, response, serSize) == 0);
@@ -262,8 +262,8 @@ int main(int argc, char* argv[]) {
   test_setAPDU_invalid();
   test_setNPDU_valid();
   test_createXwayAddr();
-  test_serializePlcMessage_t();
-  test_deserializePlcMessage_t_valid();
+  test_serializePlcMessage();
+  test_deserializePlcMessage_valid();
   test_ackMessage();
   test_freeMessage();
 

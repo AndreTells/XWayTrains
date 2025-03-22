@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#define MAX_MSG_SIZE 28
+
 typedef struct PlcMessage_t PlcMessage_t;
 
 typedef uint16_t XwayAddr;
@@ -49,10 +51,10 @@ int setNPDU(PlcMessage_t* msg, XwayNPDUType_e code, XwayAddr sender, XwayAddr re
 XwayAddr createXwayAddr(uint8_t station, uint8_t network, uint8_t port);
 
 // returns the msg size
-size_t serializePlcMessage_t(PlcMessage_t* msg, uint8_t* serMsg);
+size_t serializePlcMessage(PlcMessage_t* msg, uint8_t* serMsg);
 
 // returns the msg
-PlcMessage_t* deserializePlcMessage_t( uint8_t* serMsg);
+PlcMessage_t* deserializePlcMessage( uint8_t* serMsg);
 
 int freeMessage(PlcMessage_t* msg);
 

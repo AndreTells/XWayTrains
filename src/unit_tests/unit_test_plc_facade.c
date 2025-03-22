@@ -36,7 +36,7 @@ void test_configWritePlcMessage_toggleSwitch() {
   size_t bufSize = 512;
   uint8_t* serBuf = malloc(bufSize);
   assert(serBuf != NULL);
-  size_t serSize = serializePlcMessage_t(msg, serBuf);
+  size_t serSize = serializePlcMessage(msg, serBuf);
   assert(serSize > 0);
 
   assert(serBuf[0]  == 0x00);

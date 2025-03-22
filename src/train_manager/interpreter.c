@@ -21,7 +21,6 @@ static const int interpreterCommandTableSize = 3;
 static const KeywordToken plcMsgTypeTable[] = {
     {"rail", TOGGLE_RAIL},
     {"switch", TOGGLE_SWITCH},
-    {"invert", TOGGLE_TRAIN_DIR}
 };
 static const int plcMsgTypeTableSize = 3;
 

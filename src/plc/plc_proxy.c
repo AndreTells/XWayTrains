@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdint.h>
 
 #include "plc/plc_message.h"
 #include "plc/plc_proxy.h"
@@ -136,17 +137,26 @@ PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int clientId) {
     return NULL;
   }
 
-  size_t msgSize = getMessageSize(getNullMessage());
-  PlcMessage_t* res = (PlcMessage_t*)malloc(msgSize);
-  // considers all messages have the same size for testing purposes
-  ssize_t res_size = read(plc->outputFd[clientId][0], res, msgSize);
+  uint8_t* serMsg[] = malloc(MAX_MSG_SIZE);
+
+  int resWait = fileDescriptorTimedWait(plc->outputFd[clientId][0]);
+  if(res < 0){
+    return NULL;
+  }
+
+  ssize_t res_size = read(plc->outputFd[clientId][0], serMsg, MAX_MSG_SIZE);
   if (res_size == 0) {
     return NULL;
   }
 
-  printf("%d received %x with size %zd from %d \n", clientId, res, res_size,
-         plc->outputFd[clientId][0]);
-  return res;
+  PlcMessage_t* msg = deserializedMsg(serMsg);
+
+  PlcMessage_t* ack = createACK(msg);
+
+  uint8_t* serAck[] = malloc(MAX_MSG_SIZE);
+
+
+  return msg;
 }
 
 void* plcProxyMsgReceiverThread(void* plcProxy) {

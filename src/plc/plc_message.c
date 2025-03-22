@@ -99,7 +99,7 @@ XwayAddr createXwayAddr(uint8_t station, uint8_t network, uint8_t port){
 }
 
 // returns the msg size
-size_t serializePlcMessage_t(PlcMessage_t* msg, uint8_t* serMsg){
+size_t serializePlcMessage(PlcMessage_t* msg, uint8_t* serMsg){
   uint8_t* initSerMsg = serMsg;
   // setting preamble
   memcpy(serMsg,msg->modbusId, 5*sizeof(uint8_t));
@@ -147,7 +147,7 @@ size_t serializePlcMessage_t(PlcMessage_t* msg, uint8_t* serMsg){
 }
 
 // returns the msg
-PlcMessage_t* deserializePlcMessage_t( uint8_t* serMsg){
+PlcMessage_t* deserializePlcMessage( uint8_t* serMsg){
   PlcMessage_t* msg = createPlcMessage();
   serMsg+=7;
 

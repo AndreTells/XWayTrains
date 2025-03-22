@@ -13,6 +13,7 @@
 #include "resource_manager/request_queue.h"
 
 #define MAX_CLIENTS 4
+#define THREAD_POOL_SIZE 4
 
 struct ResourceManager_t {
   bool finished;
@@ -21,7 +22,7 @@ struct ResourceManager_t {
 
   ResourceRequestQueue_t* queue;
 
-  pthread_t consumerThread;
+  pthread_t consumerThreadPool[THREAD_POOL_SIZE];
 
   pthread_t clients[MAX_CLIENTS];
   int clientsFd[MAX_CLIENTS];
@@ -64,12 +65,14 @@ ResourceManager_t* initResourceManager(ResourceDataBaseProxy_t* safeDatabase,
 
   manager->listenFd = listenFd;
 
-  // create consumer thread
-  RequestConsumerThread_t* typedData = (RequestConsumerThread_t*) malloc(sizeof(RequestConsumerThread_t));
-  typedData->parent = manager;
-  typedData->queue = manager->queue;
 
-  pthread_create(&(manager->consumerThread),NULL,consumerThread, (void*)typedData);
+  for(int i=0; i< THREAD_POOL_SIZE; i++){
+    // create consumer thread
+    RequestConsumerThread_t* typedData = (RequestConsumerThread_t*) malloc(sizeof(RequestConsumerThread_t));
+    typedData->parent = manager;
+    typedData->queue = manager->queue;
+    pthread_create(&(manager->consumerThreadPool[i]),NULL,consumerThread, (void*)typedData);
+  }
 
   return manager;
 }
@@ -81,14 +84,19 @@ int endResourceManager(ResourceManager_t* manager) {
   }
   manager->finished = true;
 
-  pthread_join(manager->consumerThread, NULL);
+  for(int i=0; i<THREAD_POOL_SIZE; i++){
+
+    int res = pthread_join(manager->consumerThreadPool[i], NULL);
+    if(res <0){
+      return -1;
+    }
+  }
 
   for(int i=0; i<manager->lastClientIndex + 1; i++){
     int res = pthread_join(manager->clients[i], NULL);
     if(res <0){
       return -1;
     }
-    // not checking if the join is failing
   }
 
   (void)destroyQueue(manager->queue);
@@ -150,32 +158,50 @@ void* consumerThread(void* data) {
   ResourceManager_t* manager = typedData->parent;
   ResourceRequestQueue_t* queue = typedData->queue;
 
+  ResourceRequest_t* req;
+  bool timedOut = false;
   while(!manager->finished){
-    ResourceRequest_t* req = popQueue(queue);
+    if(!timedOut){
+     req = popQueue(queue);
+    }
 
-    //TODO: make one thread per request
     if(req == NULL){
       continue;
     }
 
+    timedOut = false;
     ResourceRequestResponseType_e res = RESOURCE_REFUSED;
     switch(req->reqType){
       case LOCK_RESOURCE:
-        (void)waitResourceProxy(manager->safeDatabase, req->resourceId);
-        (void)attemptLockResourceProxy(manager->safeDatabase, req->resourceId, req->requesterId);
-        res = RESOURCE_GRANTED;
+        int resWait = waitResourceProxy(manager->safeDatabase, req->resourceId);
+        if(resWait != 0){
+          timedOut = true;
+          break;
+        }
+
+        int resLock = attemptLockResourceProxy(manager->safeDatabase, req->resourceId, req->requesterId);
+
+        if(resLock == 0){
+          res = RESOURCE_GRANTED;
+        }
+
         break;
 
       case RELEASE_RESOURCE:
-        (void)releaseResourceProxy(manager->safeDatabase, req->resourceId, req->requesterId);
-        res = RESOURCE_GRANTED;
+        int resRel = releaseResourceProxy(manager->safeDatabase, req->resourceId, req->requesterId);
+        if(resRel == 0){
+          res = RESOURCE_GRANTED;
+        }
         break;
+    }
+
+    if(timedOut){
+      continue;
     }
 
     int fd = req->returnFd;
     ResourceRequestResponse_t* resp = createResourceRequestResponse(req, res);
     answerResourceRequest(fd, resp);
-
   }
 
   free(typedData);

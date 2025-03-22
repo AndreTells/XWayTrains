@@ -10,6 +10,10 @@
 #include "common/verbose.h"
 #include "common/flags.h"
 
+#define HOST_ADDR "127.0.0.1"
+#define SERVER_ADDR "10.31.125.14"
+#define PLC_PORT 502
+
 
 void test_executeCommand_nullArguments() {
   verbose("[Interpreter] executeCommand NULL Args ... \n");
@@ -17,7 +21,7 @@ void test_executeCommand_nullArguments() {
   char cmd[] = "trainId 5";
 
   /* Allocate non-NULL pointers using malloc; actual implementations are provided by mocks. */
-  PlcProxy_t* plc = initPlcProxy(" ");
+  PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ");
   Train_t* train = initTrain(plc,resMgr," ");
 
@@ -38,7 +42,7 @@ void test_executeCommand_setTrainId_success() {
 
   char cmd[] = "trainId 4";
 
-  PlcProxy_t* plc = initPlcProxy(" ");
+  PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ");
   Train_t* train = initTrain(plc,resMgr," ");
 
@@ -59,7 +63,7 @@ void test_executeCommand_plc_invalidParams() {
 
   char cmd[] = "plc rail"; // Missing target id parameter
 
-  PlcProxy_t* plc = initPlcProxy(" ");
+  PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ");
   Train_t* train = initTrain(plc,resMgr," ");
 
@@ -78,7 +82,7 @@ void test_executeCommand_resource_invalidParams() {
 
   char cmd[] = "resource"; // Missing request type and resource IDs
 
-  PlcProxy_t* plc = initPlcProxy(" ");
+  PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ");
   Train_t* train = initTrain(plc,resMgr," ");
 

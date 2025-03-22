@@ -158,6 +158,7 @@ void test_readMessagePlcProxy() {
   PlcMessage_t* ack = unitTestTryGetPlcMessage(serverFd);
   assert( ack != NULL);
   assert( compareMsgType(ack, APDU_WRITE_RESP) == 0);
+  free(ack);
 
 
   int ret = endPlcProxy(proxy);

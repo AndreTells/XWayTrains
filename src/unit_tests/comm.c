@@ -143,10 +143,9 @@ void test_read_validation() {
 
   reponse[14] = 0x37;
 
+  //
   reponse[15] = 0x07;
-
   reponse[16] = 0x68;
-
   reponse[17] = 0x07;
 
   reponse[18] = 0x09;
@@ -154,7 +153,6 @@ void test_read_validation() {
 
   reponse[20] = 0x01;
   reponse[21] = 0x00;
-
   reponse[22] = 0x1F;
   reponse[23] = 0x00;
 

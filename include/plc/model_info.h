@@ -3,7 +3,8 @@
  * @brief Definitions of identifiers for trains, rails, switches, and reversible
  * rails
  * @details Contains enumerations for identifying trains and various rail
- * components in the physical train model.
+ * components in the physical train model as well as addresses configured in the
+ * plc
  */
 
 #ifndef MODEL_INFO_H_
@@ -44,5 +45,23 @@ typedef enum SwitchGroupId_e {
   SWITCH_GROUP_33 = 33, // Tj3b, Tj3d
 }SwitchGroupId_e;
 
+typedef enum ACKAddr_e {
+  ADDR_ACK_RAIL_1 = 8,
+  ADDR_ACK_SWITCH_1 = 9,
+
+  ADDR_ACK_RAIL_2 = 15,
+  ADDR_ACK_SWITCH_2 = 16,
+
+  ADDR_ACK_RAIL_3 = 10,
+  ADDR_ACK_SWITCH_3 = 11,
+
+  ADDR_ACK_RAIL_4 = 12,
+  ADDR_ACK_SWITCH_4 = 13,
+  ADDR_ACK_INV_4 = 14,
+}ACKAddr_e;
+
 uint16_t getTrainAddr(TrainId_e trainId);
+
+TrainId_e getTargetedTrain(uint8_t* writeData);
+
 #endif  // MODEL_INFO_H_

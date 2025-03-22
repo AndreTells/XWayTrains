@@ -58,4 +58,8 @@ PlcMessage_t* deserializePlcMessage( uint8_t* serMsg);
 
 int freeMessage(PlcMessage_t* msg);
 
+bool compareMsgType(PlcMessage_t* msg, XwayAPDUCode_e code);
+
+uint8_t* getPlcMessageData(PlcMessage_t* msg);
+
 #endif  // PLC_INFO_H_

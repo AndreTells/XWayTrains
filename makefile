@@ -57,6 +57,7 @@ test:build/test/remote build/test/resource_database\
 		build/test/request_queue \
 		build/test/plc_message \
 		build/test/plc_facade \
+		build/test/plc_proxy \
 		build/test/resource_manager \
 		build/test/interpreter
 
@@ -166,8 +167,10 @@ build/test/plc_facade: $(TEST_SRC_DIR)/unit_test_plc_facade.c \
 
 build/test/plc_proxy: $(TEST_SRC_DIR)/unit_test_plc_proxy.c \
 									$(PLC_MANAGER_SRC_DIR)/plc_proxy.c \
-									$(PLC_MANAGER_SRC_DIR)/mock_plc_message.c \
-									$(PLC_MANAGER_SRC_DIR)/mock_plc_facade.c \
+									$(PLC_MANAGER_SRC_DIR)/plc_message.c \
+									$(PLC_MANAGER_SRC_DIR)/plc_facade.c \
+									$(PLC_MANAGER_SRC_DIR)/model_info.c \
+									$(COMMON_SRC_DIR)/time_out.c \
 									$(COMMON_SRC_DIR)/verbose.c \
 									$(COMMON_SRC_DIR)/flags.c
 	mkdir -p build/test

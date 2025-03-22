@@ -7,6 +7,8 @@
 #include <signal.h>
 #include "plc/plc_proxy.h"
 #include "plc/plc_message.h"
+#include "plc/plc_facade.h"
+#include "plc/model_info.h"
 #include "common/verbose.h"
 #include "common/flags.h"
 
@@ -32,15 +34,32 @@ void test_sendMessagePlcProxy() {
   PlcProxy_t* proxy = initPlcProxy("127.0.0.1");
   assert(proxy != NULL);
 
-  /* Assume getNullMessage() returns a dummy PlcMessage_t pointer
-     and that its allocated size is used by getMessageSize(). */
-  PlcMessage_t* dummyMsg = getNullMessage();
-  assert(dummyMsg != NULL);
+  /* making a message */
+  PlcMessage_t* msg = createPlcMessage();
+  assert(msg != NULL);
+  int res;
+  uint8_t pc_station = 0x28;
+  uint8_t plc_station = 0x0E;
 
-  int ret = sendMessagePlcProxy(proxy, dummyMsg);
+  uint8_t network = 1;
+  uint8_t port = 0;
+
+   res = configWritePlcMessage(msg, TOGGLE_SWITCH, pc_station , TRAIN_1, SWITCH_GROUP_31);
+  assert(res == 0);
+
+  /* configure the address information */
+  XwayAddr sender = createXwayAddr(pc_station, network, port);
+  XwayAddr receiver = createXwayAddr(plc_station, network, port);
+  uint8_t extAddr[2] = {0x09, 0x10};
+  res = setNPDU(msg, NPDU_5WAY, sender, receiver, extAddr);
+  assert(res == 0);
+
+  // attempting to send the message
+
+  int ret = sendMessagePlcProxy(proxy, msg);
   assert(ret == 0);
 
-  free(dummyMsg);  // free if getNullMessage() allocates memory
+  freeMessage(msg);
   ret = endPlcProxy(proxy);
   assert(ret == 0);
   verbose("[Plc Proxy] sendMessagePlcProxy ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
@@ -51,19 +70,11 @@ void test_readMessagePlcProxy() {
   PlcProxy_t* proxy = initPlcProxy("127.0.0.1");
   assert(proxy != NULL);
 
-  PlcMessage_t* dummyMsg = getNullMessage();
-  assert(dummyMsg != NULL);
-
-  int ret = sendMessagePlcProxy(proxy, dummyMsg);
-  assert(ret == 0);
-  free(dummyMsg);  // free the dummy message
-
-  /* Now, attempt to read the message via the proxy */
   PlcMessage_t* receivedMsg = readMessagePlcProxy(proxy, 0);
-  assert(receivedMsg != NULL);
+  assert(receivedMsg == NULL);
   free(receivedMsg);
 
-  ret = endPlcProxy(proxy);
+  int ret = endPlcProxy(proxy);
   assert(ret == 0);
   verbose("[Plc Proxy] readMessagePlcProxy ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }

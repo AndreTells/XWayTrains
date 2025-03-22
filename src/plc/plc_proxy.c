@@ -10,8 +10,9 @@
 #include "plc/plc_message.h"
 #include "plc/plc_proxy.h"
 #include "common/verbose.h"
+#include "common/time_out.h"
 
-#define MAX_NUM_REGISTRABLE_TRAINS 4
+#define MAX_NUM_REGISTRABLE_TRAINS 5 // ignore position 0
 
 struct PlcProxy_t {
   pthread_t readerThreadTid;
@@ -20,6 +21,10 @@ struct PlcProxy_t {
   bool finished;
   int sock_fd;
 };
+
+PlcMessage_t* tryGetPlcMessage(int fd);
+
+int sendPlcMessageToFd(PlcMessage_t* msg, int fd);
 
 /**
  * @brief Entry point for the PLC message receiver thread
@@ -95,16 +100,8 @@ int endPlcProxy(PlcProxy_t* plc) {
 
   verbose("[PLC PROXY]: Ending Reader Thread ... \n");
   plc->finished = true;
-  int retVal = 0;
-  pthread_kill(plc->readerThreadTid, SIGINT);
 
-  (void)pthread_join(plc->readerThreadTid, (void*)&retVal);
-  // check if the join failed
-  if (retVal != 0) {
-    verbose("[PLC PROXY]: Ending Reader Thread ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
-    verbose("[PLC PROXY]: Ending ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
-    return -1;
-  }
+  (void)pthread_join(plc->readerThreadTid, NULL);
 
   verbose("[PLC PROXY]: Ending Reader Thread ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
   sem_destroy(&(plc->mutex));
@@ -127,8 +124,11 @@ int endPlcProxy(PlcProxy_t* plc) {
 
 int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
   sem_wait(&(plc->mutex));
-  printf("msg %x sent to plc\n", msg);
+
+  sendPlcMessageToFd(msg, plc->sock_fd);
+
   sem_post(&(plc->mutex));
+
   return 0;
 }
 
@@ -137,24 +137,20 @@ PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int clientId) {
     return NULL;
   }
 
-  uint8_t* serMsg[] = malloc(MAX_MSG_SIZE);
-
-  int resWait = fileDescriptorTimedWait(plc->outputFd[clientId][0]);
-  if(res < 0){
-    return NULL;
+  PlcMessage_t* msg = tryGetPlcMessage(plc->outputFd[clientId][0]);
+  if(msg == NULL){
+    return msg;
   }
 
-  ssize_t res_size = read(plc->outputFd[clientId][0], serMsg, MAX_MSG_SIZE);
-  if (res_size == 0) {
+  PlcMessage_t* ack = createACK(msg, true);
+
+  int sendRes = sendMessagePlcProxy(plc, ack);
+  free(ack);
+
+  if(sendRes < -1) {
+    free(msg);
     return NULL;
   }
-
-  PlcMessage_t* msg = deserializedMsg(serMsg);
-
-  PlcMessage_t* ack = createACK(msg);
-
-  uint8_t* serAck[] = malloc(MAX_MSG_SIZE);
-
 
   return msg;
 }
@@ -163,23 +159,28 @@ void* plcProxyMsgReceiverThread(void* plcProxy) {
   PlcProxy_t* plc = (PlcProxy_t*)plcProxy;
   while (!plc->finished) {
     printf("plc proxy attempting to get a line: \n");
-    // will be switched with code to read a real PlcMessage_t
-    // AND not an ack
-    int target;
-    int resp;
-    (void)scanf("%d,%d", &target, &resp);
-    // generate response message
-    (void)printf("[ACK]reader read: %d %d\n", target, resp);
 
-    if (plcProxyTryRegisterClient(plc, target) != 0) {
-      // TODO(andre): treat silent error ??
+    PlcMessage_t* msg = tryGetPlcMessage(plc->sock_fd);
+
+    // if failed to get a msg, retry
+    if(msg == NULL){
       continue;
     }
-    printf("outputing to %d\n", plc->outputFd[target][1]);
-    PlcMessage_t* msg = getNullMessage();  // use actually received message
-    (void)write(plc->outputFd[target][1], msg, getMessageSize(msg));
+
+    // things that aren't write
+    if(!compareMsgType(msg, APDU_WRITE_RESP)){
+      continue;
+    }
+
+    // determining who to route the message to
+    uint8_t* data = getPlcMessageData(msg);
+    TrainId_e target = getTargetedTrain(data);
+
+    if (plcProxyTryRegisterClient(plc, target) == 0) {
+      sendPlcMessageToFd(msg, plc->outputFd[target][1]);
+    }
+
     free(msg);
-    sleep(5);
   }
 
   pthread_exit(NULL);
@@ -190,6 +191,7 @@ int plcProxyTryRegisterClient(PlcProxy_t* plcProxy, int clientId) {
   if (clientId < 0 || clientId > MAX_NUM_REGISTRABLE_TRAINS - 1) {
     return -1;
   }
+  // check if client is already registered
   if (plcProxy->outputFd[clientId][0] != -1) {
     return 0;
   }
@@ -197,4 +199,34 @@ int plcProxyTryRegisterClient(PlcProxy_t* plcProxy, int clientId) {
   int status = pipe(plcProxy->outputFd[clientId]);
 
   return status;
+}
+
+PlcMessage_t* tryGetPlcMessage(int fd){
+  uint8_t* serMsg = malloc(MAX_MSG_SIZE);
+
+  int resWait = fileDescriptorTimedWait(fd);
+  if(resWait < 0){
+    return NULL;
+  }
+
+  ssize_t resSize = read(fd, serMsg, MAX_MSG_SIZE);
+  if (resSize == 0) {
+    return NULL;
+  }
+
+  PlcMessage_t* msg = deserializePlcMessage(serMsg);
+  free(serMsg);
+  return msg;
+}
+
+int sendPlcMessageToFd(PlcMessage_t* msg, int fd){
+  uint8_t* serMsg = malloc(MAX_MSG_SIZE);
+
+  size_t serSize = serializePlcMessage(msg, serMsg);
+
+
+  int writeRes = write(fd, serMsg, serSize);
+
+  free(serMsg);
+  return writeRes;
 }

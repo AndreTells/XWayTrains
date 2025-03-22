@@ -200,3 +200,13 @@ int freeMessage(PlcMessage_t* msg){
   free(msg);
   return 0;
 }
+
+bool compareMsgType(PlcMessage_t* msg, XwayAPDUCode_e code){
+  XwayAPDU_t* apdu = &(msg->npdu.apdu);
+  return apdu->code == code;
+}
+
+uint8_t* getPlcMessageData(PlcMessage_t* msg){
+  XwayAPDU_t* apdu = &(msg->npdu.apdu);
+  return apdu->data;
+}

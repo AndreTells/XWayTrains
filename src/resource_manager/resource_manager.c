@@ -1,6 +1,6 @@
 #include <sys/socket.h>
 
-#include "resource_database_proxy"
+#include "resource_database_proxy.h"
 
 int connectSocket();
 

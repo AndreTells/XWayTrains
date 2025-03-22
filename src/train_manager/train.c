@@ -45,8 +45,9 @@ void* trainThread(void* data);
  * @note The caller is responsible for gracefully terminating the instance using
  *       `endTrain()`.
  */
-Train_t* initTrain(enum TrainId_e trainId, PlcProxy_t* plc,
-                   ResourceManagerProxy_t* resManager, char* routeFilePath) {
+struct Train_t* initTrain(enum TrainId_e trainId, PlcProxy_t* plc,
+                          ResourceManagerProxy_t* resManager,
+                          char* routeFilePath) {
   // accounting for invalid inputs
   if (plc == NULL || resManager == NULL) {
     return NULL;
@@ -126,8 +127,8 @@ void* trainThread(void* data) {
         switch_id = actuator;
       } else if (strncmp(token, "Inversion", 10) == 0) {
         section_id = actuator + 40;
-
       } else {
+        
       }
     }
 

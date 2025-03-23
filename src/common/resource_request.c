@@ -9,6 +9,7 @@
 
 #include "common/time_out.h"
 #include "common/verbose.h"
+#include "plc/model_info.h"
 
 #define RESOURCE_REQUEST_SERIALIZED_SIZE (sizeof(uint32_t) * 4)
 #define RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE (sizeof(uint32_t) * 3)
@@ -230,7 +231,8 @@ ResourceRequestResponse_t* recvResourceRequestResponse(int fd) {
   return req;
 }
 
-ResourceRequest_t* createResourceRequest(int requesterId, int resourceId,
+ResourceRequest_t* createResourceRequest(const enum TrainId_e requesterId,
+                                         const uint32_t resourceId,
                                          ResourceRequestType_e reqType,
                                          int fd) {
   ResourceRequest_t* req = malloc(sizeof(ResourceRequest_t));

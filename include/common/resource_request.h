@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "plc/model_info.h"
+
 /**
  * @enum Resource_e
  * @brief Enumerates available resource identifiers.
@@ -40,7 +42,7 @@ typedef enum {
  */
 typedef struct {
   uint32_t requesterId;
-  int resourceId;
+  uint32_t resourceId;
   ResourceRequestType_e reqType;
   int returnFd;
 } ResourceRequest_t;
@@ -103,7 +105,8 @@ ResourceRequestResponse_t* recvResourceRequestResponse(int fd);
  * @return ResourceRequest_t* Pointer to the newly created ResourceRequest_t
  * structure.
  */
-ResourceRequest_t* createResourceRequest(int requesterId, int resourceId,
+ResourceRequest_t* createResourceRequest(const enum TrainId_e requesterId,
+                                         const uint32_t resourceId,
                                          ResourceRequestType_e reqType, int fd);
 /**
  * @brief Destroys a resource request and frees associated memory.

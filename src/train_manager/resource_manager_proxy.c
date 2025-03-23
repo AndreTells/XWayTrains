@@ -26,7 +26,7 @@ struct ResourceManagerProxy_t {
 void* resManagerMsgReceiverThread(void* resourceManagerProxy);
 
 int resManagerTryRegisterClient(ResourceManagerProxy_t* resManager,
-                                int clientId);
+                                const enum TrainId_e clientId);
 
 ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr,
                                                  const uint16_t port) {
@@ -220,7 +220,7 @@ void* resManagerMsgReceiverThread(void* resourceManagerProxy) {
     }
 
     verbose("[RESOURCE MANAGER PROXY READER]: Message Received \n");
-    int target = resp->requesterId;
+    uint32_t target = resp->requesterId;
 
     if (resManagerTryRegisterClient(resManager, target) == 0) {
       verbose("[RESOURCE MANAGER PROXY READER]: Routing Message ... \n");
@@ -234,7 +234,7 @@ void* resManagerMsgReceiverThread(void* resourceManagerProxy) {
 }
 
 int resManagerTryRegisterClient(ResourceManagerProxy_t* resManager,
-                                int clientId) {
+                                const enum TrainId_e clientId) {
   // index out of range
   if (clientId < 0 || clientId > MAX_NUM_REGISTRABLE_TRAINS - 1) {
     return -1;

@@ -2,6 +2,7 @@
 #include <sys/socket.h>
 
 #include "common/resource_request.h"
+#include "plc/model_info.h"
 
 int sendResourceRequest([[maybe_unused]] int fd,
                         [[maybe_unused]] ResourceRequest_t* req) {
@@ -32,7 +33,8 @@ int answerResourceRequest([[maybe_unused]] int fd,
   return 0;
 }
 
-ResourceRequest_t* createResourceRequest(int requesterId, int resourceId,
+ResourceRequest_t* createResourceRequest(const enum TrainId_e requesterId,
+                                         const uint32_t resourceId,
                                          ResourceRequestType_e reqType,
                                          int fd) {
   ResourceRequest_t* req = malloc(sizeof(ResourceRequest_t));

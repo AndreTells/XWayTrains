@@ -67,7 +67,8 @@ test: clean \
 		build/test/plc_facade \
 		build/test/plc_proxy \
 		build/test/resource_manager \
-		build/test/interpreter
+		build/test/interpreter \
+		build/test/comm
 
 	@printf "\n[Unit testing]\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_database -s
@@ -85,6 +86,8 @@ test: clean \
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_facade -s
 	@printf "\n\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_proxy -s
+	@printf "\n\n"
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/comm -s
 	@printf "\nDone unit testing\n"
 
 
@@ -93,6 +96,11 @@ build/test/remote: $(RTEST_SRC_DIR)/main.c \
 
 	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
+
+build/test/comm: $(TEST_SRC_DIR)/comm.c \
+					$(RTEST_SRC_DIR)/comm.c
+	mkdir -p build/test
+	$(CC) -g $(CFLAGS) $^ -o $@
 
 # --------------------------------------------------------------------- #
 # Unit testing the resource Manager                                     #

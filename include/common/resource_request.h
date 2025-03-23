@@ -53,7 +53,7 @@ typedef struct {
  */
 typedef struct {
   uint32_t requesterId;
-  int resourceId;
+  uint32_t resourceId;
   ResourceRequestResponseType_e respType;
 } ResourceRequestResponse_t;
 

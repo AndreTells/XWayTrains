@@ -2,7 +2,6 @@
 
 #include <pthread.h>
 #include <semaphore.h>
-#include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -135,7 +134,7 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
 }
 
 int requestResource(ResourceManagerProxy_t* resManager,
-                    ResourceRequestType_e reqType, int resourceId,
+                    ResourceRequestType_e reqType, uint32_t resourceId,
                     const enum TrainId_e clientId) {
   int res;
   verbose("[RESOURCE MANAGER PROXY]: Resource Request ... \n");

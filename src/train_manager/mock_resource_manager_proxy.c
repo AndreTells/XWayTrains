@@ -28,7 +28,7 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
 
 int requestResource([[maybe_unused]] ResourceManagerProxy_t* resManager,
                     [[maybe_unused]] ResourceRequestType_e reqType,
-                    [[maybe_unused]] int resourceId,
+                    [[maybe_unused]] uint32_t resourceId,
                     [[maybe_unused]] const enum TrainId_e clientId) {
   return 0;
 }

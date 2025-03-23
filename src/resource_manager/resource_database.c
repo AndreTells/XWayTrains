@@ -2,6 +2,7 @@
 
 #include <err.h>
 #include <semaphore.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,7 +14,7 @@
 struct ResourceDataBase_t {
   bool registered[MAX_RESOURCE_ID];
   unsigned int availability[MAX_RESOURCE_ID];
-  int owner[MAX_RESOURCE_ID];
+  uint32_t owner[MAX_RESOURCE_ID];
   sem_t interest[MAX_RESOURCE_ID];
 };
 
@@ -29,7 +30,7 @@ ResourceDataBase_t *initResourceDataBase() {
   (void)memset(database->availability, 0, MAX_RESOURCE_ID * sizeof(int));
 
   for (int i = 0; i < MAX_RESOURCE_ID; i++) {
-    database->owner[i] = -1;
+    database->owner[i] = 0;
   }
 
   return database;
@@ -46,7 +47,7 @@ int endResourceDataBase(ResourceDataBase_t *database) {
 }
 
 int attemptLockResource(ResourceDataBase_t *database, uint8_t resourceId,
-                        int requesterId) {
+                        uint32_t requesterId) {
   // resource Id out of bounds
   if (resourceId >= MAX_RESOURCE_ID) {
     return -1;
@@ -67,7 +68,7 @@ int attemptLockResource(ResourceDataBase_t *database, uint8_t resourceId,
 }
 
 int releaseResource(ResourceDataBase_t *database, uint8_t resourceId,
-                    int requesterId) {
+                    uint32_t requesterId) {
   // only the owner can unlock it
   if (requesterId != database->owner[resourceId]) {
     return -1;

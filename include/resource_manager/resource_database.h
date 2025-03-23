@@ -49,7 +49,7 @@ int endResourceDataBase(ResourceDataBase_t* database);
  * failure.
  */
 int attemptLockResource(ResourceDataBase_t* database, uint8_t resourceId,
-                        int requesterId);
+                        uint32_t requesterId);
 
 /**
  * @brief Releases a locked resource.
@@ -62,7 +62,7 @@ int attemptLockResource(ResourceDataBase_t* database, uint8_t resourceId,
  * @return 0 on success, or a negative value on failure.
  */
 int releaseResource(ResourceDataBase_t* database, uint8_t resourceId,
-                    int requesterId);
+                    uint32_t requesterId);
 
 /**
  * @brief Waits for a resource to become available.

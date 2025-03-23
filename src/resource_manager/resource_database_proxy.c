@@ -39,7 +39,7 @@ int endResourceDataBaseProxy(ResourceDataBaseProxy_t* dbProxy) {
 }
 
 int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy,
-                             uint8_t resourceId, int requesterId) {
+                             uint8_t resourceId, uint32_t requesterId) {
   sem_wait(&db_proxy->lock);
   int res = 0;
   if (attemptLockResource(db_proxy->database, resourceId, requesterId) != 0) {
@@ -51,7 +51,7 @@ int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy,
 }
 
 int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, uint8_t resourceId,
-                         int requesterId) {
+                         uint32_t requesterId) {
   sem_wait(&db_proxy->lock);
 
   int res = releaseResource(db_proxy->database, resourceId, requesterId);

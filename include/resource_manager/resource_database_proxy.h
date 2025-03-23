@@ -49,7 +49,7 @@ int endResourceDataBaseProxy(ResourceDataBaseProxy_t* dbProxy);
  * failure.
  */
 int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy,
-                             uint8_t resourceId, int requesterId);
+                             uint8_t resourceId, uint32_t requesterId);
 
 /**
  * @brief Releases a locked resource through the proxy.
@@ -62,7 +62,7 @@ int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy,
  * @return 0 on success, or a negative value on failure.
  */
 int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, uint8_t resourceId,
-                         int requesterId);
+                         uint32_t requesterId);
 
 /**
  * @brief Waits for a resource to become available through the proxy.

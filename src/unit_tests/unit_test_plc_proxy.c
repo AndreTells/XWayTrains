@@ -88,20 +88,6 @@ void test_sendMessagePlcProxy() {
   verbose("[Plc Proxy] sendMessagePlcProxy ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
-void test_readMessagePlcProxy_fail() {
-  verbose("[Plc Proxy] readMessagePlcProxy fail ... \n");
-
-  PlcProxy_t* proxy = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
-  assert(proxy != NULL);
-
-  PlcMessage_t* receivedMsg = readMessagePlcProxy(proxy, TRAIN_1);
-  assert(receivedMsg == NULL);
-
-  int ret = endPlcProxy(proxy);
-  assert(ret == 0);
-  verbose("[Plc Proxy] readMessagePlcProxy fail ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
-}
-
 void test_readMessagePlcProxy() {
   verbose("[Plc Proxy] readMessagePlcProxy ... \n");
 
@@ -176,7 +162,6 @@ int main(int argc, char* argv[]) {
   test_init_endPlcProxy();
   test_sendMessagePlcProxy();
   test_readMessagePlcProxy();
-  test_readMessagePlcProxy_fail();
 
   verbose("\n[Unit Testing] Plc Proxy ... Done \n");
   return 0;

@@ -217,6 +217,19 @@ build/remote_test/resource_manager_client: $(REMOTE_TEST_SRC_DIR)/remote_test_re
 	mkdir -p build/remote_test
 	$(CC) -g $(CFLAGS) $^ -o $@
 
+build/remote_test/plc: $(REMOTE_TEST_SRC_DIR)/remote_test_plc.c \
+		$(PLC_MANAGER_SRC_DIR)/plc_proxy.c \
+		$(PLC_MANAGER_SRC_DIR)/plc_message.c \
+		$(PLC_MANAGER_SRC_DIR)/plc_facade.c \
+		$(PLC_MANAGER_SRC_DIR)/model_info.c \
+		$(COMMON_SRC_DIR)/comm_general.c \
+		$(COMMON_SRC_DIR)/time_out.c \
+		$(COMMON_SRC_DIR)/verbose.c \
+		$(COMMON_SRC_DIR)/flags.c
+
+	mkdir -p build/remote_test
+	$(CC) -g $(CFLAGS) $^ -o $@
+
 # --------------------------------------------------------------------- #
 # Building Final Version                                                #
 # --------------------------------------------------------------------- #

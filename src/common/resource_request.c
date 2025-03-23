@@ -72,7 +72,8 @@ int deserializeResourceRequest(const uint8_t* buffer, ResourceRequest_t* req) {
 
   // Deserialize resourceId
   memcpy(&net_val, buffer + offset, sizeof(net_val));
-  req->resourceId = ntohl(net_val);
+  const uint32_t resourceId = ntohl(net_val);
+  req->resourceId = resourceId > UINT8_MAX ? UINT8_MAX : (uint8_t)resourceId;
   offset += sizeof(net_val);
 
   // Deserialize request type (reqType)
@@ -143,7 +144,8 @@ int deserializeResourceRequestResponse(const uint8_t* buffer,
 
   // Deserialize resourceId
   memcpy(&net_val, buffer + offset, sizeof(net_val));
-  resp->resourceId = ntohl(net_val);
+  const uint32_t resourceId = ntohl(net_val);
+  resp->resourceId = resourceId > UINT8_MAX ? UINT8_MAX : (uint8_t)resourceId;
   offset += sizeof(net_val);
 
   // Deserialize response type (respType)

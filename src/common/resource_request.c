@@ -21,8 +21,7 @@
  * @param buffer Pointer to the buffer to fill with serialized data.
  * @return int 0 on success, negative on error.
  */
-int serializeResourceRequest(const ResourceRequest_t* req,
-                             unsigned char* buffer) {
+int serializeResourceRequest(const ResourceRequest_t* req, uint8_t* buffer) {
   if (!req || !buffer) {
     return -1;
   }
@@ -59,8 +58,7 @@ int serializeResourceRequest(const ResourceRequest_t* req,
  * @param req Pointer to the ResourceRequest_t structure to fill.
  * @return int 0 on success, negative on error.
  */
-int deserializeResourceRequest(const unsigned char* buffer,
-                               ResourceRequest_t* req) {
+int deserializeResourceRequest(const uint8_t* buffer, ResourceRequest_t* req) {
   if (!req || !buffer) {
     return -1;
   }
@@ -98,7 +96,7 @@ int deserializeResourceRequest(const unsigned char* buffer,
  * @return int 0 on success, negative on error.
  */
 int serializeResourceRequestResponse(const ResourceRequestResponse_t* resp,
-                                     unsigned char* buffer) {
+                                     uint8_t* buffer) {
   if (!resp || !buffer) {
     return -1;
   }
@@ -130,7 +128,7 @@ int serializeResourceRequestResponse(const ResourceRequestResponse_t* resp,
  * @param resp Pointer to the ResourceRequestResponse_t structure to fill.
  * @return int 0 on success, negative on error.
  */
-int deserializeResourceRequestResponse(const unsigned char* buffer,
+int deserializeResourceRequestResponse(const uint8_t* buffer,
                                        ResourceRequestResponse_t* resp) {
   if (!resp || !buffer) {
     return -1;

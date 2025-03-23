@@ -10,7 +10,7 @@ PlcMessage_t* createPlcMessage() { return malloc(sizeof(PlcMessage_t)); }
 
 int setAPDU([[maybe_unused]] PlcMessage_t* msg,
             [[maybe_unused]] XwayAPDUCode_e code,
-            [[maybe_unused]] uint8_t* data, [[maybe_unused]] int dataLen) {
+            [[maybe_unused]] uint8_t* data, [[maybe_unused]] size_t dataLen) {
   return 0;
 }
 

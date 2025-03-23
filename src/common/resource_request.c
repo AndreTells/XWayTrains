@@ -159,10 +159,10 @@ int sendResourceRequest(int fd, ResourceRequest_t* req) {
       "[RESOURCE REQUEST]: sending request from %d request type %d for "
       "resource %d through %d\n",
       req->requesterId, req->reqType, req->resourceId, fd);
-  char buf[RESOURCE_REQUEST_SERIALIZED_SIZE];
+  uint8_t buf[RESOURCE_REQUEST_SERIALIZED_SIZE];
   serializeResourceRequest(req, buf);
 
-  int ret = write(fd, buf, RESOURCE_REQUEST_SERIALIZED_SIZE);
+  int ret = (int)write(fd, buf, RESOURCE_REQUEST_SERIALIZED_SIZE);
   return ret;
 }
 
@@ -171,10 +171,10 @@ int answerResourceRequest(int fd, ResourceRequestResponse_t* resp) {
       "[RESOURCE REQUEST]: sending response to %d resp type %d for resource %d "
       "through %d\n",
       resp->requesterId, resp->respType, resp->resourceId, fd);
-  char buf[RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE];
+  uint8_t buf[RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE];
   serializeResourceRequestResponse(resp, buf);
 
-  int ret = write(fd, buf, RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE);
+  int ret = (int)write(fd, buf, RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE);
   return ret;
 }
 
@@ -187,10 +187,10 @@ ResourceRequest_t* recvResourceRequest(int fd) {
 
   ResourceRequest_t* req = malloc(sizeof(ResourceRequest_t));
 
-  char buf[RESOURCE_REQUEST_SERIALIZED_SIZE];
+  uint8_t buf[RESOURCE_REQUEST_SERIALIZED_SIZE];
   memset(buf, 0, RESOURCE_REQUEST_SERIALIZED_SIZE);
 
-  res = read(fd, buf, RESOURCE_REQUEST_SERIALIZED_SIZE);
+  res = (int)read(fd, buf, RESOURCE_REQUEST_SERIALIZED_SIZE);
 
   deserializeResourceRequest(buf, req);
 
@@ -213,11 +213,12 @@ ResourceRequestResponse_t* recvResourceRequestResponse(int fd) {
 
   ResourceRequestResponse_t* req = malloc(sizeof(ResourceRequest_t));
 
-  char buf[RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE];
+  uint8_t buf[RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE];
   memset(buf, 0, RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE);
 
-  res = read(fd, buf,
-             RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE);  // MAY CAUSE AN ISSUE
+  res = (int)read(
+      fd, buf,
+      RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE);  // MAY CAUSE AN ISSUE
 
   deserializeResourceRequestResponse(buf, req);
 

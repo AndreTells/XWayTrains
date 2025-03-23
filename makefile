@@ -93,8 +93,8 @@ test: clean \
 
 build/test/remote: $(RTEST_SRC_DIR)/main.c \
 					$(RTEST_SRC_DIR)/comm.c \
-					$(COMMON_SRC_DIR)/verbose.c
-
+					$(COMMON_SRC_DIR)/verbose.c \
+					$(COMMON_SRC_DIR)/comm_general.c
 	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
 

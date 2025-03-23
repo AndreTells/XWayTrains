@@ -6,13 +6,13 @@
 /* Usage : ./clientUdpc [adrIPserv] [portServ]   [adrIPcli] */
 /****************************************************/
 #include <arpa/inet.h>
-#include <errno.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include "common/comm_general.h"
 #include "plc/comm.h"
 
 #define CHECKERROR(var, val, msg) \
@@ -116,21 +116,14 @@ int send_command(const in_port_t port, const in_addr_t addr, const word_t train,
   return 0;
 }
 
-static bool str_to_uint16(const char *str, uint16_t *res) {
-  long int val = strtol(str, NULL, 10);
-  if (errno == ERANGE || val > UINT16_MAX || val < 0) return false;
-  *res = (uint16_t)val;
-  return true;
-}
-
 int main(int argc, char *argv[]) {
   in_port_t port;
   in_addr_t addr;
 
   if (argc >= 3) {
     uint16_t port_number;
-    const bool success = str_to_uint16(argv[2], &port_number);
-    if (!success) {
+    const int success = str_to_uint16(argv[2], &port_number);
+    if (success == -1) {
       fprintf(stderr, "Invalid port or out of uint16_t range\n");
       exit(EXIT_FAILURE);
     }

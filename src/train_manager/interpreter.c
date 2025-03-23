@@ -148,7 +148,8 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
       uint16_t targetId;
       if (str_to_uint16(targetIdStr, &targetId) == -1) {
         verbose(VERBOSE_KRED
-                "[Interpreter]: Error: invalid message type, not a valid integer\n" VERBOSE_RESET);
+                "[Interpreter]: Error: invalid message type, not a valid "
+                "integer\n" VERBOSE_RESET);
         res = -1;
         break;
       }

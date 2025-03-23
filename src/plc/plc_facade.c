@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 int configWritePlcMessage(PlcMessage_t* msg, PlcMessageType_e msgType,
-                          uint8_t station, enum TrainId_e trainId, int target){
+                          uint16_t station, enum TrainId_e trainId, int target){
   uint8_t data[13];
   memset(data, 0, sizeof(data));
   int dataLen = 13;

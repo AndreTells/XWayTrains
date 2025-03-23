@@ -37,6 +37,6 @@ typedef enum {
  */
 
 int configWritePlcMessage(PlcMessage_t* msg, PlcMessageType_e msgType,
-                          uint8_t station, enum TrainId_e trainId, int target);
+                          uint16_t station, enum TrainId_e trainId, int target);
 
 #endif  // PLC_FACADE_H_

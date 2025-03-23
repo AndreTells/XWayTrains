@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "common/comm_general.h"
 #include "common/verbose.h"
 #include "plc/model_info.h"
 #include "plc/plc_facade.h"
@@ -144,7 +145,13 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
 
       PlcMessageType_e plcMsgType = (PlcMessageType_e)plcMsgTypeInt;
 
-      int targetId = atoi(targetIdStr);
+      uint16_t targetId;
+      if (str_to_uint16(targetIdStr, &targetId) == -1) {
+        verbose(VERBOSE_KRED
+                "[Interpreter]: Error: invalid message type\n" VERBOSE_RESET);
+        res = -1;
+        break;
+      }
 
       PlcMessage_t* msg = NULL;
       res = configWritePlcMessage(msg, plcMsgType, 0, getTrainId(state),

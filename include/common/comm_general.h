@@ -9,6 +9,7 @@
 #define COMM_GENERAL_H_
 
 #include <stdbool.h>
+#include <stdint.h>
 
 /**
  * @brief Creates a TCP socket.
@@ -35,6 +36,14 @@ int tcpCreateSocketWrapper(bool server, char* ipAddress, int port);
  * @return 0 on success, or a negative value on error.
  */
 int tcpConnectWrapper(int sockFd, char* ipAddress, int port);
+
+/**
+ * @brief convert string to unsigned 16 bit integer
+ * @param str Pointer to string
+ * @param res Pointer to a variable that will recieved the result
+ * @return 0 on success, or a negative value on error
+ */
+int str_to_uint16(const char* str, uint16_t* res);
 
 /**
  * @brief Accepts an incoming TCP connection.

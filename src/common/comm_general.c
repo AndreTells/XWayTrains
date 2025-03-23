@@ -1,8 +1,10 @@
 #include "common/comm_general.h"
 
 #include <arpa/inet.h>
+#include <errno.h>
 #include <netinet/in.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 
@@ -56,6 +58,13 @@ int tcpConnectWrapper(int sockFd, char* ipAddress, int port) {
   int resConnect = connect(sockFd, (struct sockaddr*)&addr, sizeof(addr));
 
   return resConnect;
+}
+
+int str_to_uint16(const char* str, uint16_t* res) {
+  long int val = strtol(str, NULL, 10);
+  if (errno == ERANGE || val > UINT16_MAX || val < 0) return -1;
+  *res = (uint16_t)val;
+  return 0;
 }
 
 int tcpAcceptWrapper(int sockFd) { return accept(sockFd, NULL, NULL); }

@@ -4,9 +4,11 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "common/verbose.h"
+
 int configWritePlcMessage(PlcMessage_t* msg, PlcMessageType_e msgType,
                           uint16_t station, enum TrainId_e trainId,
-                          int target) {
+                          uint16_t target) {
   uint8_t data[13];
   memset(data, 0, sizeof(data));
   int dataLen = 13;
@@ -39,6 +41,17 @@ int configWritePlcMessage(PlcMessage_t* msg, PlcMessageType_e msgType,
       memcpy(data + 11, &target,
              sizeof(uint16_t));  // implicitly swaps byte order
       break;
+
+    case (TOGGLE_INVERT):
+      const uint16_t target_invert = target + 40;
+      memcpy(data + 9, &target_invert,
+             sizeof(uint16_t));  // implicitly swaps byte order
+      break;
+
+    default:
+      verbose(VERBOSE_KRED
+              "[plc_facade] Error: INVALID MSG TYPE\n" VERBOSE_RESET);
+      return -1;
   }
 
   int res = setAPDU(msg, APDU_WRITE_REQ, data, dataLen);

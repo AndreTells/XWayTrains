@@ -8,6 +8,7 @@
 #ifndef PLC_FACADE_H_
 #define PLC_FACADE_H_
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "plc/model_info.h"
 #include "plc/plc_message.h"
@@ -28,8 +29,7 @@ typedef enum { TOGGLE_RAIL, TOGGLE_SWITCH, TOGGLE_INVERT } PlcMessageType_e;
  * identifier, and target.
  *
  * @param msg Pointer to the PlcMessage_t structure that will be configured.
- * @param msgType The type of message to be configured (e.g., TOGGLE_RAIL or
- * TOGGLE_SWITCH).
+ * @param msgType The type of message to be configured (e.g. TOGGLE_RAIL).
  * @param station The station identifier where the message will be applied.
  * @param trainId The train identifier associated with the message.
  * @param target The target component (e.g., rail or switch) to be toggled.
@@ -37,6 +37,7 @@ typedef enum { TOGGLE_RAIL, TOGGLE_SWITCH, TOGGLE_INVERT } PlcMessageType_e;
  */
 
 int configWritePlcMessage(PlcMessage_t* msg, PlcMessageType_e msgType,
-                          uint16_t station, enum TrainId_e trainId, int target);
+                          uint16_t station, enum TrainId_e trainId,
+                          uint16_t target);
 
 #endif  // PLC_FACADE_H_

@@ -98,7 +98,7 @@ build/test/remote: $(RTEST_SRC_DIR)/main.c \
 	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
 
-build/test/comm: $(TEST_SRC_DIR)/comm.c \
+build/test/comm: $(TEST_SRC_DIR)/unit_test_comm.c \
 					$(RTEST_SRC_DIR)/comm.c \
 					$(COMMON_SRC_DIR)/verbose.c \
 					$(COMMON_SRC_DIR)/flags.c
@@ -233,4 +233,4 @@ build/resource_manager: $(RESOURCE_MANAGER_SRC_DIR)/resource_manager_main.c \
 	$(CC) -g $(CFLAGS) $^ -o $@
 
 clean:
-	rm -fr build/*
+	rm -fr build/* vgcore.*

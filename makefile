@@ -51,7 +51,6 @@ format_code:
 	clang-format --verbose -i --style=file src/remote_test/*
 	clang-format --verbose -i --style=file src/resource_manager/*
 	clang-format --verbose -i --style=file src/train_manager/*
-	clang-format --verbose -i --style=file test/*
 	clang-format --verbose -i --style=file include/common/*
 	clang-format --verbose -i --style=file include/plc/*
 	clang-format --verbose -i --style=file include/resource_manager/*

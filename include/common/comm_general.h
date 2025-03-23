@@ -15,8 +15,10 @@
  *
  * This function creates a TCP socket and binds it if it is a server socket.
  *
- * @param server Boolean indicating whether the socket is for a server (true) or client (false).
- * @param ipAddress Pointer to a string containing the IP address to bind/connect to.
+ * @param server Boolean indicating whether the socket is for a server (true) or
+ * client (false).
+ * @param ipAddress Pointer to a string containing the IP address to
+ * bind/connect to.
  * @param port The port number to bind/connect to.
  * @return The socket file descriptor on success, or a negative value on error.
  */
@@ -37,10 +39,12 @@ int tcpConnectWrapper(int sockFd, char* ipAddress, int port);
 /**
  * @brief Accepts an incoming TCP connection.
  *
- * This function waits for an incoming connection on the specified socket and accepts it.
+ * This function waits for an incoming connection on the specified socket and
+ * accepts it.
  *
  * @param sockFd The socket file descriptor.
- * @return The new socket file descriptor for the accepted connection, or a negative value on error.
+ * @return The new socket file descriptor for the accepted connection, or a
+ * negative value on error.
  */
 int tcpAcceptWrapper(int sockFd);
 

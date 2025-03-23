@@ -1,13 +1,15 @@
 /**
  * @file interpreter.h
- * @brief Interface for interpreting and executing commands related to train management.
+ * @brief Interface for interpreting and executing commands related to train
+ * management.
  * @details Provides functions for reading and executing commands from a file,
  *          as well as managing train states and PLC communication.
  */
 #ifndef INTERPRETER_H_
 #define INTERPRETER_H_
-#include "train_manager/train.h"
 #include <stdio.h>
+
+#include "train_manager/train.h"
 
 /**
  * @typedef Path_t
@@ -20,11 +22,12 @@ typedef FILE* Path_t;
  * @brief Enumeration of command types for the interpreter.
  */
 typedef enum {
-  CMD_SET_TRAIN_ID, // 1 in data: id
-  CMD_SET, // 2 in data: PlcMessageType, id
-  CMD_RESOURCE, // at least 2 in: data ResourceRequestType_e, resourceId1, resourceId2 ...
+  CMD_SET_TRAIN_ID,  // 1 in data: id
+  CMD_SET,           // 2 in data: PlcMessageType, id
+  CMD_RESOURCE,      // at least 2 in: data ResourceRequestType_e, resourceId1,
+                     // resourceId2 ...
   UNKNOWN
-}InterpreterCommandType_e ;
+} InterpreterCommandType_e;
 
 /**
  * @struct KeywordToken
@@ -32,15 +35,16 @@ typedef enum {
  * @note TODO: maybe refactor this so it's not exposed to all
  */
 typedef struct {
-    const char *keyword;
-    int token;
+  const char* keyword;
+  int token;
 } KeywordToken;
 
 /**
  * @brief Reads a single line from the given path.
  *
  * @param path File handle to read from.
- * @return char* Pointer to the read line (must be freed by the caller), or NULL on failure.
+ * @return char* Pointer to the read line (must be freed by the caller), or NULL
+ * on failure.
  */
 char* readPathLine(Path_t path);
 
@@ -71,4 +75,4 @@ Path_t initPath(char* filePath);
  */
 int destroyInterpreter(Path_t path);
 
-#endif // INTERPRETER_H_
+#endif  // INTERPRETER_H_

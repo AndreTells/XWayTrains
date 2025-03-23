@@ -22,9 +22,11 @@ typedef struct ResourceManagerProxy_t ResourceManagerProxy_t;
  *
  * @param resManagerIpAddr IP address of the Resource Manager.
  * @param port Port number for communication.
- * @return ResourceManagerProxy_t* Pointer to the initialized proxy instance, or NULL on failure.
+ * @return ResourceManagerProxy_t* Pointer to the initialized proxy instance, or
+ * NULL on failure.
  */
-ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr, int port);
+ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr,
+                                                 int port);
 
 /**
  * @brief Gracefully terminate a Resource Manager Proxy instance

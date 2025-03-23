@@ -1,10 +1,10 @@
 #ifndef PLC_MESSAGE_H_
 #define PLC_MESSAGE_H_
-#include "plc/model_info.h"
-
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
+
+#include "plc/model_info.h"
 
 /**
  * @def MAX_MSG_SIZE
@@ -30,10 +30,7 @@ typedef uint16_t XwayAddr;
  * @enum XwayAPDUCode_e
  * @brief Enumeration of APDU codes used in PLC messages.
  */
-typedef enum {
-  APDU_WRITE_RESP = 0xFE,
-  APDU_WRITE_REQ = 0x37
-}XwayAPDUCode_e;
+typedef enum { APDU_WRITE_RESP = 0xFE, APDU_WRITE_REQ = 0x37 } XwayAPDUCode_e;
 
 /**
  * @enum XwayNPDUType_e
@@ -42,16 +39,13 @@ typedef enum {
 typedef enum {
   NPDU_3WAY = 0xF0,
   NPDU_5WAY = 0xF1,
-}XwayNPDUType_e;
+} XwayNPDUType_e;
 
 /**
  * @enum XwayMachineCategory_e
  * @brief Enumeration of machine categories.
  */
-typedef enum {
-  PLC_CATEGORY = 0x06,
-  PC_CATEGORY = 0x07
-}XwayMachineCategory_e;
+typedef enum { PLC_CATEGORY = 0x06, PC_CATEGORY = 0x07 } XwayMachineCategory_e;
 
 /**
  * @enum UniteObjectSegments_e
@@ -62,7 +56,7 @@ typedef enum {
   INTERNAL_DATA_SPACE = 0x68,
   CONSTANT_DATA_SPACE = 0x69,
   SYSTEM_DATA_SPACE = 0x6A
-}UniteObjectSegments_e;
+} UniteObjectSegments_e;
 
 /**
  * @enum UniteObjectType_e
@@ -72,7 +66,7 @@ typedef enum {
   UNITE_TYPE_DATE = 1,
   UNITE_TYPE_WORD = 7,
   UNITE_TYPE_DOUBLE = 8,
-}UniteObjectType_e;
+} UniteObjectType_e;
 
 /**
  * @brief Creates a new PLC message.
@@ -86,7 +80,8 @@ PlcMessage_t* createPlcMessage();
  *
  * @param msg Pointer to the original PLC message.
  * @param res Boolean result to include in the acknowledgment.
- * @return PlcMessage_t* Pointer to the newly created acknowledgment PLC message.
+ * @return PlcMessage_t* Pointer to the newly created acknowledgment PLC
+ * message.
  */
 PlcMessage_t* createACK(PlcMessage_t* msg, bool res);
 
@@ -111,7 +106,8 @@ int setAPDU(PlcMessage_t* msg, XwayAPDUCode_e code, uint8_t* data, int dataLen);
  * @param extendedAddr Pointer to the extended address data.
  * @return int Status code (0 for success, negative for error).
  */
-int setNPDU(PlcMessage_t* msg, XwayNPDUType_e code, XwayAddr sender, XwayAddr receiver, uint8_t* extendedAddr);
+int setNPDU(PlcMessage_t* msg, XwayNPDUType_e code, XwayAddr sender,
+            XwayAddr receiver, uint8_t* extendedAddr);
 
 /**
  * @brief Creates an Xway address from station, network, and port values.
@@ -127,7 +123,8 @@ XwayAddr createXwayAddr(uint8_t station, uint8_t network, uint8_t port);
  * @brief Serializes a PLC message into a buffer.
  *
  * @param msg Pointer to the PLC message to be serialized.
- * @param serMsg Pointer to the buffer where the serialized message will be stored.
+ * @param serMsg Pointer to the buffer where the serialized message will be
+ * stored.
  * @return size_t Size of the serialized message.
  */
 size_t serializePlcMessage(PlcMessage_t* msg, uint8_t* serMsg);
@@ -138,8 +135,7 @@ size_t serializePlcMessage(PlcMessage_t* msg, uint8_t* serMsg);
  * @param serMsg Pointer to the buffer containing the serialized message.
  * @return PlcMessage_t* Pointer to the deserialized PLC message.
  */
-PlcMessage_t* deserializePlcMessage( uint8_t* serMsg);
-
+PlcMessage_t* deserializePlcMessage(uint8_t* serMsg);
 
 /**
  * @brief Frees a PLC message and its associated memory.
@@ -154,7 +150,8 @@ int freeMessage(PlcMessage_t* msg);
  *
  * @param msg Pointer to the PLC message to be checked.
  * @param code APDU code to compare.
- * @return bool True if the message's APDU type matches the given code, false otherwise.
+ * @return bool True if the message's APDU type matches the given code, false
+ * otherwise.
  */
 bool compareMsgType(PlcMessage_t* msg, XwayAPDUCode_e code);
 

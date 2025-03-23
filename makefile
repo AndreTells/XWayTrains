@@ -2,8 +2,16 @@
 # Defining directories                                                  #
 # --------------------------------------------------------------------- #
 CC = clang
-SRC_DIR = ./src/
-INCLUDE_DIR = ./include/
+COMMON_SRC_DIR = ./src/common
+TEST_SRC_DIR = ./src/unit_tests
+REMOTE_TEST_SRC_DIR = ./src/remote_test
+RTEST_SRC_DIR = ./src/remote_test
+RESOURCE_MANAGER_SRC_DIR = ./src/resource_manager
+TRAIN_MANAGER_SRC_DIR = ./src/train_manager
+PLC_MANAGER_SRC_DIR = ./src/plc
+
+INCLUDE_DIR = ./include
+
 BIN_DIR = ./bin/
 OBJ_DIR = $(BIN_DIR)/obj
 
@@ -14,9 +22,8 @@ OBJ_DIR = $(BIN_DIR)/obj
 #       -std=c99        : respect the ISO C99 standard                  #
 #       -pedantic       : enforces the C standard as much as possible   #
 # --------------------------------------------------------------------- #
-STD = -std=gnu23
-CFLAGS += $(STD)
-CFLAGS += -Wall
+CFLAGS  = -Wall
+CFLAGS += -std=gnu23
 CFLAGS += -Wextra
 CFLAGS += -pedantic
 CFLAGS += -Wshadow
@@ -30,83 +37,192 @@ CFLAGS += -fstack-usage
 CFLAGS += -Wconversion
 CFLAGS += -I$(INCLUDE_DIR)
 CFLAGS += -lm
+CFLAGS += -g
 
 # --------------------------------------------------------------------- #
 # Definition of linker options                                          #
 # --------------------------------------------------------------------- #
 LDFLAGS = -lrt
 
-# --------------------------------------------------------------------- #
-# Definition of file lists                                              #
-# --------------------------------------------------------------------- #
-RESOURCE_MANAGER_FILES = src/resource_manager/resource_manager.c
-RESOURCE_MANAGER_FILES += src/resource_manager/resource_manager_proxy_cli.c
-RESOURCE_MANAGER_FILES += src/resource_manager/resource_manager_proxy_remote.c
-RESOURCE_MANAGER_FILES += src/resource_manager/ressource_database.c
-RESOURCE_MANAGER_FILES += src/resource_manager/ressource_database_proxy.c
+all: format_code static_analyser build/remote_test/main
 
-TRAIN_MANAGER_FILES = src/train_manager/plc_info_test.c
-TRAIN_MANAGER_FILES += src/train_manager/plc_proxy_cli.c
-TRAIN_MANAGER_FILES += src/train_manager/resource_manager_proxy_cli.c
-TRAIN_MANAGER_FILES += src/train_manager/resource_manager_proxy_remote.c
-TRAIN_MANAGER_FILES += src/train_manager/train.c
-
-# --------------------------------------------------------------------- #
-# Build instructions                                                    #
-# --------------------------------------------------------------------- #
-
-all: format_code test build
-
-unit_test_ressource_manager:
-	clang -I include src/unit_test_ressource_manager.c src/ressource_database.c src/ressource_database_proxy.c -o bin/ressource_manager_unit_test.out
 
 format_code:
-	find src test include -type f -name '*.[hc]' -exec clang-format --verbose -i --style=file {} \+
+	clang-format --verbose -i --style=file src/common/*
+	clang-format --verbose -i --style=file src/plc/*
+	clang-format --verbose -i --style=file src/remote_test/*
+	clang-format --verbose -i --style=file src/resource_manager/*
+	clang-format --verbose -i --style=file src/train_manager/*
+	clang-format --verbose -i --style=file test/*
+	clang-format --verbose -i --style=file include/common/*
+	clang-format --verbose -i --style=file include/plc/*
+	clang-format --verbose -i --style=file include/resource_manager/*
+	clang-format --verbose -i --style=file include/train_manager/*
 
 static_analyser:
-# 	clang-tidy src/* -- $(STD) -I include
+# 	clang-tidy src/* -- -std=c11 -I include
 
-test: build/test/comm
+test: clean \
+		build/test/remote build/test/resource_database\
+		build/test/resource_manager_proxy \
+		build/test/request_queue \
+		build/test/plc_message \
+		build/test/plc_facade \
+		build/test/plc_proxy \
+		build/test/resource_manager \
+		build/test/interpreter
+
 	@printf "\n[Unit testing]\n"
-	build/test/comm
-# 	build/test/unit_test_resource_manager_proxy_cli
-# 	build/test/unit_test_plc_proxy_cli
-# 	build/test/unit_test_train
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_database -s
+	@printf "\n\n"
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/request_queue -s
+	@printf "\n\n"
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_manager -s
+	@printf "\n\n"
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_manager_proxy -s
+	@printf "\n\n"
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/interpreter -s
+	@printf "\n\n"
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_message -s
+	@printf "\n\n"
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_facade -s
+	@printf "\n\n"
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_proxy -s
 	@printf "\nDone unit testing\n"
 
-build: build/remote_test/main build/resource_manager build/train_manager
 
-build/plc_proxy: src/plc_proxy.c
-	mkdir -p build
-	$(CC) $(CFLAGS) $^ -o $@
+build/test/remote: $(RTEST_SRC_DIR)/main.c \
+					$(RTEST_SRC_DIR)/comm.c
 
-build/resource_manager: $(RESOURCE_MANAGER_FILES)
-	mkdir -p build
-	$(CC) $(CFLAGS) $^ -o $@
-
-build/train_manager: $(TRAIN_MANAGER_FILES)
-	mkdir -p build
-	$(CC) $(CFLAGS) $^ -o $@
-
-build/test/comm: test/comm.c src/remote_test/comm.c
 	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
 
-build/test/unit_test_resource_manager_proxy_cli: test/unit_test_resource_manager_proxy.c src/resource_manager_proxy_cli.c
-	mkdir -p build
-	$(CC) -g $(CFLAGS) $^ -o $@
+# --------------------------------------------------------------------- #
+# Unit testing the resource Manager                                     #
+# --------------------------------------------------------------------- #
+build/test/request_queue: $(TEST_SRC_DIR)/unit_test_request_queue.c \
+								$(RESOURCE_MANAGER_SRC_DIR)/request_queue.c \
+								$(COMMON_SRC_DIR)/resource_request.c \
+								$(COMMON_SRC_DIR)/verbose.c \
+								$(COMMON_SRC_DIR)/flags.c \
+								$(COMMON_SRC_DIR)/time_out.c
 
-build/test/unit_test_plc_proxy_cli: test/unit_test_plc_proxy.c src/plc_proxy_cli.c src/plc_info_test.c
-	mkdir -p build
-	$(CC) -g $(CFLAGS) $^ -o $@
-
-build/test/unit_test_train: test/unit_test_train.c src/plc_proxy_cli.c src/plc_info_test.c src/resource_manager_proxy_cli.c src/train.c
-	mkdir -p build
-	$(CC) -g $(CFLAGS) $^ -o $@
-
-build/remote_test/main: src/remote_test/main.c src/remote_test/comm.c
-	mkdir -p build/remote_test
+	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
+
+build/test/resource_database: $(TEST_SRC_DIR)/unit_test_resource_database.c \
+								$(RESOURCE_MANAGER_SRC_DIR)/resource_database.c \
+								$(RESOURCE_MANAGER_SRC_DIR)/resource_database_proxy.c \
+								$(COMMON_SRC_DIR)/verbose.c \
+								$(COMMON_SRC_DIR)/flags.c \
+								$(COMMON_SRC_DIR)/time_out.c
+	mkdir -p build/test
+	$(CC) $(CFLAGS) $^ -o $@
+
+build/test/resource_manager: $(TEST_SRC_DIR)/unit_test_resource_manager.c \
+						$(RESOURCE_MANAGER_SRC_DIR)/resource_manager.c \
+						$(RESOURCE_MANAGER_SRC_DIR)/resource_database.c \
+						$(RESOURCE_MANAGER_SRC_DIR)/request_queue.c \
+						$(RESOURCE_MANAGER_SRC_DIR)/resource_database_proxy.c \
+						$(COMMON_SRC_DIR)/mock_comm_general.c \
+						$(COMMON_SRC_DIR)/mock_resource_request.c \
+						$(COMMON_SRC_DIR)/verbose.c \
+						$(COMMON_SRC_DIR)/flags.c \
+						$(COMMON_SRC_DIR)/time_out.c
+
+	mkdir -p build/test
+	$(CC) $(CFLAGS) $^ -o $@
+
+# --------------------------------------------------------------------- #
+# Unit testing the Train Manager                                        #
+# --------------------------------------------------------------------- #
+
+build/test/resource_manager_proxy: $(TEST_SRC_DIR)/unit_test_resource_manager_proxy.c \
+									$(TRAIN_MANAGER_SRC_DIR)/resource_manager_proxy.c \
+									$(COMMON_SRC_DIR)/mock_resource_request.c \
+									$(COMMON_SRC_DIR)/mock_comm_general.c \
+									$(COMMON_SRC_DIR)/time_out.c \
+									$(COMMON_SRC_DIR)/verbose.c \
+									$(COMMON_SRC_DIR)/flags.c
+	mkdir -p build/test
+	$(CC) -g $(CFLAGS) $^ -o $@
+
+build/test/interpreter: $(TEST_SRC_DIR)/unit_test_interpreter.c \
+									$(TRAIN_MANAGER_SRC_DIR)/interpreter.c \
+									$(TRAIN_MANAGER_SRC_DIR)/mock_resource_manager_proxy.c \
+									$(TRAIN_MANAGER_SRC_DIR)/mock_train.c \
+									$(PLC_MANAGER_SRC_DIR)/mock_plc_message.c \
+									$(PLC_MANAGER_SRC_DIR)/mock_plc_proxy.c \
+									$(PLC_MANAGER_SRC_DIR)/mock_plc_facade.c \
+									$(COMMON_SRC_DIR)/mock_resource_request.c \
+									$(COMMON_SRC_DIR)/verbose.c \
+									$(COMMON_SRC_DIR)/flags.c
+	mkdir -p build/test
+	$(CC) -g $(CFLAGS) $^ -o $@
+
+# --------------------------------------------------------------------- #
+# Unit testing PLC                                                      #
+# --------------------------------------------------------------------- #
+
+build/test/plc_message: $(TEST_SRC_DIR)/unit_test_plc_message.c \
+									$(PLC_MANAGER_SRC_DIR)/plc_message.c \
+									$(COMMON_SRC_DIR)/verbose.c \
+									$(COMMON_SRC_DIR)/flags.c
+	mkdir -p build/test
+	$(CC) -g $(CFLAGS) $^ -o $@
+
+build/test/plc_facade: $(TEST_SRC_DIR)/unit_test_plc_facade.c \
+									$(PLC_MANAGER_SRC_DIR)/plc_message.c \
+									$(PLC_MANAGER_SRC_DIR)/plc_facade.c \
+									$(PLC_MANAGER_SRC_DIR)/model_info.c \
+									$(COMMON_SRC_DIR)/verbose.c \
+									$(COMMON_SRC_DIR)/flags.c
+	mkdir -p build/test
+	$(CC) -g $(CFLAGS) $^ -o $@
+
+build/test/plc_proxy: $(TEST_SRC_DIR)/unit_test_plc_proxy.c \
+									$(PLC_MANAGER_SRC_DIR)/plc_proxy.c \
+									$(PLC_MANAGER_SRC_DIR)/plc_message.c \
+									$(PLC_MANAGER_SRC_DIR)/plc_facade.c \
+									$(PLC_MANAGER_SRC_DIR)/model_info.c \
+									$(COMMON_SRC_DIR)/mock_comm_general.c \
+									$(COMMON_SRC_DIR)/time_out.c \
+									$(COMMON_SRC_DIR)/verbose.c \
+									$(COMMON_SRC_DIR)/flags.c
+	mkdir -p build/test
+	$(CC) -g $(CFLAGS) $^ -o $@
+
+# --------------------------------------------------------------------- #
+# remote testing PLC                                                    #
+# --------------------------------------------------------------------- #
+
+build/remote_test/resource_manager_client: $(REMOTE_TEST_SRC_DIR)/remote_test_resource_manager_client.c \
+		$(TRAIN_MANAGER_SRC_DIR)/resource_manager_proxy.c \
+		$(COMMON_SRC_DIR)/resource_request.c \
+		$(COMMON_SRC_DIR)/comm_general.c \
+		$(COMMON_SRC_DIR)/time_out.c \
+		$(COMMON_SRC_DIR)/verbose.c \
+		$(COMMON_SRC_DIR)/flags.c
+
+	mkdir -p build/remote_test
+	$(CC) -g $(CFLAGS) $^ -o $@
+
+# --------------------------------------------------------------------- #
+# Building Final Version                                                #
+# --------------------------------------------------------------------- #
+
+build/resource_manager: $(RESOURCE_MANAGER_SRC_DIR)/resource_manager_main.c \
+						$(RESOURCE_MANAGER_SRC_DIR)/resource_manager.c \
+						$(RESOURCE_MANAGER_SRC_DIR)/resource_database.c \
+						$(RESOURCE_MANAGER_SRC_DIR)/request_queue.c \
+						$(RESOURCE_MANAGER_SRC_DIR)/resource_database_proxy.c \
+						$(COMMON_SRC_DIR)/comm_general.c \
+						$(COMMON_SRC_DIR)/verbose.c \
+						$(COMMON_SRC_DIR)/resource_request.c \
+						$(COMMON_SRC_DIR)/time_out.c \
+						$(COMMON_SRC_DIR)/flags.c
+	mkdir -p build
+	$(CC) -g $(CFLAGS) $^ -o $@
 
 clean:
 	rm -fr build/*

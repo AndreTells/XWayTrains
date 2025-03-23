@@ -79,7 +79,7 @@ int client(char *host, char *port) {
     printf("Received %zd bytes: %s\n", nread, buf);
   }
 
-  exit(EXIT_SUCCESS);
+ exit(EXIT_SUCCESS);
 }
 
 int main(void) {

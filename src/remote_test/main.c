@@ -13,7 +13,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "comm.h"
+#include "plc/comm.h"
 
 #define CHECKERROR(var, val, msg) \
   if ((var) == (val)) {           \

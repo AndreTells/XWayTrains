@@ -215,7 +215,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
 
       int resourceList[MAX_RESOURCE_REQUEST_AMM];
       memset(resourceList, 0, MAX_RESOURCE_REQUEST_AMM * sizeof(int));
-      int len = 0;
+      size_t len = 0;
       char* resIdStr = strtok_r(NULL, separator, &nextToken);
 
       // enforces that atleast one resource must be requested
@@ -229,7 +229,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
 
       while (resIdStr) {
         int tmp = atoi(resIdStr);
-        if (!(tmp > 0 && tmp < MAX_RESOURCE)) {
+        if (!(tmp > 0 && tmp < (int)MAX_RESOURCE)) {
           res = -1;
           break;
         }
@@ -253,7 +253,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
 
       qsort(resourceList, len, sizeof(int), compare_ints);
 
-      for (int i = 0; i < len; i++) {
+      for (size_t i = 0; i < len; i++) {
         res = requestResource(resManager, reqType, resourceList[i],
                               getTrainId(state));
 

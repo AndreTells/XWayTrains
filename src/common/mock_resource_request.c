@@ -3,7 +3,10 @@
 
 #include "common/resource_request.h"
 
-int sendResourceRequest(int fd, ResourceRequest_t* req) { return 0; }
+int sendResourceRequest([[maybe_unused]] int fd,
+                        [[maybe_unused]] ResourceRequest_t* req) {
+  return 0;
+}
 
 ResourceRequest_t* recvResourceRequest(int fd) {
   ResourceRequest_t* req = malloc(sizeof(ResourceRequest_t));
@@ -15,7 +18,8 @@ ResourceRequest_t* recvResourceRequest(int fd) {
   return req;
 }
 
-ResourceRequestResponse_t* recvResourceRequestResponse(int fd) {
+ResourceRequestResponse_t* recvResourceRequestResponse(
+    [[maybe_unused]] int fd) {
   ResourceRequest_t* req = createResourceRequest(0, 0, LOCK_RESOURCE, -1);
   ResourceRequestResponse_t* resp =
       createResourceRequestResponse(req, RESOURCE_GRANTED);
@@ -23,7 +27,10 @@ ResourceRequestResponse_t* recvResourceRequestResponse(int fd) {
   return resp;
 }
 
-int answerResourceRequest(int fd, ResourceRequestResponse_t* resp) { return 0; }
+int answerResourceRequest([[maybe_unused]] int fd,
+                          [[maybe_unused]] ResourceRequestResponse_t* resp) {
+  return 0;
+}
 
 ResourceRequest_t* createResourceRequest(int requesterId, int resourceId,
                                          ResourceRequestType_e reqType,

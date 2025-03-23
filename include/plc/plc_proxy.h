@@ -8,6 +8,7 @@
 #ifndef PLC_PROXY_H_
 #define PLC_PROXY_H_
 
+#include "plc/model_info.h"
 #include "plc/plc_message.h"
 
 /**
@@ -29,7 +30,8 @@ typedef struct PlcProxy_t PlcProxy_t;
  * @return PlcProxy_t* Pointer to the newly created PLC Proxy instance, or NULL
  * on failure.
  */
-PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr, int port);
+PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr,
+                         const uint16_t port);
 
 /**
  * @brief Gracefully terminate a PLC Proxy instance
@@ -53,6 +55,6 @@ int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg);
  * @return Pointer to the received message, or NULL on failure
  * @note the caller is in charge of freeing memory of the received message
  */
-PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int cliendtId);
+PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, enum TrainId_e cliendtId);
 
 #endif  // PLC_PROXY_H_

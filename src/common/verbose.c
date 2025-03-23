@@ -1,7 +1,7 @@
 #include "common/verbose.h"
 
-#include <stdbool.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 #define VERBOSE_KRED "\x1B[31m"
@@ -10,18 +10,18 @@
 
 bool Verbose = false;
 
-void setVerbose(bool setting) {
-    Verbose = setting;
-}
+void setVerbose(bool setting) { Verbose = setting; }
 
-int verbose(const char * restrict format, ...) {
-    if( !Verbose )
-        return 0;
+int verbose(const char* __restrict format, ...) {
+  if (!Verbose) return 0;
 
-    va_list args;
-    va_start(args, format);
-    int ret = vprintf(format, args);
-    va_end(args);
+  va_list args;
+  va_start(args, format);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+  int ret = vprintf(format, args);
+#pragma GCC diagnostic pop
+  va_end(args);
 
-    return ret;
+  return ret;
 }

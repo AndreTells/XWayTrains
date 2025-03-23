@@ -8,6 +8,7 @@
 #ifndef PLC_FACADE_H_
 #define PLC_FACADE_H_
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "plc/model_info.h"
 #include "plc/plc_message.h"
@@ -16,27 +17,27 @@
  * @enum PlcMessageType_e
  * @brief Enumeration of PLC message types.
  *
- * This enumeration specifies the types of messages that can be generated for the PLC.
+ * This enumeration specifies the types of messages that can be generated for
+ * the PLC.
  */
-typedef enum {
-  TOGGLE_RAIL,
-  TOGGLE_SWITCH,
-}PlcMessageType_e;
+typedef enum { TOGGLE_RAIL, TOGGLE_SWITCH, TOGGLE_INVERT } PlcMessageType_e;
 
 /**
  * @brief Configures a PLC message for writing.
  *
- * This function sets up a PLC message with the specified type, station, train identifier, and target.
+ * This function sets up a PLC message with the specified type, station, train
+ * identifier, and target.
  *
  * @param msg Pointer to the PlcMessage_t structure that will be configured.
- * @param msgType The type of message to be configured (e.g., TOGGLE_RAIL or TOGGLE_SWITCH).
+ * @param msgType The type of message to be configured (e.g. TOGGLE_RAIL).
  * @param station The station identifier where the message will be applied.
  * @param trainId The train identifier associated with the message.
  * @param target The target component (e.g., rail or switch) to be toggled.
  * @return int Status code (0 for success, negative for error).
  */
 
-int configWritePlcMessage(PlcMessage_t* msg, PlcMessageType_e msgType,
-                          uint16_t station, enum TrainId_e trainId, int target);
+int configWritePlcMessage(PlcMessage_t* msg, const PlcMessageType_e msgType,
+                          const uint16_t station, const enum TrainId_e trainId,
+                          const uint16_t target);
 
 #endif  // PLC_FACADE_H_

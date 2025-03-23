@@ -1,11 +1,12 @@
 /**
  * @file resource_manager.h
- * @brief Interface for a resource manager using the ResourceDataBaseProxy as its database.
+ * @brief Interface for a resource manager using the ResourceDataBaseProxy as
+ * its database.
  *
  * This file defines the interface for a resource manager that interacts with a
- * `ResourceDataBaseProxy_t` instance to manage resources. The resource manager ensures
- * remote access to the database and provides functionality for initialization,
- * termination, and accepting train managers.
+ * `ResourceDataBaseProxy_t` instance to manage resources. The resource manager
+ * ensures remote access to the database and provides functionality for
+ * initialization, termination, and accepting train managers.
  */
 
 #ifndef RESOURCE_MANAGER_H_
@@ -23,14 +24,17 @@ typedef struct ResourceManager_t ResourceManager_t;
 /**
  * @brief Initializes a new Resource Manager instance.
  *
- * This function creates and initializes a new Resource Manager instance, associating
- * it with the provided `ResourceDataBaseProxy_t` instance. The manager is also
- * configured with the specified IP address and port for communication.
+ * This function creates and initializes a new Resource Manager instance,
+ * associating it with the provided `ResourceDataBaseProxy_t` instance. The
+ * manager is also configured with the specified IP address and port for
+ * communication.
  *
- * @param safeDatabase A pointer to the `ResourceDataBaseProxy_t` instance to be managed.
+ * @param safeDatabase A pointer to the `ResourceDataBaseProxy_t` instance to be
+ * managed.
  * @param ipAddress The IP address to be used for communication.
  * @param port The port to be used for communication.
- * @return A pointer to the newly created Resource Manager instance, or NULL if initialization fails.
+ * @return A pointer to the newly created Resource Manager instance, or NULL if
+ * initialization fails.
  */
 ResourceManager_t* initResourceManager(ResourceDataBaseProxy_t* safeDatabase,
                                        char* ipAddress, int port);

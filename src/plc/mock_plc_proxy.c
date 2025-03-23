@@ -1,11 +1,11 @@
 #include <pthread.h>
 #include <semaphore.h>
-#include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "plc/model_info.h"
 #include "plc/plc_message.h"
 #include "plc/plc_proxy.h"
 
@@ -19,7 +19,8 @@ struct PlcProxy_t {
   int sock_fd;
 };
 
-PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr, int port){
+PlcProxy_t* initPlcProxy([[maybe_unused]] char* hostIpAddr, char* plcIpAddr,
+                         [[maybe_unused]] const uint16_t port) {
   // check if it's a valid IP address
   if (plcIpAddr == NULL) {
     return NULL;
@@ -43,10 +44,12 @@ int endPlcProxy(PlcProxy_t* plc) {
   return 0;
 }
 
-int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
+int sendMessagePlcProxy([[maybe_unused]] PlcProxy_t* plc,
+                        [[maybe_unused]] PlcMessage_t* msg) {
   return 0;
 }
 
-PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int clientId) {
+PlcMessage_t* readMessagePlcProxy([[maybe_unused]] PlcProxy_t* plc,
+                                  [[maybe_unused]] enum TrainId_e clientId) {
   return createPlcMessage();
 }

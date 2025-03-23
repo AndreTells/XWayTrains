@@ -11,7 +11,7 @@
 #define REMOTEPORT 502
 
 #define EMETTEUR_STATION_ID 36
-#define EMETTEUR_RESEAU_ID 1
+#define EMETTEUR_RESEAU_ID 0x01
 #define EMETTEUR_PORT_ID 0
 
 #define DESTINATAIRE_STATION_ID 14
@@ -51,7 +51,7 @@
 typedef uint16_t word_t;
 
 typedef struct {
-  word_t station_id;
+  uint8_t station_id;
   uint8_t network_id;
   uint8_t porte_id;
 } xway_address_t;
@@ -96,8 +96,7 @@ bool is_write_ack_successful(const uint8_t request[MAXOCTETS]);
 
 bool is_read_successful(const uint8_t response[MAXOCTETS],
                         const uint8_t request_bytes[MAXOCTETS],
-                        uint8_t *port_number, const xway_package_t request,
-                        word_t *switch_id);
+                        uint8_t *port_number, word_t *switch_id);
 
 void build_ack(const xway_package_t package, uint8_t request[MAXOCTETS]);
 #endif

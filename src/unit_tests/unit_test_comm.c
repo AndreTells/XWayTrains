@@ -1,4 +1,6 @@
-#include "comm.h"
+#include "plc/comm.h"
+#include "common/verbose.h"
+#include "common/flags.h"
 
 #include <arpa/inet.h>
 #include <assert.h>
@@ -7,10 +9,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#define GREEN "\033[1;32m"
-#define NOCOLOR "\033[1;0m"
-
-void test_write_req() {
+void test_write_req(void) {
   uint8_t requete[MAXOCTETS];
 
   xway_package_t paquet;
@@ -21,7 +20,8 @@ void test_write_req() {
   init_write_package(&paquet, local, automate, TRAIN1, UNCHANGED, 31);
   build_write_request(paquet, requete);
   print_data_hex(requete);
-  printf("Test the WRITE_OBJECTS is identical: ");
+
+  verbose("Test the WRITE_OBJECTS is identical: ");
   fflush(stdout);
   // checking the modbus preamble
   assert(requete[0] == 0x00);
@@ -72,10 +72,10 @@ void test_write_req() {
   assert(requete[26] == 0x1F); // data 3[1]
   assert(requete[27] == 0x00); // data 3[2]
 
-  printf(GREEN " passed.\n" NOCOLOR);
+  verbose(VERBOSE_KGRN " passed.\n" VERBOSE_RESET);
 }
 
-void test_write_ack_validation() {
+void test_write_ack_validation(void) {
   uint8_t reponse[MAXOCTETS];
   reponse[0] = 0x00;
   reponse[1] = 0x00;
@@ -102,13 +102,13 @@ void test_write_ack_validation() {
 
   const bool result = is_write_ack_successful(reponse);
 
-  printf("It validates the sample WRITE_OBJECTS_ACK: ");
+  verbose("It validates the sample WRITE_OBJECTS_ACK: ");
   fflush(stdout);
   assert(result);
-  printf(GREEN " passed.\n" NOCOLOR);
+  verbose(VERBOSE_KGRN " passed.\n" VERBOSE_RESET);
 }
 
-void test_read_validation() {
+void test_read_validation(void) {
   uint8_t requete[MAXOCTETS];
 
   xway_package_t paquet;
@@ -158,18 +158,18 @@ void test_read_validation() {
 
   uint8_t port_number;
   word_t new_switch_id;
-  const bool result = is_read_successful(reponse, requete, &port_number, paquet,
-                                         &new_switch_id);
+  const bool result =
+      is_read_successful(reponse, requete, &port_number, &new_switch_id);
 
-  printf("It validates the sample READ recieved: ");
+  verbose("It validates the sample READ recieved: ");
   fflush(stdout);
   assert(result);
   assert(port_number == 0x34);
   assert(new_switch_id == 0x001F);
-  printf(GREEN " passed.\n" NOCOLOR);
+  verbose(VERBOSE_KGRN " passed.\n" VERBOSE_RESET);
 }
 
-void test_ack() {
+void test_ack(void) {
   uint8_t requete[MAXOCTETS];
 
   xway_package_t paquet;
@@ -181,7 +181,7 @@ void test_ack() {
   paquet.addresses.port_ack = 0x67;
   build_ack(paquet, requete);
 
-  printf("Test the ACK is identical: ");
+  verbose("Test the ACK is identical: ");
   fflush(stdout);
   assert(requete[0] == 0x00);
   assert(requete[1] == 0x00);
@@ -200,12 +200,20 @@ void test_ack() {
   assert(requete[12] == 0x19);
   assert(requete[13] == 0x67);
   assert(requete[14] == 0xFE);
-  printf(GREEN " passed.\n" NOCOLOR);
+  verbose(VERBOSE_KGRN " passed.\n" VERBOSE_RESET);
 }
 
-int main() {
+int main(int argc, char** argv) {
+  bool verbose_mode = get_flag_value(argc, argv, VERBOSE_FLAG, NULL);
+  setVerbose(verbose_mode);
+
+  verbose("[Unit Testing] Comm ... \n\n");
+
   test_write_req();
   test_write_ack_validation();
   test_read_validation();
   test_ack();
+
+  verbose("\n[Unit Testing] Comm ... Done \n");
+  return 0;
 }

@@ -12,15 +12,16 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include "common/comm_general.h"
 #include "plc/comm.h"
 
 #define CHECKERROR(var, val, msg) \
-  if (var == val) {               \
+  if ((var) == (val)) {           \
     perror(msg);                  \
     exit(1);                      \
   }
 
-int send_command(const int port, const in_addr_t addr, const word_t train,
+int send_command(const in_port_t port, const in_addr_t addr, const word_t train,
                  const word_t section_id, const word_t switch_id) {
   // init request
   uint8_t requete[MAXOCTETS];
@@ -59,13 +60,12 @@ int send_command(const int port, const in_addr_t addr, const word_t train,
 
   uint8_t reponse[MAXOCTETS];
   ssize_t nbbytes = 0;
-  ssize_t nbbytes_expected = requete[5] + 6;
+  size_t nbbytes_expected = requete[5] + 6;
   uint8_t port_number;
 
   // STEP 1 - Start actual communication
   printf("Send\n");
-  nbbytes = send(sd1, requete, nbbytes_expected, 0);
-  if (nbbytes < nbbytes_expected) {
+  if (send(sd1, requete, nbbytes_expected, 0) == -1) {
     perror("send: error on initial connection");
     return 3;
   }
@@ -75,7 +75,7 @@ int send_command(const int port, const in_addr_t addr, const word_t train,
   nbbytes = recvfrom(sd1, reponse, MAXOCTETS, 0, (struct sockaddr *)&addr_serv,
                      &adr_len);
   if (nbbytes > 0) {
-    perror("Response : \n");
+    printf("Response : \n");
     print_data_hex(reponse);
   }
 
@@ -95,10 +95,8 @@ int send_command(const int port, const in_addr_t addr, const word_t train,
 
   // make sure it is correct
   word_t new_switch_id;
-  if (!is_read_successful(reponse, requete, &port_number, paquet,
-                          &new_switch_id)) {
-    perror("Unsucceful response");
-    return 5;
+  if (!is_read_successful(reponse, requete, &port_number, &new_switch_id)) {
+    perror("Unsucceful response, sending ACK anyways");
   }
   paquet.addresses.port_ack = port_number;
 
@@ -108,8 +106,7 @@ int send_command(const int port, const in_addr_t addr, const word_t train,
   printf("Send the ACK\n");
   build_ack(paquet, requete);
   nbbytes_expected = requete[5] + 6;
-  nbbytes = send(sd1, requete, nbbytes_expected, 0);
-  if (nbbytes < nbbytes_expected) {
+  if (send(sd1, requete, nbbytes_expected, 0) == -1) {
     perror("send: error on initial connection");
     return 6;
   }
@@ -120,17 +117,22 @@ int send_command(const int port, const in_addr_t addr, const word_t train,
 }
 
 int main(int argc, char *argv[]) {
-  int port;
+  in_port_t port;
   in_addr_t addr;
 
   if (argc >= 3) {
-    port = htons(atoi(argv[2]));
+    uint16_t port_number;
+    const int success = str_to_uint16(argv[2], &port_number);
+    if (success == -1) {
+      fprintf(stderr, "Invalid port or out of uint16_t range\n");
+      exit(EXIT_FAILURE);
+    }
+    port = htons(port_number);
     addr = inet_addr(argv[1]);
   } else {
     port = htons(REMOTEPORT);
     addr = inet_addr(REMOTEIP);
   }
-
-  send_command(port, addr, TRAIN1, 29, UNCHANGED);
+  send_command(port, addr, TRAIN1, UNCHANGED, 3);
   return EXIT_SUCCESS;
 }

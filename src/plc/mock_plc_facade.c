@@ -1,6 +1,9 @@
 #include "plc/plc_facade.h"
 
-int configWritePlcMessage(PlcMessage_t* msg, PlcMessageType_e msgType,
-                          uint16_t station, enum TrainId_e trainId, int target){
+int configWritePlcMessage([[maybe_unused]] PlcMessage_t* msg,
+                          [[maybe_unused]] PlcMessageType_e msgType,
+                          [[maybe_unused]] uint16_t station,
+                          [[maybe_unused]] enum TrainId_e trainId,
+                          [[maybe_unused]] uint16_t target) {
   return 0;
 }

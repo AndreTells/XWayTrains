@@ -77,6 +77,35 @@ void test_executeCommand_plc_invalidParams() {
   verbose("[Interpreter] executeCommand plc Invalid Params ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
+void test_executeCommand_plc_validParams() {
+  verbose("[Interpreter] executeCommand plc Valid Params ... \n");
+
+  int ret = 0;
+
+  PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
+  ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
+  Train_t* train = initTrain(plc,resMgr," ");
+
+  // setVerbose(true);
+  char cmd [20] = "plc rail 22";
+  ret = executeCommand(cmd, train, plc, resMgr);
+  assert(ret == 0);
+
+  strcpy(cmd,"plc switch 7");
+  ret = executeCommand(cmd, train, plc, resMgr);
+  assert(ret == 0);
+
+  strcpy(cmd, "plc invert 4");
+  ret = executeCommand(cmd, train, plc, resMgr);
+  assert(ret == 0);
+
+  endTrain(train);
+  endResourceManagerProxy(resMgr);
+  endPlcProxy(plc);
+
+  verbose("[Interpreter] executeCommand plc Invalid Params ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
+}
+
 void test_executeCommand_resource_invalidParams() {
   verbose("[Interpreter] executeCommand resource Invalid Params ... \n");
 
@@ -99,24 +128,31 @@ void test_executeCommand_resource_invalidParams() {
 void test_initPath_destroyInterpreter() {
   verbose("[Interpreter] initPath & destroyInterpreter ... \n");
 
-  const char* tempFile = "temp_test_file.txt";
+  const char* tempFile = "data/train1.csv";
+  // Write sample data to file
   FILE* fp = fopen(tempFile, "w");
   assert(fp != NULL);
-  fputs("test\n", fp);
+  fputs("Train Id	1\n"
+    "Id	Type	Resources\n"
+    "3	rail	1\n"
+    "3	switch\n"
+    "10	invert\n", fp);
   fclose(fp);
 
-  Path_t path = initPath((char*)tempFile);
+  // Open it
+  Path_t path = initPath(tempFile);
   assert(path != NULL);
 
+  // Read it
   char* line = readPathLine(path);
   assert(line != NULL);
-  assert(strcmp(line, "test\n") == 0);
+  assert(strcmp(line, "Train Id	1\n") == 0);
   free(line);
 
   int ret = destroyInterpreter(path);
   assert(ret == 0);
 
-  remove(tempFile);
+  assert(remove(tempFile) == 0);
 
   verbose("[Interpreter] initPath & destroyInterpreter ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
@@ -130,6 +166,7 @@ int main(int argc, char* argv[]) {
   test_executeCommand_nullArguments();
   test_executeCommand_setTrainId_success();
   test_executeCommand_plc_invalidParams();
+  test_executeCommand_plc_validParams();
   test_executeCommand_resource_invalidParams();
   test_initPath_destroyInterpreter();
 

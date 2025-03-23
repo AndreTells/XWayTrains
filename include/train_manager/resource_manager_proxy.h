@@ -7,6 +7,7 @@
 #ifndef RESOURCE_MANAGER_PROXY_H_
 #define RESOURCE_MANAGER_PROXY_H_
 #include "common/resource_request.h"
+#include "plc/model_info.h"
 
 /**
  * @brief Opaque handle for Resource Manager Proxy
@@ -22,9 +23,11 @@ typedef struct ResourceManagerProxy_t ResourceManagerProxy_t;
  *
  * @param resManagerIpAddr IP address of the Resource Manager.
  * @param port Port number for communication.
- * @return ResourceManagerProxy_t* Pointer to the initialized proxy instance, or NULL on failure.
+ * @return ResourceManagerProxy_t* Pointer to the initialized proxy instance, or
+ * NULL on failure.
  */
-ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr, int port);
+ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr,
+                                                 const uint16_t port);
 
 /**
  * @brief Gracefully terminate a Resource Manager Proxy instance
@@ -46,6 +49,6 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager);
  */
 int requestResource(ResourceManagerProxy_t* resManager,
                     ResourceRequestType_e reqType, int resourceId,
-                    int clientId);
+                    const enum TrainId_e clientId);
 
 #endif  // RESOURCE_MANAGER_PROXY_H_

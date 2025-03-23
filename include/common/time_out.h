@@ -35,4 +35,4 @@ int loadTimeSpec(struct timespec* ts);
  */
 int fileDescriptorTimedWait(int fd);
 
-#endif // TIME_OUT_H_
+#endif  // TIME_OUT_H_

@@ -23,7 +23,8 @@ typedef struct ResourceRequestQueue_t ResourceRequestQueue_t;
  *
  * This function creates and initializes a new thread-safe queue.
  *
- * @return A pointer to the newly created queue, or NULL if the allocation fails.
+ * @return A pointer to the newly created queue, or NULL if the allocation
+ * fails.
  */
 ResourceRequestQueue_t* initQueue();
 
@@ -42,8 +43,9 @@ int destroyQueue(ResourceRequestQueue_t* queue);
 /**
  * @brief Pushes a new request onto the queue.
  *
- * This function adds a new `ResourceRequest_t` element to the queue. The operation
- * is thread-safe and will block if necessary to ensure proper serialization.
+ * This function adds a new `ResourceRequest_t` element to the queue. The
+ * operation is thread-safe and will block if necessary to ensure proper
+ * serialization.
  *
  * @param queue A pointer to the queue where the request will be added.
  * @param req A pointer to the `ResourceRequest_t` to be added to the queue.
@@ -55,14 +57,15 @@ int pushQueue(ResourceRequestQueue_t* queue, ResourceRequest_t* req);
 /**
  * @brief Pops a request from the queue.
  *
- * This function removes and returns the next `ResourceRequest_t` element from the queue.
- * The operation is thread-safe and will block if the queue is empty until an element
- * becomes available.
+ * This function removes and returns the next `ResourceRequest_t` element from
+ * the queue. The operation is thread-safe and will block if the queue is empty
+ * until an element becomes available.
  *
  * @param queue A pointer to the queue from which the request will be removed.
- * @return A pointer to the `ResourceRequest_t` that was removed from the queue, or NULL if an error occurs.
+ * @return A pointer to the `ResourceRequest_t` that was removed from the queue,
+ * or NULL if an error occurs.
  * @note waits at most 5 seconds to do it, otherwise returs an error
  */
 ResourceRequest_t* popQueue(ResourceRequestQueue_t* queue);
 
-#endif // REQUEST_QUEUE_H_
+#endif  // REQUEST_QUEUE_H_

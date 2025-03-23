@@ -1,24 +1,20 @@
 #include <pthread.h>
 #include <semaphore.h>
-#include <signal.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 #include "common/resource_request.h"
-#include "common/verbose.h"
 #include "plc/model_info.h"
 #include "train_manager/resource_manager_proxy.h"
-
 
 struct ResourceManagerProxy_t {
   int test;
 };
 
-
-ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr, int port) {
-
+ResourceManagerProxy_t* initResourceManagerProxy(
+    [[maybe_unused]] char* resManagerIpAddr,
+    [[maybe_unused]] const uint16_t port) {
   ResourceManagerProxy_t* resManager =
       (ResourceManagerProxy_t*)malloc(sizeof(ResourceManagerProxy_t));
 
@@ -30,8 +26,9 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
   return 0;
 }
 
-int requestResource(ResourceManagerProxy_t* resManager,
-                    ResourceRequestType_e reqType, int resourceId,
-                    int clientId){
+int requestResource([[maybe_unused]] ResourceManagerProxy_t* resManager,
+                    [[maybe_unused]] ResourceRequestType_e reqType,
+                    [[maybe_unused]] int resourceId,
+                    [[maybe_unused]] const enum TrainId_e clientId) {
   return 0;
 }

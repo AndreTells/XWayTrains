@@ -27,7 +27,7 @@
  * @param ... Additional arguments corresponding to the format string.
  * @return The number of characters printed, or a negative value on error.
  */
-int verbose(const char * restrict, ...);
+int verbose(const char* restrict, ...);
 
 /**
  * @brief Prints verbose messages if verbose mode is enabled.
@@ -41,4 +41,4 @@ int verbose(const char * restrict, ...);
  */
 void setVerbose(bool);
 
-#endif // VERBOSE_H_
+#endif  // VERBOSE_H_

@@ -9,18 +9,21 @@
 #define COMM_GENERAL_H_
 
 #include <stdbool.h>
+#include <stdint.h>
 
 /**
  * @brief Creates a TCP socket.
  *
  * This function creates a TCP socket and binds it if it is a server socket.
  *
- * @param server Boolean indicating whether the socket is for a server (true) or client (false).
- * @param ipAddress Pointer to a string containing the IP address to bind/connect to.
+ * @param server Boolean indicating whether the socket is for a server (true) or
+ * client (false).
+ * @param ipAddress Pointer to a string containing the IP address to
+ * bind/connect to.
  * @param port The port number to bind/connect to.
  * @return The socket file descriptor on success, or a negative value on error.
  */
-int tcpCreateSocketWrapper(bool server, char* ipAddress, int port);
+int tcpCreateSocketWrapper(bool server, char* ipAddress, const uint16_t port);
 
 /**
  * @brief Establishes a connection to a TCP server.
@@ -32,15 +35,25 @@ int tcpCreateSocketWrapper(bool server, char* ipAddress, int port);
  * @param port The port number of the server.
  * @return 0 on success, or a negative value on error.
  */
-int tcpConnectWrapper(int sockFd, char* ipAddress, int port);
+int tcpConnectWrapper(int sockFd, char* ipAddress, const uint16_t port);
+
+/**
+ * @brief convert string to unsigned 16 bit integer
+ * @param str Pointer to string
+ * @param res Pointer to a variable that will recieved the result
+ * @return 0 on success, or a negative value on error
+ */
+int str_to_uint16(const char* str, uint16_t* res);
 
 /**
  * @brief Accepts an incoming TCP connection.
  *
- * This function waits for an incoming connection on the specified socket and accepts it.
+ * This function waits for an incoming connection on the specified socket and
+ * accepts it.
  *
  * @param sockFd The socket file descriptor.
- * @return The new socket file descriptor for the accepted connection, or a negative value on error.
+ * @return The new socket file descriptor for the accepted connection, or a
+ * negative value on error.
  */
 int tcpAcceptWrapper(int sockFd);
 

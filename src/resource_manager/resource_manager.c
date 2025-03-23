@@ -1,6 +1,5 @@
 #include "resource_manager/resource_manager.h"
 
-
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdbool.h>
@@ -29,16 +28,16 @@ struct ResourceManager_t {
   int lastClientIndex;
 };
 
-typedef struct{
-  int inputFd; // were it's getting the requests from
+typedef struct {
+  int inputFd;  // were it's getting the requests from
   ResourceManager_t* parent;
   ResourceRequestQueue_t* queue;
-}RequestProducerThread_t;
+} RequestProducerThread_t;
 
-typedef struct{
+typedef struct {
   ResourceManager_t* parent;
   ResourceRequestQueue_t* queue;
-}RequestConsumerThread_t;
+} RequestConsumerThread_t;
 
 void* producerThread(void* data);
 
@@ -65,13 +64,14 @@ ResourceManager_t* initResourceManager(ResourceDataBaseProxy_t* safeDatabase,
 
   manager->listenFd = listenFd;
 
-
-  for(int i=0; i< THREAD_POOL_SIZE; i++){
+  for (int i = 0; i < THREAD_POOL_SIZE; i++) {
     // create consumer thread
-    RequestConsumerThread_t* typedData = (RequestConsumerThread_t*) malloc(sizeof(RequestConsumerThread_t));
+    RequestConsumerThread_t* typedData =
+        (RequestConsumerThread_t*)malloc(sizeof(RequestConsumerThread_t));
     typedData->parent = manager;
     typedData->queue = manager->queue;
-    pthread_create(&(manager->consumerThreadPool[i]),NULL,consumerThread, (void*)typedData);
+    pthread_create(&(manager->consumerThreadPool[i]), NULL, consumerThread,
+                   (void*)typedData);
   }
 
   return manager;
@@ -79,22 +79,21 @@ ResourceManager_t* initResourceManager(ResourceDataBaseProxy_t* safeDatabase,
 
 int endResourceManager(ResourceManager_t* manager) {
   // considering edge cases
-  if(manager == NULL){
+  if (manager == NULL) {
     return -1;
   }
   manager->finished = true;
 
-  for(int i=0; i<THREAD_POOL_SIZE; i++){
-
+  for (int i = 0; i < THREAD_POOL_SIZE; i++) {
     int res = pthread_join(manager->consumerThreadPool[i], NULL);
-    if(res <0){
+    if (res < 0) {
       return -1;
     }
   }
 
-  for(int i=0; i<manager->lastClientIndex + 1; i++){
+  for (int i = 0; i < manager->lastClientIndex + 1; i++) {
     int res = pthread_join(manager->clients[i], NULL);
-    if(res <0){
+    if (res < 0) {
       return -1;
     }
   }
@@ -112,8 +111,8 @@ int acceptTrainManager(ResourceManager_t* manager) {
   if (connectionFd < 0) {
     return -1;
   }
-  manager->lastClientIndex +=1;
-  int i = manager->lastClientIndex; // id of the client
+  manager->lastClientIndex += 1;
+  int i = manager->lastClientIndex;  // id of the client
 
   manager->clientsFd[i] = connectionFd;
   RequestProducerThread_t* threadData = malloc(sizeof(RequestProducerThread_t));
@@ -121,24 +120,25 @@ int acceptTrainManager(ResourceManager_t* manager) {
   threadData->parent = manager;
   threadData->queue = manager->queue;
 
-  pthread_create(&(manager->clients[i]),NULL,producerThread, (void*)threadData);
+  pthread_create(&(manager->clients[i]), NULL, producerThread,
+                 (void*)threadData);
 
   return 0;
 }
 
 void* producerThread(void* data) {
   verbose("[RESOURCE MANAGER]: initializing producer thread\n");
-  RequestProducerThread_t* typedData = (RequestProducerThread_t*) data;
+  RequestProducerThread_t* typedData = (RequestProducerThread_t*)data;
   ResourceManager_t* manager = typedData->parent;
 
-  if(manager == NULL){
+  if (manager == NULL) {
     free(typedData);
     pthread_exit(NULL);
   }
 
   ResourceRequestQueue_t* queue = typedData->queue;
 
-  if(queue == NULL){
+  if (queue == NULL) {
     free(typedData);
     pthread_exit(NULL);
   }
@@ -146,23 +146,25 @@ void* producerThread(void* data) {
   int inputFd = typedData->inputFd;
 
   verbose("[RESOURCE MANAGER]: Waiting for messages in socket %d\n", inputFd);
-  while(!(manager->finished)){
+  while (!(manager->finished)) {
     ResourceRequest_t* req = recvResourceRequest(inputFd);
 
-    if(req == NULL){
+    if (req == NULL) {
       continue;
     }
 
     // client disconnected
-    if(req->reqType == UNKNOWN_RES_REQ_TYPE){
+    if (req->reqType == UNKNOWN_RES_REQ_TYPE) {
       verbose("[RESOURCE MANAGER]: Client Disconnected or Unkwon message\n");
       break;
     }
 
-    verbose("[RESOURCE MANAGER]: Producer Thread received a message from %d request type %d for resource %d\n",
-            req->requesterId, req->reqType,  req->resourceId);
+    verbose(
+        "[RESOURCE MANAGER]: Producer Thread received a message from %d "
+        "request type %d for resource %d\n",
+        req->requesterId, req->reqType, req->resourceId);
 
-    pushQueue(queue,req);
+    pushQueue(queue, req);
   }
 
   close(inputFd);
@@ -172,18 +174,18 @@ void* producerThread(void* data) {
 
 void* consumerThread(void* data) {
   verbose("[RESOURCE MANAGER]: initializing consumer thread\n");
-  RequestConsumerThread_t* typedData = (RequestConsumerThread_t*) data;
+  RequestConsumerThread_t* typedData = (RequestConsumerThread_t*)data;
   ResourceManager_t* manager = typedData->parent;
   ResourceRequestQueue_t* queue = typedData->queue;
 
   ResourceRequest_t* req = NULL;
   bool timedOut = false;
-  while(!manager->finished){
-    if(!timedOut){
-     req = popQueue(queue);
+  while (!manager->finished) {
+    if (!timedOut) {
+      req = popQueue(queue);
     }
 
-    if(req == NULL){
+    if (req == NULL) {
       continue;
     }
 
@@ -191,28 +193,34 @@ void* consumerThread(void* data) {
 
     timedOut = false;
     ResourceRequestResponseType_e res = RESOURCE_REFUSED;
-    switch(req->reqType){
+    switch (req->reqType) {
       case LOCK_RESOURCE:
         int resWait = waitResourceProxy(manager->safeDatabase, req->resourceId);
-        if(resWait != 0){
-          verbose("[RESOURCE MANAGER]: consumer thread timed out waiting for resource\n");
+        if (resWait != 0) {
+          verbose(
+              "[RESOURCE MANAGER]: consumer thread timed out waiting for "
+              "resource\n");
           timedOut = true;
           break;
         }
 
-        int resLock = attemptLockResourceProxy(manager->safeDatabase, req->resourceId, req->requesterId);
+        int resLock = attemptLockResourceProxy(
+            manager->safeDatabase, req->resourceId, req->requesterId);
 
-        if(resLock == 0){
-          verbose("[RESOURCE MANAGER]: consumer thread locked resource %d\n", req->resourceId);
+        if (resLock == 0) {
+          verbose("[RESOURCE MANAGER]: consumer thread locked resource %d\n",
+                  req->resourceId);
           res = RESOURCE_GRANTED;
         }
 
         break;
 
       case RELEASE_RESOURCE:
-        int resRel = releaseResourceProxy(manager->safeDatabase, req->resourceId, req->requesterId);
-        if(resRel == 0){
-          verbose("[RESOURCE MANAGER]: consumer thread released resource %d\n", req->resourceId);
+        int resRel = releaseResourceProxy(manager->safeDatabase,
+                                          req->resourceId, req->requesterId);
+        if (resRel == 0) {
+          verbose("[RESOURCE MANAGER]: consumer thread released resource %d\n",
+                  req->resourceId);
           res = RESOURCE_GRANTED;
         }
         break;
@@ -222,15 +230,18 @@ void* consumerThread(void* data) {
         break;
     }
 
-    if(timedOut){
-      verbose("[RESOURCE MANAGER]: consumer thread timed out treating message\n");
+    if (timedOut) {
+      verbose(
+          "[RESOURCE MANAGER]: consumer thread timed out treating message\n");
       continue;
     }
 
     int fd = req->returnFd;
     ResourceRequestResponse_t* resp = createResourceRequestResponse(req, res);
     answerResourceRequest(fd, resp);
-    verbose("[RESOURCE MANAGER]: consumer thread responded request via socket %d\n",fd);
+    verbose(
+        "[RESOURCE MANAGER]: consumer thread responded request via socket %d\n",
+        fd);
   }
 
   free(typedData);

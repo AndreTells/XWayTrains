@@ -7,6 +7,6 @@
 #define IP_ADDRESS_FLAG "-ip"
 
 bool get_flag_value(int argc, char *argv[], const char *flag_str,
-                           char** flag_value);
+                    char **flag_value);
 
-#endif // FLAGS_H_
+#endif  // FLAGS_H_

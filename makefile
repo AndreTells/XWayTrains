@@ -26,6 +26,13 @@ CFLAGS  = -Wall
 CFLAGS += -std=gnu23
 CFLAGS += -Wextra
 CFLAGS += -pedantic
+CFLAGS += -Wshadow
+CFLAGS += -Wdouble-promotion
+CFLAGS += -Wformat=2
+CFLAGS += -Wformat-truncation
+CFLAGS += -Wundef
+CFLAGS += -fno-common
+CFLAGS += -Wconversion
 CFLAGS += -I$(INCLUDE_DIR)
 CFLAGS += -lm
 CFLAGS += -g
@@ -35,7 +42,7 @@ CFLAGS += -g
 # --------------------------------------------------------------------- #
 LDFLAGS = -lrt
 
-all: format_code static_analyser build/remote_test/main
+all: format_code static_analyser test
 
 
 format_code:
@@ -44,7 +51,6 @@ format_code:
 	clang-format --verbose -i --style=file src/remote_test/*
 	clang-format --verbose -i --style=file src/resource_manager/*
 	clang-format --verbose -i --style=file src/train_manager/*
-	clang-format --verbose -i --style=file test/*
 	clang-format --verbose -i --style=file include/common/*
 	clang-format --verbose -i --style=file include/plc/*
 	clang-format --verbose -i --style=file include/resource_manager/*
@@ -61,7 +67,8 @@ test: clean \
 		build/test/plc_facade \
 		build/test/plc_proxy \
 		build/test/resource_manager \
-		build/test/interpreter
+		build/test/interpreter \
+		build/test/comm
 
 	@printf "\n[Unit testing]\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_database -s
@@ -79,34 +86,44 @@ test: clean \
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_facade -s
 	@printf "\n\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_proxy -s
+	@printf "\n\n"
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/comm -s
 	@printf "\nDone unit testing\n"
 
 
 build/test/remote: $(RTEST_SRC_DIR)/main.c \
-					$(RTEST_SRC_DIR)/comm.c
-
+					$(RTEST_SRC_DIR)/comm.c \
+					$(COMMON_SRC_DIR)/verbose.c \
+					$(COMMON_SRC_DIR)/comm_general.c
 	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
+
+build/test/comm: $(TEST_SRC_DIR)/unit_test_comm.c \
+					$(RTEST_SRC_DIR)/comm.c \
+					$(COMMON_SRC_DIR)/verbose.c \
+					$(COMMON_SRC_DIR)/flags.c
+	mkdir -p build/test
+	$(CC) -g $(CFLAGS) $^ -o $@
 
 # --------------------------------------------------------------------- #
 # Unit testing the resource Manager                                     #
 # --------------------------------------------------------------------- #
 build/test/request_queue: $(TEST_SRC_DIR)/unit_test_request_queue.c \
-								$(RESOURCE_MANAGER_SRC_DIR)/request_queue.c \
-								$(COMMON_SRC_DIR)/resource_request.c \
-								$(COMMON_SRC_DIR)/verbose.c \
-								$(COMMON_SRC_DIR)/flags.c \
-								$(COMMON_SRC_DIR)/time_out.c
+						$(RESOURCE_MANAGER_SRC_DIR)/request_queue.c \
+						$(COMMON_SRC_DIR)/resource_request.c \
+						$(COMMON_SRC_DIR)/verbose.c \
+						$(COMMON_SRC_DIR)/flags.c \
+						$(COMMON_SRC_DIR)/time_out.c
 
 	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
 
 build/test/resource_database: $(TEST_SRC_DIR)/unit_test_resource_database.c \
-								$(RESOURCE_MANAGER_SRC_DIR)/resource_database.c \
-								$(RESOURCE_MANAGER_SRC_DIR)/resource_database_proxy.c \
-								$(COMMON_SRC_DIR)/verbose.c \
-								$(COMMON_SRC_DIR)/flags.c \
-								$(COMMON_SRC_DIR)/time_out.c
+						$(RESOURCE_MANAGER_SRC_DIR)/resource_database.c \
+						$(RESOURCE_MANAGER_SRC_DIR)/resource_database_proxy.c \
+						$(COMMON_SRC_DIR)/verbose.c \
+						$(COMMON_SRC_DIR)/flags.c \
+						$(COMMON_SRC_DIR)/time_out.c
 	mkdir -p build/test
 	$(CC) $(CFLAGS) $^ -o $@
 
@@ -129,26 +146,28 @@ build/test/resource_manager: $(TEST_SRC_DIR)/unit_test_resource_manager.c \
 # --------------------------------------------------------------------- #
 
 build/test/resource_manager_proxy: $(TEST_SRC_DIR)/unit_test_resource_manager_proxy.c \
-									$(TRAIN_MANAGER_SRC_DIR)/resource_manager_proxy.c \
-									$(COMMON_SRC_DIR)/mock_resource_request.c \
-									$(COMMON_SRC_DIR)/mock_comm_general.c \
-									$(COMMON_SRC_DIR)/time_out.c \
-									$(COMMON_SRC_DIR)/verbose.c \
-									$(COMMON_SRC_DIR)/flags.c
+						$(TRAIN_MANAGER_SRC_DIR)/resource_manager_proxy.c \
+						$(COMMON_SRC_DIR)/mock_resource_request.c \
+						$(COMMON_SRC_DIR)/mock_comm_general.c \
+						$(COMMON_SRC_DIR)/time_out.c \
+						$(COMMON_SRC_DIR)/verbose.c \
+						$(COMMON_SRC_DIR)/flags.c
 	mkdir -p build/test
 	$(CC) -g $(CFLAGS) $^ -o $@
 
 build/test/interpreter: $(TEST_SRC_DIR)/unit_test_interpreter.c \
-									$(TRAIN_MANAGER_SRC_DIR)/interpreter.c \
-									$(TRAIN_MANAGER_SRC_DIR)/mock_resource_manager_proxy.c \
-									$(TRAIN_MANAGER_SRC_DIR)/mock_train.c \
-									$(PLC_MANAGER_SRC_DIR)/mock_plc_message.c \
-									$(PLC_MANAGER_SRC_DIR)/mock_plc_proxy.c \
-									$(PLC_MANAGER_SRC_DIR)/mock_plc_facade.c \
-									$(COMMON_SRC_DIR)/mock_resource_request.c \
-									$(COMMON_SRC_DIR)/verbose.c \
-									$(COMMON_SRC_DIR)/flags.c
+						$(TRAIN_MANAGER_SRC_DIR)/interpreter.c \
+						$(TRAIN_MANAGER_SRC_DIR)/mock_resource_manager_proxy.c \
+						$(TRAIN_MANAGER_SRC_DIR)/mock_train.c \
+						$(PLC_MANAGER_SRC_DIR)/mock_plc_message.c \
+						$(PLC_MANAGER_SRC_DIR)/mock_plc_proxy.c \
+						$(PLC_MANAGER_SRC_DIR)/mock_plc_facade.c \
+						$(COMMON_SRC_DIR)/mock_resource_request.c \
+						$(COMMON_SRC_DIR)/verbose.c \
+						$(COMMON_SRC_DIR)/flags.c \
+						$(COMMON_SRC_DIR)/comm_general.c
 	mkdir -p build/test
+	mkdir -p data
 	$(CC) -g $(CFLAGS) $^ -o $@
 
 # --------------------------------------------------------------------- #
@@ -156,30 +175,30 @@ build/test/interpreter: $(TEST_SRC_DIR)/unit_test_interpreter.c \
 # --------------------------------------------------------------------- #
 
 build/test/plc_message: $(TEST_SRC_DIR)/unit_test_plc_message.c \
-									$(PLC_MANAGER_SRC_DIR)/plc_message.c \
-									$(COMMON_SRC_DIR)/verbose.c \
-									$(COMMON_SRC_DIR)/flags.c
+						$(PLC_MANAGER_SRC_DIR)/plc_message.c \
+						$(COMMON_SRC_DIR)/verbose.c \
+						$(COMMON_SRC_DIR)/flags.c
 	mkdir -p build/test
 	$(CC) -g $(CFLAGS) $^ -o $@
 
 build/test/plc_facade: $(TEST_SRC_DIR)/unit_test_plc_facade.c \
-									$(PLC_MANAGER_SRC_DIR)/plc_message.c \
-									$(PLC_MANAGER_SRC_DIR)/plc_facade.c \
-									$(PLC_MANAGER_SRC_DIR)/model_info.c \
-									$(COMMON_SRC_DIR)/verbose.c \
-									$(COMMON_SRC_DIR)/flags.c
+						$(PLC_MANAGER_SRC_DIR)/plc_message.c \
+						$(PLC_MANAGER_SRC_DIR)/plc_facade.c \
+						$(PLC_MANAGER_SRC_DIR)/model_info.c \
+						$(COMMON_SRC_DIR)/verbose.c \
+						$(COMMON_SRC_DIR)/flags.c
 	mkdir -p build/test
 	$(CC) -g $(CFLAGS) $^ -o $@
 
 build/test/plc_proxy: $(TEST_SRC_DIR)/unit_test_plc_proxy.c \
-									$(PLC_MANAGER_SRC_DIR)/plc_proxy.c \
-									$(PLC_MANAGER_SRC_DIR)/plc_message.c \
-									$(PLC_MANAGER_SRC_DIR)/plc_facade.c \
-									$(PLC_MANAGER_SRC_DIR)/model_info.c \
-									$(COMMON_SRC_DIR)/mock_comm_general.c \
-									$(COMMON_SRC_DIR)/time_out.c \
-									$(COMMON_SRC_DIR)/verbose.c \
-									$(COMMON_SRC_DIR)/flags.c
+						$(PLC_MANAGER_SRC_DIR)/plc_proxy.c \
+						$(PLC_MANAGER_SRC_DIR)/plc_message.c \
+						$(PLC_MANAGER_SRC_DIR)/plc_facade.c \
+						$(PLC_MANAGER_SRC_DIR)/model_info.c \
+						$(COMMON_SRC_DIR)/mock_comm_general.c \
+						$(COMMON_SRC_DIR)/time_out.c \
+						$(COMMON_SRC_DIR)/verbose.c \
+						$(COMMON_SRC_DIR)/flags.c
 	mkdir -p build/test
 	$(CC) -g $(CFLAGS) $^ -o $@
 
@@ -216,4 +235,4 @@ build/resource_manager: $(RESOURCE_MANAGER_SRC_DIR)/resource_manager_main.c \
 	$(CC) -g $(CFLAGS) $^ -o $@
 
 clean:
-	rm -fr build/*
+	rm -fr build/* vgcore.*

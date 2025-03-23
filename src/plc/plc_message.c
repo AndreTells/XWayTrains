@@ -144,7 +144,7 @@ size_t serializePlcMessage(PlcMessage_t* msg, uint8_t* serMsg) {
     serMsg += apdu->dataLen;
   }
 
-  return sizeof(uint8_t) * (serMsg - initSerMsg - 1);
+  return sizeof(uint8_t) * (size_t)(serMsg - initSerMsg - 1);
 }
 
 // returns the msg

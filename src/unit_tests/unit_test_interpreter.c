@@ -102,7 +102,11 @@ void test_initPath_destroyInterpreter() {
   const char* tempFile = "data/train1.csv";
   FILE* fp = fopen(tempFile, "w");
   assert(fp != NULL);
-  fputs("test\n", fp);
+  fputs("Train Id	1\n"
+"Type	Actuate	Resources\n"
+"3	Section	1\n"
+"3	Switch\n"
+"10	Invert\n", fp);
   fclose(fp);
 
   Path_t path = initPath(tempFile);
@@ -110,13 +114,13 @@ void test_initPath_destroyInterpreter() {
 
   char* line = readPathLine(path);
   assert(line != NULL);
-  assert(strcmp(line, "test\n") == 0);
+  assert(strcmp(line, "Train Id	1\n") == 0);
   free(line);
 
   int ret = destroyInterpreter(path);
   assert(ret == 0);
 
-  remove(tempFile);
+  assert(remove(tempFile) == 0);
 
   verbose("[Interpreter] initPath & destroyInterpreter ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }

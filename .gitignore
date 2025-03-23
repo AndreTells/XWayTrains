@@ -56,3 +56,4 @@ build/*
 .cache/
 .bear_config.json
 compile_commands.json
+vgcore.*

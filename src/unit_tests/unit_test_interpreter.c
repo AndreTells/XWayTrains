@@ -40,7 +40,7 @@ void test_executeCommand_nullArguments() {
 void test_executeCommand_setTrainId_success() {
   verbose("[Interpreter] executeCommand setTrainId ... \n");
 
-  char cmd[] = "trainId 4";
+  char cmd[] = "trainId\t4";
 
   PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);

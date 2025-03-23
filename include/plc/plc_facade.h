@@ -19,11 +19,7 @@
  * This enumeration specifies the types of messages that can be generated for
  * the PLC.
  */
-typedef enum {
-  TOGGLE_RAIL,
-  TOGGLE_SWITCH,
-  TOGGLE_INVERT
-} PlcMessageType_e;
+typedef enum { TOGGLE_RAIL, TOGGLE_SWITCH, TOGGLE_INVERT } PlcMessageType_e;
 
 /**
  * @brief Configures a PLC message for writing.

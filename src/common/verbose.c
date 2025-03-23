@@ -17,7 +17,10 @@ int verbose(const char* __restrict format, ...) {
 
   va_list args;
   va_start(args, format);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
   int ret = vprintf(format, args);
+#pragma GCC diagnostic pop
   va_end(args);
 
   return ret;

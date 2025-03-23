@@ -12,6 +12,7 @@
 #include "common/comm_general.h"
 #include "common/time_out.h"
 #include "common/verbose.h"
+#include "plc/model_info.h"
 #include "plc/plc_message.h"
 
 #define MAX_NUM_REGISTRABLE_TRAINS 5  // ignore position 0
@@ -41,7 +42,7 @@ void* plcProxyMsgReceiverThread(void* plcProxy);
  * @param[in] clientId ID of the client to register
  * @return 0 on success, non-zero error code on failure
  */
-int plcProxyTryRegisterClient(PlcProxy_t* plcProxy, int clientId);
+int plcProxyTryRegisterClient(PlcProxy_t* plcProxy, enum TrainId_e clientId);
 
 PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr, int port) {
   // check if it's a valid IP address
@@ -157,7 +158,7 @@ int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
   return 0;
 }
 
-PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int clientId) {
+PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, enum TrainId_e clientId) {
   if (plcProxyTryRegisterClient(plc, clientId) != 0) {
     return NULL;
   }
@@ -215,7 +216,7 @@ void* plcProxyMsgReceiverThread(void* plcProxy) {
   pthread_exit(NULL);
 }
 
-int plcProxyTryRegisterClient(PlcProxy_t* plcProxy, int clientId) {
+int plcProxyTryRegisterClient(PlcProxy_t* plcProxy, enum TrainId_e clientId) {
   // index out of range
   if (clientId < 0 || clientId > MAX_NUM_REGISTRABLE_TRAINS - 1) {
     return -1;

@@ -51,8 +51,8 @@ int setTrainId(Train_t* train, int id);
  * @brief Retrieves the ID of a train.
  *
  * @param[in] train Pointer to the train instance.
- * @return int The train's ID.
+ * @return enum TrainId_e The train's ID.
  */
-int getTrainId(Train_t* train);
+enum TrainId_e getTrainId(Train_t* train);
 
 #endif  // TRAIN_H_

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "plc/model_info.h"
 #include "plc/plc_message.h"
 #include "plc/plc_proxy.h"
 
@@ -45,6 +46,6 @@ int endPlcProxy(PlcProxy_t* plc) {
 
 int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) { return 0; }
 
-PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int clientId) {
+PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, enum TrainId_e clientId) {
   return createPlcMessage();
 }

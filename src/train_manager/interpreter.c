@@ -54,6 +54,8 @@ char* readPathLine(Path_t path) {
   return fgets(line, MAX_LINE_SIZE, path);
 }
 
+const char separator[] = " ";
+
 int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
                    ResourceManagerProxy_t* resManager) {
   verbose("[Interpreter]: Executing Command ... \n");
@@ -63,11 +65,11 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
     return -1;
   }
 
-  verbose("[Interpreter]: Parsing Line Command ... \n");
+  verbose("[Interpreter]: Parsing Line Command ... %s\n", cmdLine);
 
   // split string in a thread safe way
-  char* nextToken;
-  char* cmdStr = strtok_r(cmdLine, "\t", &nextToken);
+  char* nextToken = NULL;
+  char* cmdStr = strtok_r(cmdLine, " ", &nextToken);
   if (cmdStr == NULL) {
     verbose("[Interpreter]: Parsing Line Command ... " VERBOSE_KRED
             "fail \n" VERBOSE_RESET);
@@ -96,7 +98,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
       res = 0;
       verbose("[Interpreter]: Setting Train Id ... \n");
 
-      char* idStr = strtok_r(NULL, " ", &nextToken);
+      char* idStr = strtok_r(NULL, separator, &nextToken);
       if (idStr == NULL) {
         verbose("[Interpreter]: Setting Train Id  ... " VERBOSE_KRED
                 "fail \n" VERBOSE_RESET);
@@ -120,8 +122,8 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
     case (CMD_SET):
       res = 0;
       verbose("[Interpreter]: Contacting the PLC ... \n");
-      char* plcMsgTypeStr = strtok_r(NULL, " ", &nextToken);
-      char* targetIdStr = strtok_r(NULL, " ", &nextToken);
+      char* plcMsgTypeStr = strtok_r(NULL, separator, &nextToken);
+      char* targetIdStr = strtok_r(NULL, separator, &nextToken);
 
       if (plcMsgTypeStr == NULL || targetIdStr == NULL) {
         verbose("[Interpreter]: Contacting the PLC ... " VERBOSE_KRED
@@ -145,8 +147,8 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
       int targetId = atoi(targetIdStr);
 
       PlcMessage_t* msg = NULL;
-      configWritePlcMessage(msg, plcMsgType, 0, getTrainId(state),
-                            targetId);  // TODO: get station from proxy
+      res = configWritePlcMessage(msg, plcMsgType, 0, getTrainId(state),
+                                  targetId);  // TODO: get station from proxy
 
       if (res == -1) {
         verbose("[Interpreter]: Contacting the PLC ... " VERBOSE_KRED
@@ -189,7 +191,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
     case (CMD_RESOURCE):
       res = 0;
       verbose("[Interpreter]: Contacting the Resource Manager ... \n");
-      char* reqTypeStr = strtok_r(NULL, " ", &nextToken);
+      char* reqTypeStr = strtok_r(NULL, separator, &nextToken);
       if (reqTypeStr == NULL) {
         verbose(
             "[Interpreter]: Contacting the Resource Manager ... " VERBOSE_KRED
@@ -214,7 +216,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
       int resourceList[MAX_RESOURCE_REQUEST_AMM];
       memset(resourceList, 0, MAX_RESOURCE_REQUEST_AMM * sizeof(int));
       int len = 0;
-      char* resIdStr = strtok_r(NULL, " ", &nextToken);
+      char* resIdStr = strtok_r(NULL, separator, &nextToken);
 
       // enforces that atleast one resource must be requested
       if (resIdStr == NULL) {
@@ -239,7 +241,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
           break;
         }
 
-        resIdStr = strtok_r(NULL, " ", &nextToken);
+        resIdStr = strtok_r(NULL, separator, &nextToken);
       }
 
       if (res == -1) {

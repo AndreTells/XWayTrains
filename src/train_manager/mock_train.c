@@ -45,4 +45,4 @@ int setTrainId(Train_t* train, int id) {
   return 0;
 }
 
-int getTrainId(Train_t* train) { return train->trainId; }
+enum TrainId_e getTrainId(Train_t* train) { return train->trainId; }

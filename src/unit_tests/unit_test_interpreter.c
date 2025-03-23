@@ -40,7 +40,7 @@ void test_executeCommand_nullArguments() {
 void test_executeCommand_setTrainId_success() {
   verbose("[Interpreter] executeCommand setTrainId ... \n");
 
-  char cmd[] = "trainId\t4";
+  char cmd[] = "trainId 4";
 
   PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
@@ -69,6 +69,35 @@ void test_executeCommand_plc_invalidParams() {
 
   int ret = executeCommand(cmd, train, plc, resMgr);
   assert(ret == -1);
+
+  endTrain(train);
+  endResourceManagerProxy(resMgr);
+  endPlcProxy(plc);
+
+  verbose("[Interpreter] executeCommand plc Invalid Params ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
+}
+
+void test_executeCommand_plc_validParams() {
+  verbose("[Interpreter] executeCommand plc Valid Params ... \n");
+
+  int ret = 0;
+
+  PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
+  ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
+  Train_t* train = initTrain(plc,resMgr," ");
+
+  setVerbose(true);
+  char cmd [20] = "plc rail 22";
+  ret = executeCommand(cmd, train, plc, resMgr);
+  assert(ret == 0);
+
+  strcpy(cmd,"plc switch 7");
+  ret = executeCommand(cmd, train, plc, resMgr);
+  assert(ret == 0);
+
+  strcpy(cmd, "plc invert 4");
+  ret = executeCommand(cmd, train, plc, resMgr);
+  assert(ret == 0);
 
   endTrain(train);
   endResourceManagerProxy(resMgr);
@@ -137,6 +166,7 @@ int main(int argc, char* argv[]) {
   test_executeCommand_nullArguments();
   test_executeCommand_setTrainId_success();
   test_executeCommand_plc_invalidParams();
+  test_executeCommand_plc_validParams();
   test_executeCommand_resource_invalidParams();
   test_initPath_destroyInterpreter();
 

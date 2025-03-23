@@ -8,6 +8,7 @@
 #ifndef PLC_PROXY_H_
 #define PLC_PROXY_H_
 
+#include "plc/model_info.h"
 #include "plc/plc_message.h"
 
 /**
@@ -53,6 +54,6 @@ int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg);
  * @return Pointer to the received message, or NULL on failure
  * @note the caller is in charge of freeing memory of the received message
  */
-PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int cliendtId);
+PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, enum TrainId_e cliendtId);
 
 #endif  // PLC_PROXY_H_

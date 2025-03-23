@@ -163,8 +163,14 @@ PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, enum TrainId_e clientId) {
   if (plcProxyTryRegisterClient(plc, clientId) != 0) {
     return NULL;
   }
+  PlcMessage_t* msg;
+  while(!plc->finished){
+     msg = tryGetPlcMessage(plc->outputFd[clientId][0]);
+    if(msg != NULL){
+      break;
+    }
+  }
 
-  PlcMessage_t* msg = tryGetPlcMessage(plc->outputFd[clientId][0]);
   if (msg == NULL) {
     return msg;
   }

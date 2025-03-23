@@ -10,7 +10,7 @@
 
 #define MAX_BACKLOG 10
 
-int tcpCreateSocketWrapper(bool server, char* ipAddress, int port) {
+int tcpCreateSocketWrapper(bool server, char* ipAddress, const uint16_t port) {
   // Create TCP socket:
   int socketFd = socket(AF_INET, SOCK_STREAM, 0);
 

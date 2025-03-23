@@ -23,7 +23,7 @@
  * @param port The port number to bind/connect to.
  * @return The socket file descriptor on success, or a negative value on error.
  */
-int tcpCreateSocketWrapper(bool server, char* ipAddress, int port);
+int tcpCreateSocketWrapper(bool server, char* ipAddress, const uint16_t port);
 
 /**
  * @brief Establishes a connection to a TCP server.

@@ -16,7 +16,7 @@ typedef struct {
 
 static MockSocketPair mockPairs[MAX_PORT + 1] = {0};
 
-int tcpCreateSocketWrapper(bool server, char* ipAddress, int port) {
+int tcpCreateSocketWrapper(bool server, char* ipAddress, const uint16_t port) {
   (void)ipAddress;  // Unused in this mock.
 
   if (port < 0 || port > MAX_PORT) {

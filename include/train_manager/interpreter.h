@@ -65,7 +65,7 @@ int executeCommand(char* cmd, Train_t* state, PlcProxy_t* plc,
  * @param filePath Path to the command file.
  * @return Path_t File handle for the initialized path, or NULL on failure.
  */
-Path_t initPath(char* filePath);
+Path_t initPath(const char* filePath);
 
 /**
  * @brief Closes and destroys the interpreter path.

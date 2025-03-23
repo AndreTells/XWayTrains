@@ -281,10 +281,24 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
   return res;
 }
 
-Path_t initPath(char* filePath) {
-  // TODO: check file extension
-  FILE* fp = fopen(filePath, "r");
-  return fp;
+const char* get_filename_ext(const char* filename) {
+  const char* dot = strrchr(filename, '.');
+  if (!dot || dot == filename) return "";
+  return dot + 1;
+}
+
+Path_t initPath(const char* filePath) {
+  const char* ext = get_filename_ext(filePath);
+  if (strncmp(ext, "csv", 4) == 0) {
+    verbose("[Interpreter]: Parsing filename ... " VERBOSE_KGRN
+            "success \n" VERBOSE_RESET);
+    FILE* fp = fopen(filePath, "r");
+    return fp;
+  } else {
+    verbose("[Interpreter]: Parsing filename ... " VERBOSE_KRED
+            "fail \n" VERBOSE_RESET);
+    return NULL;
+  }
 }
 
 int destroyInterpreter(Path_t path) { return fclose(path); }

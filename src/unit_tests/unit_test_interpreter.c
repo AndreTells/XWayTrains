@@ -99,13 +99,13 @@ void test_executeCommand_resource_invalidParams() {
 void test_initPath_destroyInterpreter() {
   verbose("[Interpreter] initPath & destroyInterpreter ... \n");
 
-  const char* tempFile = "temp_test_file.txt";
+  const char* tempFile = "data/train1.csv";
   FILE* fp = fopen(tempFile, "w");
   assert(fp != NULL);
   fputs("test\n", fp);
   fclose(fp);
 
-  Path_t path = initPath((char*)tempFile);
+  Path_t path = initPath(tempFile);
   assert(path != NULL);
 
   char* line = readPathLine(path);

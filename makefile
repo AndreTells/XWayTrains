@@ -42,7 +42,7 @@ CFLAGS += -g
 # --------------------------------------------------------------------- #
 LDFLAGS = -lrt
 
-all: format_code static_analyser build/remote_test/main
+all: format_code static_analyser test
 
 
 format_code:

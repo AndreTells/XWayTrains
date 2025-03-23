@@ -53,7 +53,8 @@ format_code:
 static_analyser:
 # 	clang-tidy src/* -- -std=c11 -I include
 
-test:build/test/remote build/test/resource_database\
+test: clean \
+		build/test/remote build/test/resource_database\
 		build/test/resource_manager_proxy \
 		build/test/request_queue \
 		build/test/plc_message \

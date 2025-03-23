@@ -2431,7 +2431,7 @@
 </UseCaseItem>
 <UseCase id="65c1871b-e649-11ef-a5ec-88f4da9a3387">
 <name>
-<val>Setup ressource manager</val>
+<val>Setup resource manager</val>
 </name>
 <package>
 <ref refid="f3a4d688-70f4-11ec-aabc-f47b099bf663"/>
@@ -2786,7 +2786,7 @@
 </Property>
 <UseCase id="b0fd9821-e64d-11ef-a651-88f4da9a3387">
 <name>
-<val>Define ressource Manager</val>
+<val>Define resource Manager</val>
 </name>
 <package>
 <ref refid="f3a4d688-70f4-11ec-aabc-f47b099bf663"/>
@@ -3955,7 +3955,7 @@
 </SysMLDiagram>
 <Requirement id="fe8b12a6-e6ed-11ef-92ca-88f4da9a3387">
 <name>
-<val>The train manager must be in a different machine from the ressource manager</val>
+<val>The train manager must be in a different machine from the resource manager</val>
 </name>
 <package>
 <ref refid="012edaba-70f5-11ec-aabc-f47b099bf663"/>
@@ -4052,7 +4052,7 @@
 </VerifyItem>
 <Requirement id="c0ee419d-e6ee-11ef-bea9-88f4da9a3387">
 <name>
-<val>The train manager must allow for the ressource manager to be specified at setup</val>
+<val>The train manager must allow for the resource manager to be specified at setup</val>
 </name>
 <nestingClass>
 <ref refid="24656154-e6ed-11ef-bd09-88f4da9a3387"/>
@@ -4139,7 +4139,7 @@
 </RefineItem>
 <Requirement id="022024e5-e6ef-11ef-839b-88f4da9a3387">
 <name>
-<val>The train manager must be able to communicate with the ressource manager</val>
+<val>The train manager must be able to communicate with the resource manager</val>
 </name>
 <nestingClass>
 <ref refid="24656154-e6ed-11ef-bd09-88f4da9a3387"/>
@@ -4300,7 +4300,7 @@
 </Refine>
 <Requirement id="3bc42b15-e6f0-11ef-b8b8-88f4da9a3387">
 <name>
-<val>The ressource manager must limit the acces to ressources</val>
+<val>The resource manager must limit the acces to resources</val>
 </name>
 <nestedClassifier>
 <reflist>
@@ -4339,7 +4339,7 @@
 </RequirementItem>
 <Requirement id="5e169265-e6f0-11ef-a9f3-88f4da9a3387">
 <name>
-<val>The ressource manager must ensure at most 1 train manager has a given ressource at a time</val>
+<val>The resource manager must ensure at most 1 train manager has a given resource at a time</val>
 </name>
 <nestingClass>
 <ref refid="3bc42b15-e6f0-11ef-b8b8-88f4da9a3387"/>
@@ -4395,7 +4395,7 @@
 </ContainmentItem>
 <Requirement id="7cc0e425-e6f0-11ef-beb0-88f4da9a3387">
 <name>
-<val>The ressource manager must be able to connect to multilpe train managerrs</val>
+<val>The resource manager must be able to connect to multilpe train managerrs</val>
 </name>
 <nestedClassifier>
 <reflist>
@@ -4434,7 +4434,7 @@
 </RequirementItem>
 <Requirement id="8bf4520c-e6f0-11ef-91e5-88f4da9a3387">
 <name>
-<val>The ressource manager must be able to connect to at least 2 train managers</val>
+<val>The resource manager must be able to connect to at least 2 train managers</val>
 </name>
 <nestingClass>
 <ref refid="7cc0e425-e6f0-11ef-beb0-88f4da9a3387"/>
@@ -4490,7 +4490,7 @@
 </ContainmentItem>
 <Requirement id="aa877e4f-e6f0-11ef-8601-88f4da9a3387">
 <name>
-<val>The ressource manager must be in a different machine from the train manager</val>
+<val>The resource manager must be in a different machine from the train manager</val>
 </name>
 <package>
 <ref refid="012edaba-70f5-11ec-aabc-f47b099bf663"/>
@@ -4523,7 +4523,7 @@
 </RequirementItem>
 <Requirement id="c2118d69-e6f0-11ef-a99e-88f4da9a3387">
 <name>
-<val>The ressource manarger must be able to connect to any train manager</val>
+<val>The resource manarger must be able to connect to any train manager</val>
 </name>
 <nestingClass>
 <ref refid="7cc0e425-e6f0-11ef-beb0-88f4da9a3387"/>
@@ -4579,7 +4579,7 @@
 </ContainmentItem>
 <Requirement id="d1e2adea-e6f0-11ef-85b2-88f4da9a3387">
 <name>
-<val>The ressource manager's communication must be in AF-INET connected mode</val>
+<val>The resource manager's communication must be in AF-INET connected mode</val>
 </name>
 <package>
 <ref refid="012edaba-70f5-11ec-aabc-f47b099bf663"/>
@@ -4656,7 +4656,7 @@
 </Verify>
 <Requirement id="76c0d569-e6f1-11ef-9c4a-88f4da9a3387">
 <name>
-<val>The ressource manager must be able to create/ delete ressources</val>
+<val>The resource manager must be able to create/ delete resources</val>
 </name>
 <nestingClass>
 <ref refid="3bc42b15-e6f0-11ef-b8b8-88f4da9a3387"/>
@@ -7496,7 +7496,7 @@
 </MessageItem>
 <Message id="32302247-e719-11ef-9ac2-88f4da9a3387">
 <name>
-<val>request_ressource_manager_ip()</val>
+<val>request_resource_manager_ip()</val>
 </name>
 <presentation>
 <reflist>
@@ -8535,7 +8535,7 @@
 </MessageItem>
 <Message id="7111db0f-e71b-11ef-83a5-88f4da9a3387">
 <name>
-<val>release_ressource(ressource)</val>
+<val>release_resource(resource)</val>
 </name>
 <presentation>
 <reflist>
@@ -8831,7 +8831,7 @@
 </MessageItem>
 <Message id="bebf3c01-e71b-11ef-841a-88f4da9a3387">
 <name>
-<val>unlock_ressource(ressource)</val>
+<val>unlock_resource(resource)</val>
 </name>
 <presentation>
 <reflist>
@@ -8884,7 +8884,7 @@
 </MessageItem>
 <Message id="b0ee2e05-e71b-11ef-8926-88f4da9a3387">
 <name>
-<val>check_ressource_exists(ressource)</val>
+<val>check_resource_exists(resource)</val>
 </name>
 <presentation>
 <reflist>
@@ -9025,7 +9025,7 @@
 </MessageOccurrenceSpecification>
 <Message id="38773f5c-e71b-11ef-87b8-88f4da9a3387">
 <name>
-<val>release_ressource(train_id,ressource)</val>
+<val>release_resource(train_id,resource)</val>
 </name>
 <presentation>
 <reflist>
@@ -9646,7 +9646,7 @@
 </MessageOccurrenceSpecification>
 <Message id="4dd5c1e0-e71a-11ef-8d9a-88f4da9a3387">
 <name>
-<val>lock_ressource(ressource)</val>
+<val>lock_resource(resource)</val>
 </name>
 <presentation>
 <reflist>
@@ -9814,7 +9814,7 @@
 </MessageOccurrenceSpecification>
 <Message id="296e8c86-e71a-11ef-b85e-88f4da9a3387">
 <name>
-<val>check_ressource_exists(ressource)</val>
+<val>check_resource_exists(resource)</val>
 </name>
 <presentation>
 <reflist>
@@ -9838,7 +9838,7 @@
 </MessageOccurrenceSpecification>
 <Message id="0cda5c6e-e71a-11ef-8fc0-88f4da9a3387">
 <name>
-<val>request_ressource(ressource)</val>
+<val>request_resource(resource)</val>
 </name>
 <presentation>
 <reflist>
@@ -9957,7 +9957,7 @@
 </MessageOccurrenceSpecification>
 <Message id="a9d95fd4-e71a-11ef-b9f9-88f4da9a3387">
 <name>
-<val>grant_ressource(train_id,ressource)</val>
+<val>grant_resource(train_id,resource)</val>
 </name>
 <presentation>
 <reflist>
@@ -9981,7 +9981,7 @@
 </MessageOccurrenceSpecification>
 <Message id="cef17af5-e719-11ef-992c-88f4da9a3387">
 <name>
-<val>request_ressource(train_id,ressource)</val>
+<val>request_resource(train_id,resource)</val>
 </name>
 <presentation>
 <reflist>

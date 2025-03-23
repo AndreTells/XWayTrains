@@ -42,7 +42,7 @@ typedef enum {
  */
 typedef struct {
   uint32_t requesterId;
-  uint32_t resourceId;
+  uint8_t resourceId;
   ResourceRequestType_e reqType;
   int returnFd;
 } ResourceRequest_t;
@@ -53,7 +53,7 @@ typedef struct {
  */
 typedef struct {
   uint32_t requesterId;
-  uint32_t resourceId;
+  uint8_t resourceId;
   ResourceRequestResponseType_e respType;
 } ResourceRequestResponse_t;
 
@@ -106,7 +106,7 @@ ResourceRequestResponse_t* recvResourceRequestResponse(int fd);
  * structure.
  */
 ResourceRequest_t* createResourceRequest(const enum TrainId_e requesterId,
-                                         const uint32_t resourceId,
+                                         const uint8_t resourceId,
                                          ResourceRequestType_e reqType, int fd);
 /**
  * @brief Destroys a resource request and frees associated memory.

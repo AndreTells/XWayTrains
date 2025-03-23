@@ -134,7 +134,7 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
 }
 
 int requestResource(ResourceManagerProxy_t* resManager,
-                    ResourceRequestType_e reqType, uint32_t resourceId,
+                    ResourceRequestType_e reqType, uint8_t resourceId,
                     const enum TrainId_e clientId) {
   int res;
   verbose("[RESOURCE MANAGER PROXY]: Resource Request ... \n");

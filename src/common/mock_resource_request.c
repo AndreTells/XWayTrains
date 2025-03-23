@@ -34,7 +34,7 @@ int answerResourceRequest([[maybe_unused]] int fd,
 }
 
 ResourceRequest_t* createResourceRequest(const enum TrainId_e requesterId,
-                                         const uint32_t resourceId,
+                                         const uint8_t resourceId,
                                          ResourceRequestType_e reqType,
                                          int fd) {
   ResourceRequest_t* req = malloc(sizeof(ResourceRequest_t));

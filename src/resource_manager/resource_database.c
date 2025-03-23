@@ -45,65 +45,65 @@ int endResourceDataBase(ResourceDataBase_t *database) {
   return 0;
 }
 
-int attemptLockResource(ResourceDataBase_t *database, uint8_t ressourceId,
+int attemptLockResource(ResourceDataBase_t *database, uint8_t resourceId,
                         int requesterId) {
-  // ressource Id out of bounds
-  if (ressourceId < 0 || ressourceId >= MAX_RESOURCE_ID) {
+  // resource Id out of bounds
+  if (resourceId >= MAX_RESOURCE_ID) {
     return -1;
   }
 
-  // if ressource is not registered, register it
-  if (!database->registered[ressourceId]) {
-    (void)registerResource(database, ressourceId, 1);
+  // if resource is not registered, register it
+  if (!database->registered[resourceId]) {
+    (void)registerResource(database, resourceId, 1);
   }
 
-  if (database->availability[ressourceId] < 1) {
+  if (database->availability[resourceId] < 1) {
     return -1;
   }
 
-  database->availability[ressourceId] -= 1;
-  database->owner[ressourceId] = requesterId;
+  database->availability[resourceId] -= 1;
+  database->owner[resourceId] = requesterId;
   return 0;
 }
 
-int releaseResource(ResourceDataBase_t *database, uint8_t ressourceId,
+int releaseResource(ResourceDataBase_t *database, uint8_t resourceId,
                     int requesterId) {
   // only the owner can unlock it
-  if (requesterId != database->owner[ressourceId]) {
+  if (requesterId != database->owner[resourceId]) {
     return -1;
   }
 
-  // if ressource is not registered, return error
-  if (!database->registered[ressourceId]) {
+  // if resource is not registered, return error
+  if (!database->registered[resourceId]) {
     return -1;
   }
 
-  database->availability[ressourceId] += 1;
+  database->availability[resourceId] += 1;
 
-  (void)sem_post(&(database->interest[ressourceId]));
+  (void)sem_post(&(database->interest[resourceId]));
   return 0;
 }
 
-int waitResource(ResourceDataBase_t *database, uint8_t ressourceId) {
-  // if ressource is not registered, register it
-  if (!database->registered[ressourceId]) {
-    (void)registerResource(database, ressourceId, 1);
+int waitResource(ResourceDataBase_t *database, uint8_t resourceId) {
+  // if resource is not registered, register it
+  if (!database->registered[resourceId]) {
+    (void)registerResource(database, resourceId, 1);
   }
 
   struct timespec ts;
   loadTimeSpec(&ts);
-  return sem_timedwait(&(database->interest[ressourceId]), &ts);
+  return sem_timedwait(&(database->interest[resourceId]), &ts);
 }
 
-int registerResource(ResourceDataBase_t *database, uint8_t ressourceId,
+int registerResource(ResourceDataBase_t *database, uint8_t resourceId,
                      unsigned int ammount) {
   if (ammount > 1) {
     // TODO: implement
     return -1;
   }
-  database->registered[ressourceId] = true;
-  database->availability[ressourceId] = ammount;
-  sem_init(&(database->interest[ressourceId]), 0, ammount);
+  database->registered[resourceId] = true;
+  database->availability[resourceId] = ammount;
+  sem_init(&(database->interest[resourceId]), 0, ammount);
 
   return 0;
 }

@@ -30,7 +30,8 @@ typedef struct PlcProxy_t PlcProxy_t;
  * @return PlcProxy_t* Pointer to the newly created PLC Proxy instance, or NULL
  * on failure.
  */
-PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr, int port);
+PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr,
+                         const uint16_t port);
 
 /**
  * @brief Gracefully terminate a PLC Proxy instance

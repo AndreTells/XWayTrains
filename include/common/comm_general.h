@@ -35,7 +35,7 @@ int tcpCreateSocketWrapper(bool server, char* ipAddress, int port);
  * @param port The port number of the server.
  * @return 0 on success, or a negative value on error.
  */
-int tcpConnectWrapper(int sockFd, char* ipAddress, int port);
+int tcpConnectWrapper(int sockFd, char* ipAddress, const uint16_t port);
 
 /**
  * @brief convert string to unsigned 16 bit integer

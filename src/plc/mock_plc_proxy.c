@@ -1,6 +1,5 @@
 #include <pthread.h>
 #include <semaphore.h>
-#include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,7 +20,7 @@ struct PlcProxy_t {
 };
 
 PlcProxy_t* initPlcProxy([[maybe_unused]] char* hostIpAddr, char* plcIpAddr,
-                         [[maybe_unused]] int port) {
+                         [[maybe_unused]] const uint16_t port) {
   // check if it's a valid IP address
   if (plcIpAddr == NULL) {
     return NULL;

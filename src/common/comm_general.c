@@ -46,7 +46,7 @@ int tcpCreateSocketWrapper(bool server, char* ipAddress, int port) {
   return socketFd;
 }
 
-int tcpConnectWrapper(int sockFd, char* ipAddress, int port) {
+int tcpConnectWrapper(int sockFd, char* ipAddress, const uint16_t port) {
   struct sockaddr_in addr;
   (void)memset(&addr, 0, sizeof(addr));
 

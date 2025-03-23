@@ -29,7 +29,7 @@ int resManagerTryRegisterClient(ResourceManagerProxy_t* resManager,
                                 int clientId);
 
 ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr,
-                                                 int port) {
+                                                 const uint16_t port) {
   // check if it's a valid IP address
   verbose("[RESOURCE MANAGER PROXY]: Initializing ... \n");
   if (resManagerIpAddr == NULL || port < 0) {

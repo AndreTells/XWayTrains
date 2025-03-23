@@ -27,7 +27,7 @@ typedef struct ResourceManagerProxy_t ResourceManagerProxy_t;
  * NULL on failure.
  */
 ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr,
-                                                 int port);
+                                                 const uint16_t port);
 
 /**
  * @brief Gracefully terminate a Resource Manager Proxy instance

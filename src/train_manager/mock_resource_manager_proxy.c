@@ -13,7 +13,8 @@ struct ResourceManagerProxy_t {
 };
 
 ResourceManagerProxy_t* initResourceManagerProxy(
-    [[maybe_unused]] char* resManagerIpAddr, [[maybe_unused]] int port) {
+    [[maybe_unused]] char* resManagerIpAddr,
+    [[maybe_unused]] const uint16_t port) {
   ResourceManagerProxy_t* resManager =
       (ResourceManagerProxy_t*)malloc(sizeof(ResourceManagerProxy_t));
 

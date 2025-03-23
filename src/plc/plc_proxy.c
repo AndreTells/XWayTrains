@@ -44,7 +44,8 @@ void* plcProxyMsgReceiverThread(void* plcProxy);
  */
 int plcProxyTryRegisterClient(PlcProxy_t* plcProxy, enum TrainId_e clientId);
 
-PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr, int port) {
+PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr,
+                         const uint16_t port) {
   // check if it's a valid IP address
   verbose("[PLC PROXY]: Initializing ... \n");
   if (plcIpAddr == NULL || hostIpAddr == NULL || port < 0) {

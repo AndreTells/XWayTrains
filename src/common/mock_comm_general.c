@@ -39,7 +39,8 @@ int tcpCreateSocketWrapper(bool server, char* ipAddress, int port) {
   return server ? mockPairs[port].server_fd : mockPairs[port].client_fd;
 }
 
-int tcpConnectWrapper([[maybe_unused]] int sockFd, char* ipAddress, int port) {
+int tcpConnectWrapper([[maybe_unused]] int sockFd, char* ipAddress,
+                      const uint16_t port) {
   (void)ipAddress;  // Unused in this mock.
 
   if (port < 0 || port > MAX_PORT) {

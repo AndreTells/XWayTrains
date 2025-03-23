@@ -6,9 +6,9 @@
 
 #include "common/verbose.h"
 
-int configWritePlcMessage(PlcMessage_t* msg, PlcMessageType_e msgType,
-                          uint16_t station, enum TrainId_e trainId,
-                          uint16_t target) {
+int configWritePlcMessage(PlcMessage_t* msg, const PlcMessageType_e msgType,
+                          const uint16_t station, const enum TrainId_e trainId,
+                          const uint16_t target) {
   uint8_t data[13];
   memset(data, 0, sizeof(data));
   int dataLen = 13;

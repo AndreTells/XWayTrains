@@ -154,7 +154,8 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
       }
 
       PlcMessage_t* msg = NULL;
-      res = configWritePlcMessage(msg, plcMsgType, 0, getTrainId(state),
+      const uint16_t station = 0;
+      res = configWritePlcMessage(msg, plcMsgType, station, getTrainId(state),
                                   targetId);  // TODO: get station from proxy
 
       if (res == -1) {

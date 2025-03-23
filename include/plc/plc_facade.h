@@ -36,8 +36,8 @@ typedef enum { TOGGLE_RAIL, TOGGLE_SWITCH, TOGGLE_INVERT } PlcMessageType_e;
  * @return int Status code (0 for success, negative for error).
  */
 
-int configWritePlcMessage(PlcMessage_t* msg, PlcMessageType_e msgType,
-                          uint16_t station, enum TrainId_e trainId,
-                          uint16_t target);
+int configWritePlcMessage(PlcMessage_t* msg, const PlcMessageType_e msgType,
+                          const uint16_t station, const enum TrainId_e trainId,
+                          const uint16_t target);
 
 #endif  // PLC_FACADE_H_

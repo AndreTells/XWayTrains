@@ -45,7 +45,7 @@ int serializeResourceRequest(const ResourceRequest_t* req,
   offset += sizeof(net_val);
 
   // Serialize returnFd
-  net_val = htonl(req->returnFd);
+  net_val = htonl((uint32_t)req->returnFd);
   memcpy(buffer + offset, &net_val, sizeof(net_val));
   offset += sizeof(net_val);
 
@@ -84,7 +84,7 @@ int deserializeResourceRequest(const unsigned char* buffer,
 
   // Deserialize returnFd
   memcpy(&net_val, buffer + offset, sizeof(net_val));
-  req->returnFd = ntohl(net_val);
+  req->returnFd = (int)ntohl(net_val);
   offset += sizeof(net_val);
 
   return 0;

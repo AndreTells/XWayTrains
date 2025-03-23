@@ -8,6 +8,7 @@
 #ifndef TIME_OUT_H_
 #define TIME_OUT_H_
 
+#include <stdint.h>
 #include <time.h>
 /**
  * @brief Timeout duration in seconds.

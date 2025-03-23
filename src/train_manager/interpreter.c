@@ -22,6 +22,7 @@ static const int interpreterCommandTableSize = 3;
 static const KeywordToken plcMsgTypeTable[] = {
     {"rail", TOGGLE_RAIL},
     {"switch", TOGGLE_SWITCH},
+    {"invert", TOGGLE_INVERT},
 };
 static const int plcMsgTypeTableSize = 3;
 
@@ -63,9 +64,10 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
   }
 
   verbose("[Interpreter]: Parsing Line Command ... \n");
+
   // split string in a thread safe way
   char* nextToken;
-  char* cmdStr = strtok_r(cmdLine, " ", &nextToken);
+  char* cmdStr = strtok_r(cmdLine, "\t", &nextToken);
   if (cmdStr == NULL) {
     verbose("[Interpreter]: Parsing Line Command ... " VERBOSE_KRED
             "fail \n" VERBOSE_RESET);
@@ -73,6 +75,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
             "fail \n" VERBOSE_RESET);
     return -1;
   }
+
   int cmdInt = getTokenType(cmdStr, interpreterCommandTable,
                             interpreterCommandTableSize);
   if (cmdInt == -1) {

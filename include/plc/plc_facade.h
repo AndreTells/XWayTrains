@@ -22,6 +22,7 @@
 typedef enum {
   TOGGLE_RAIL,
   TOGGLE_SWITCH,
+  TOGGLE_INVERT
 } PlcMessageType_e;
 
 /**

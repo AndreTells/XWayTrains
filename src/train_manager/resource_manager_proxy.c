@@ -136,7 +136,7 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
 
 int requestResource(ResourceManagerProxy_t* resManager,
                     ResourceRequestType_e reqType, int resourceId,
-                    int clientId) {
+                    const enum TrainId_e clientId) {
   int res;
   verbose("[RESOURCE MANAGER PROXY]: Resource Request ... \n");
   verbose("[RESOURCE MANAGER PROXY]: Checking if client is registered ... \n");

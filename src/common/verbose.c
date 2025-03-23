@@ -12,7 +12,7 @@ bool Verbose = false;
 
 void setVerbose(bool setting) { Verbose = setting; }
 
-int verbose(const char* restrict format, ...) {
+int verbose(const char* __restrict format, ...) {
   if (!Verbose) return 0;
 
   va_list args;

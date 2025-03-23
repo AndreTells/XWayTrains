@@ -7,6 +7,7 @@
 #ifndef RESOURCE_MANAGER_PROXY_H_
 #define RESOURCE_MANAGER_PROXY_H_
 #include "common/resource_request.h"
+#include "plc/model_info.h"
 
 /**
  * @brief Opaque handle for Resource Manager Proxy
@@ -48,6 +49,6 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager);
  */
 int requestResource(ResourceManagerProxy_t* resManager,
                     ResourceRequestType_e reqType, int resourceId,
-                    int clientId);
+                    const enum TrainId_e clientId);
 
 #endif  // RESOURCE_MANAGER_PROXY_H_

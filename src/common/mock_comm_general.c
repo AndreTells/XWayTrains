@@ -1,10 +1,6 @@
 #include <arpa/inet.h>
-#include <errno.h>
 #include <netinet/in.h>
 #include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/socket.h>
 
 #include "common/comm_general.h"
@@ -43,7 +39,7 @@ int tcpCreateSocketWrapper(bool server, char* ipAddress, int port) {
   return server ? mockPairs[port].server_fd : mockPairs[port].client_fd;
 }
 
-int tcpConnectWrapper(int sockFd, char* ipAddress, int port) {
+int tcpConnectWrapper([[maybe_unused]] int sockFd, char* ipAddress, int port) {
   (void)ipAddress;  // Unused in this mock.
 
   if (port < 0 || port > MAX_PORT) {

@@ -86,7 +86,7 @@ void test_executeCommand_plc_validParams() {
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
   Train_t* train = initTrain(plc,resMgr," ");
 
-  setVerbose(true);
+  // setVerbose(true);
   char cmd [20] = "plc rail 22";
   ret = executeCommand(cmd, train, plc, resMgr);
   assert(ret == 0);

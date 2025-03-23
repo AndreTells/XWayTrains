@@ -4,7 +4,6 @@
 #include <unistd.h>
 
 #include "plc/model_info.h"
-#include "plc/plc_message.h"
 #include "plc/plc_proxy.h"
 #include "train_manager/resource_manager_proxy.h"
 #include "train_manager/train.h"
@@ -16,7 +15,7 @@ struct Train_t {
 };
 
 Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
-                   char* routeFilePath) {
+                   [[maybe_unused]] char* routeFilePath) {
   // accounting for invalid inputs
   if (plc == NULL || resManager == NULL) {
     return NULL;

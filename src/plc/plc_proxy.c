@@ -48,7 +48,7 @@ PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr,
                          const uint16_t port) {
   // check if it's a valid IP address
   verbose("[PLC PROXY]: Initializing ... \n");
-  if (plcIpAddr == NULL || hostIpAddr == NULL || port < 0) {
+  if (plcIpAddr == NULL || hostIpAddr == NULL) {
     verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED
             "fail \n" VERBOSE_RESET);
     return NULL;
@@ -255,7 +255,7 @@ int sendPlcMessageToFd(PlcMessage_t* msg, int fd) {
 
   size_t serSize = serializePlcMessage(msg, serMsg);
 
-  int writeRes = write(fd, serMsg, serSize);
+  int writeRes = (int)write(fd, serMsg, serSize);
 
   return writeRes;
 }

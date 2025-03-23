@@ -31,7 +31,7 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr,
                                                  const uint16_t port) {
   // check if it's a valid IP address
   verbose("[RESOURCE MANAGER PROXY]: Initializing ... \n");
-  if (resManagerIpAddr == NULL || port < 0) {
+  if (resManagerIpAddr == NULL) {
     verbose("[RESOURCE MANAGER PROXY]: Initializing ... " VERBOSE_KRED
             "fail \n" VERBOSE_RESET);
     return NULL;

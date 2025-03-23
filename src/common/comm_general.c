@@ -24,7 +24,7 @@ int tcpCreateSocketWrapper(bool server, char* ipAddress, const uint16_t port) {
   }
 
   // invalid information for the server
-  if (ipAddress == 0 || port < 0) {
+  if (ipAddress == 0) {
     return -1;
   }
 

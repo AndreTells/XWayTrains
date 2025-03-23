@@ -19,7 +19,7 @@ static MockSocketPair mockPairs[MAX_PORT + 1] = {0};
 int tcpCreateSocketWrapper(bool server, char* ipAddress, const uint16_t port) {
   (void)ipAddress;  // Unused in this mock.
 
-  if (port < 0 || port > MAX_PORT) {
+  if (port > MAX_PORT) {
     //    verbose("tcpCreateSocketWrapper: Invalid port %d. Valid range is 0 to
     //    %d.\n", port, MAX_PORT);
     return -1;
@@ -43,7 +43,7 @@ int tcpConnectWrapper([[maybe_unused]] int sockFd, char* ipAddress,
                       const uint16_t port) {
   (void)ipAddress;  // Unused in this mock.
 
-  if (port < 0 || port > MAX_PORT) {
+  if (port > MAX_PORT) {
     //  fprintf(stderr, "tcpConnectWrapper: Invalid port %d. Valid range is 0 to
     //  %d.\n", port, MAX_PORT);
     return -1;

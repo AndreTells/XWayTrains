@@ -1,5 +1,3 @@
-#include "train_manager/train.h"
-
 #include <pthread.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -9,6 +7,7 @@
 #include "plc/plc_message.h"
 #include "plc/plc_proxy.h"
 #include "train_manager/resource_manager_proxy.h"
+#include "train_manager/train.h"
 
 struct Train_t {
   enum TrainId_e trainId;
@@ -23,7 +22,8 @@ Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
     return NULL;
   }
 
-  Train_t* train = (Train_t*)malloc(sizeof(Train_t)); // check if malloc failed if (train == NULL) { return train; }
+  Train_t* train = (Train_t*)malloc(sizeof(
+      Train_t));  // check if malloc failed if (train == NULL) { return train; }
 
   train->trainId = UNKNOWN_TRAIN;
   train->plc = plc;
@@ -37,14 +37,12 @@ int endTrain(Train_t* train) {
   return 0;
 }
 
-int setTrainId(Train_t* train, int id){
-  if(id > TRAIN_4 || id == UNKNOWN_TRAIN){
+int setTrainId(Train_t* train, int id) {
+  if (id > TRAIN_4 || id == UNKNOWN_TRAIN) {
     return -1;
   }
-  train->trainId = (TrainId_e) id;
+  train->trainId = (TrainId_e)id;
   return 0;
 }
 
-int getTrainId(Train_t* train){
-  return train->trainId;
-}
+int getTrainId(Train_t* train) { return train->trainId; }

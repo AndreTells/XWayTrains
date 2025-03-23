@@ -11,14 +11,12 @@
 #include "plc/model_info.h"
 #include "train_manager/resource_manager_proxy.h"
 
-
 struct ResourceManagerProxy_t {
   int test;
 };
 
-
-ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr, int port) {
-
+ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr,
+                                                 int port) {
   ResourceManagerProxy_t* resManager =
       (ResourceManagerProxy_t*)malloc(sizeof(ResourceManagerProxy_t));
 
@@ -32,6 +30,6 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
 
 int requestResource(ResourceManagerProxy_t* resManager,
                     ResourceRequestType_e reqType, int resourceId,
-                    int clientId){
+                    int clientId) {
   return 0;
 }

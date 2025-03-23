@@ -1,19 +1,20 @@
+#include "plc/plc_proxy.h"
+
 #include <pthread.h>
 #include <semaphore.h>
 #include <signal.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <stdint.h>
 
-#include "plc/plc_message.h"
-#include "plc/plc_proxy.h"
-#include "common/verbose.h"
-#include "common/time_out.h"
 #include "common/comm_general.h"
+#include "common/time_out.h"
+#include "common/verbose.h"
+#include "plc/plc_message.h"
 
-#define MAX_NUM_REGISTRABLE_TRAINS 5 // ignore position 0
+#define MAX_NUM_REGISTRABLE_TRAINS 5  // ignore position 0
 
 struct PlcProxy_t {
   pthread_t readerThreadTid;
@@ -46,30 +47,34 @@ PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr, int port) {
   // check if it's a valid IP address
   verbose("[PLC PROXY]: Initializing ... \n");
   if (plcIpAddr == NULL || hostIpAddr == NULL || port < 0) {
-    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED
+            "fail \n" VERBOSE_RESET);
     return NULL;
   }
 
   PlcProxy_t* plcProxy = (PlcProxy_t*)malloc(sizeof(PlcProxy_t));
 
-  if(plcProxy == NULL){
-    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+  if (plcProxy == NULL) {
+    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED
+            "fail \n" VERBOSE_RESET);
     return NULL;
   }
 
   plcProxy->sock_fd = tcpCreateSocketWrapper(false, hostIpAddr, port);
 
-  if(plcProxy->sock_fd == -1){
+  if (plcProxy->sock_fd == -1) {
     free(plcProxy);
-    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED
+            "fail \n" VERBOSE_RESET);
     return NULL;
   }
 
   int connRes = tcpConnectWrapper(plcProxy->sock_fd, plcIpAddr, port);
 
-  if(connRes == -1){
+  if (connRes == -1) {
     free(plcProxy);
-    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED
+            "fail \n" VERBOSE_RESET);
     return NULL;
   }
 
@@ -85,7 +90,8 @@ PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr, int port) {
   // check if sem_init failed
   if (resSemInit != 0) {
     free(plcProxy);
-    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED
+            "fail \n" VERBOSE_RESET);
     return NULL;
   }
 
@@ -98,8 +104,10 @@ PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr, int port) {
   // check if pthread_create
   if (resPthreadCreate != 0) {
     free(plcProxy);
-    verbose("[PLC PROXY]: Initializing Reader Thread ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
-    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+    verbose("[PLC PROXY]: Initializing Reader Thread ... " VERBOSE_KRED
+            "fail \n" VERBOSE_RESET);
+    verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED
+            "fail \n" VERBOSE_RESET);
     return NULL;
   }
 
@@ -118,7 +126,8 @@ int endPlcProxy(PlcProxy_t* plc) {
 
   (void)pthread_join(plc->readerThreadTid, NULL);
 
-  verbose("[PLC PROXY]: Ending Reader Thread ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
+  verbose("[PLC PROXY]: Ending Reader Thread ... " VERBOSE_KGRN
+          "success \n" VERBOSE_RESET);
   sem_destroy(&(plc->mutex));
 
   // closing all open pipes
@@ -131,7 +140,8 @@ int endPlcProxy(PlcProxy_t* plc) {
     close(plc->outputFd[i][1]);
   }
 
-  verbose("[PLC PROXY]: Closing Pipes ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
+  verbose("[PLC PROXY]: Closing Pipes ... " VERBOSE_KGRN
+          "success \n" VERBOSE_RESET);
 
   free(plc);
   return 0;
@@ -153,7 +163,7 @@ PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int clientId) {
   }
 
   PlcMessage_t* msg = tryGetPlcMessage(plc->outputFd[clientId][0]);
-  if(msg == NULL){
+  if (msg == NULL) {
     return msg;
   }
 
@@ -162,7 +172,7 @@ PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int clientId) {
   int sendRes = sendMessagePlcProxy(plc, ack);
   free(ack);
 
-  if(sendRes < -1) {
+  if (sendRes < -1) {
     free(msg);
     return NULL;
   }
@@ -178,13 +188,13 @@ void* plcProxyMsgReceiverThread(void* plcProxy) {
     PlcMessage_t* msg = tryGetPlcMessage(plc->sock_fd);
 
     // if failed to get a msg, retry
-    if(msg == NULL){
+    if (msg == NULL) {
       continue;
     }
 
     verbose("[PLC PROXY]: read a line \n");
     // things that aren't write
-    if(!compareMsgType(msg, APDU_WRITE_REQ)){
+    if (!compareMsgType(msg, APDU_WRITE_REQ)) {
       continue;
     }
 
@@ -220,11 +230,11 @@ int plcProxyTryRegisterClient(PlcProxy_t* plcProxy, int clientId) {
   return status;
 }
 
-PlcMessage_t* tryGetPlcMessage(int fd){
+PlcMessage_t* tryGetPlcMessage(int fd) {
   uint8_t serMsg[MAX_MSG_SIZE];
 
   int resWait = fileDescriptorTimedWait(fd);
-  if(resWait < 0){
+  if (resWait < 0) {
     return NULL;
   }
 
@@ -238,7 +248,7 @@ PlcMessage_t* tryGetPlcMessage(int fd){
 }
 
 // does not consider the situation where it failed to connect to a server
-int sendPlcMessageToFd(PlcMessage_t* msg, int fd){
+int sendPlcMessageToFd(PlcMessage_t* msg, int fd) {
   uint8_t serMsg[MAX_MSG_SIZE];
 
   size_t serSize = serializePlcMessage(msg, serMsg);

@@ -19,7 +19,7 @@ struct PlcProxy_t {
   int sock_fd;
 };
 
-PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr, int port){
+PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr, int port) {
   // check if it's a valid IP address
   if (plcIpAddr == NULL) {
     return NULL;
@@ -43,9 +43,7 @@ int endPlcProxy(PlcProxy_t* plc) {
   return 0;
 }
 
-int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
-  return 0;
-}
+int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) { return 0; }
 
 PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, int clientId) {
   return createPlcMessage();

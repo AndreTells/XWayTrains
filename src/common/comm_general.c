@@ -26,7 +26,6 @@ int tcpCreateSocketWrapper(bool server, char* ipAddress, int port) {
     return -1;
   }
 
-
   struct sockaddr_in addr;
   (void)memset(&addr, 0, sizeof(addr));
   // Set port and IP:
@@ -59,6 +58,4 @@ int tcpConnectWrapper(int sockFd, char* ipAddress, int port) {
   return resConnect;
 }
 
-int tcpAcceptWrapper(int sockFd) {
-  return accept(sockFd, NULL, NULL);
-}
+int tcpAcceptWrapper(int sockFd) { return accept(sockFd, NULL, NULL); }

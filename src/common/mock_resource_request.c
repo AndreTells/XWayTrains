@@ -1,14 +1,11 @@
-#include "common/resource_request.h"
 #include <stdlib.h>
 #include <sys/socket.h>
 
+#include "common/resource_request.h"
 
-int sendResourceRequest(int fd,ResourceRequest_t* req){
-  return 0;
-}
+int sendResourceRequest(int fd, ResourceRequest_t* req) { return 0; }
 
-ResourceRequest_t* recvResourceRequest(int fd){
-
+ResourceRequest_t* recvResourceRequest(int fd) {
   ResourceRequest_t* req = malloc(sizeof(ResourceRequest_t));
   req->requesterId = 0;
   req->resourceId = 0;
@@ -18,20 +15,19 @@ ResourceRequest_t* recvResourceRequest(int fd){
   return req;
 }
 
-ResourceRequestResponse_t* recvResourceRequestResponse(int fd){
-  ResourceRequest_t* req = createResourceRequest(0,0,LOCK_RESOURCE, -1);
-  ResourceRequestResponse_t* resp = createResourceRequestResponse(req, RESOURCE_GRANTED);
+ResourceRequestResponse_t* recvResourceRequestResponse(int fd) {
+  ResourceRequest_t* req = createResourceRequest(0, 0, LOCK_RESOURCE, -1);
+  ResourceRequestResponse_t* resp =
+      createResourceRequestResponse(req, RESOURCE_GRANTED);
   free(req);
   return resp;
 }
 
-int answerResourceRequest(int fd, ResourceRequestResponse_t* resp){
-  return 0;
-}
+int answerResourceRequest(int fd, ResourceRequestResponse_t* resp) { return 0; }
 
-ResourceRequest_t* createResourceRequest( int requesterId,int resourceId,
-                                    ResourceRequestType_e reqType, int fd){
-
+ResourceRequest_t* createResourceRequest(int requesterId, int resourceId,
+                                         ResourceRequestType_e reqType,
+                                         int fd) {
   ResourceRequest_t* req = malloc(sizeof(ResourceRequest_t));
   req->requesterId = requesterId;
   req->resourceId = resourceId;
@@ -41,14 +37,13 @@ ResourceRequest_t* createResourceRequest( int requesterId,int resourceId,
   return req;
 }
 
-int destroyResourceRequest(ResourceRequest_t* req){
+int destroyResourceRequest(ResourceRequest_t* req) {
   free(req);
   return 0;
 }
 
-ResourceRequestResponse_t* createResourceRequestResponse( ResourceRequest_t*req,
-                                             ResourceRequestResponseType_e respType){
-
+ResourceRequestResponse_t* createResourceRequestResponse(
+    ResourceRequest_t* req, ResourceRequestResponseType_e respType) {
   ResourceRequestResponse_t* resp = malloc(sizeof(ResourceRequestResponse_t));
   resp->requesterId = req->requesterId;
   resp->resourceId = req->resourceId;
@@ -57,7 +52,7 @@ ResourceRequestResponse_t* createResourceRequestResponse( ResourceRequest_t*req,
   return resp;
 }
 
-int destroyResourceRequestResponse(ResourceRequestResponse_t* req){
+int destroyResourceRequestResponse(ResourceRequestResponse_t* req) {
   free(req);
   return 0;
 }

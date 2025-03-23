@@ -32,8 +32,6 @@ CFLAGS += -Wformat=2
 CFLAGS += -Wformat-truncation
 CFLAGS += -Wundef
 CFLAGS += -fno-common
-# generate files that analyse stack usage
-CFLAGS += -fstack-usage
 CFLAGS += -Wconversion
 CFLAGS += -I$(INCLUDE_DIR)
 CFLAGS += -lm

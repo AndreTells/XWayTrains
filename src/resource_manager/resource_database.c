@@ -1,11 +1,12 @@
 #include "resource_manager/resource_database.h"
-#include "common/time_out.h"
 
 #include <err.h>
 #include <semaphore.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "common/time_out.h"
 
 #define MAX_RESOURCE_ID 50
 
@@ -84,7 +85,6 @@ int releaseResource(ResourceDataBase_t *database, int ressourceId,
 }
 
 int waitResource(ResourceDataBase_t *database, int ressourceId) {
-
   // if ressource is not registered, register it
   if (!database->registered[ressourceId]) {
     (void)registerResource(database, ressourceId, 1);
@@ -92,15 +92,15 @@ int waitResource(ResourceDataBase_t *database, int ressourceId) {
 
   struct timespec ts;
   loadTimeSpec(&ts);
-  return sem_timedwait(&(database->interest[ressourceId]),&ts);
+  return sem_timedwait(&(database->interest[ressourceId]), &ts);
 }
 
 int registerResource(ResourceDataBase_t *database, int ressourceId,
                      int ammount) {
-  if(ammount > 1){
+  if (ammount > 1) {
     // TODO: implement
     return -1;
- }
+  }
   database->registered[ressourceId] = true;
   database->availability[ressourceId] = ammount;
   sem_init(&(database->interest[ressourceId]), 0, ammount);

@@ -94,9 +94,9 @@ int setNPDU(PlcMessage_t* msg, XwayNPDUType_e code, XwayAddr sender,
 }
 
 XwayAddr createXwayAddr(uint8_t station, uint8_t network, uint8_t port) {
-  uint16_t expandedStation = (int16_t)station;
-  return (expandedStation << BYTE_SIZE) + (network << (BYTE_SIZE / 2)) +
-         (port & 0x0F);
+  uint16_t expandedStation = (uint16_t)station;
+  return (XwayAddr)(expandedStation << BYTE_SIZE) +
+         (XwayAddr)(network << (BYTE_SIZE / 2)) + (port & 0x0F);
 }
 
 // returns the msg size

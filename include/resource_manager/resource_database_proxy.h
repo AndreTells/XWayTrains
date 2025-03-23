@@ -88,5 +88,5 @@ int waitResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId);
  * @note does not manage access to the database
  */
 int registerResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId,
-                          int ammount);
+                          unsigned int ammount);
 #endif  // RESSOURCE_DATABASE_PROXY_H_

@@ -12,7 +12,7 @@
 
 struct ResourceDataBase_t {
   bool registered[MAX_RESOURCE_ID];
-  int availability[MAX_RESOURCE_ID];
+  unsigned int availability[MAX_RESOURCE_ID];
   int owner[MAX_RESOURCE_ID];
   sem_t interest[MAX_RESOURCE_ID];
 };
@@ -96,7 +96,7 @@ int waitResource(ResourceDataBase_t *database, int ressourceId) {
 }
 
 int registerResource(ResourceDataBase_t *database, int ressourceId,
-                     int ammount) {
+                     unsigned int ammount) {
   if (ammount > 1) {
     // TODO: implement
     return -1;

@@ -1,6 +1,8 @@
 #ifndef RESOURCE_REQUEST_H_
 #define RESOURCE_REQUEST_H_
 
+#include <stdint.h>
+
 /**
  * @enum Resource_e
  * @brief Enumerates available resource identifiers.
@@ -37,7 +39,7 @@ typedef enum {
  * @brief Structure representing a resource request.
  */
 typedef struct {
-  int requesterId;
+  uint32_t requesterId;
   int resourceId;
   ResourceRequestType_e reqType;
   int returnFd;
@@ -48,7 +50,7 @@ typedef struct {
  * @brief Structure representing a response to a resource request.
  */
 typedef struct {
-  int requesterId;
+  uint32_t requesterId;
   int resourceId;
   ResourceRequestResponseType_e respType;
 } ResourceRequestResponse_t;

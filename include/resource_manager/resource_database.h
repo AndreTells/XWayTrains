@@ -87,6 +87,6 @@ int waitResource(ResourceDataBase_t* database, int ressourceId);
  * @note does not manage access to the database
  */
 int registerResource(ResourceDataBase_t* database, int ressourceId,
-                     int ammount);
+                     unsigned int ammount);
 
 #endif  // RESSOURCE_DATABASE_H_

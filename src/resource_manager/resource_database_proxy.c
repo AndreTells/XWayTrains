@@ -65,7 +65,7 @@ int waitResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId) {
 }
 
 int registerResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId,
-                          int ammount) {
+                          unsigned int ammount) {
   registerResource(database->database, ressourceId, ammount);
   return 0;
 }

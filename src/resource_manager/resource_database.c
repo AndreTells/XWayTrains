@@ -45,7 +45,7 @@ int endResourceDataBase(ResourceDataBase_t *database) {
   return 0;
 }
 
-int attemptLockResource(ResourceDataBase_t *database, int ressourceId,
+int attemptLockResource(ResourceDataBase_t *database, uint8_t ressourceId,
                         int requesterId) {
   // ressource Id out of bounds
   if (ressourceId < 0 || ressourceId >= MAX_RESOURCE_ID) {
@@ -66,7 +66,7 @@ int attemptLockResource(ResourceDataBase_t *database, int ressourceId,
   return 0;
 }
 
-int releaseResource(ResourceDataBase_t *database, int ressourceId,
+int releaseResource(ResourceDataBase_t *database, uint8_t ressourceId,
                     int requesterId) {
   // only the owner can unlock it
   if (requesterId != database->owner[ressourceId]) {
@@ -84,7 +84,7 @@ int releaseResource(ResourceDataBase_t *database, int ressourceId,
   return 0;
 }
 
-int waitResource(ResourceDataBase_t *database, int ressourceId) {
+int waitResource(ResourceDataBase_t *database, uint8_t ressourceId) {
   // if ressource is not registered, register it
   if (!database->registered[ressourceId]) {
     (void)registerResource(database, ressourceId, 1);
@@ -95,7 +95,7 @@ int waitResource(ResourceDataBase_t *database, int ressourceId) {
   return sem_timedwait(&(database->interest[ressourceId]), &ts);
 }
 
-int registerResource(ResourceDataBase_t *database, int ressourceId,
+int registerResource(ResourceDataBase_t *database, uint8_t ressourceId,
                      unsigned int ammount) {
   if (ammount > 1) {
     // TODO: implement

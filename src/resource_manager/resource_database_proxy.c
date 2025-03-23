@@ -38,8 +38,8 @@ int endResourceDataBaseProxy(ResourceDataBaseProxy_t* dbProxy) {
   return 0;
 }
 
-int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId,
-                             int requesterId) {
+int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy,
+                             uint8_t ressourceId, int requesterId) {
   sem_wait(&db_proxy->lock);
   int res = 0;
   if (attemptLockResource(db_proxy->database, ressourceId, requesterId) != 0) {
@@ -50,7 +50,7 @@ int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId,
   return res;
 }
 
-int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId,
+int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, uint8_t ressourceId,
                          int requesterId) {
   sem_wait(&db_proxy->lock);
 
@@ -60,12 +60,12 @@ int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId,
   return res;
 }
 
-int waitResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId) {
+int waitResourceProxy(ResourceDataBaseProxy_t* database, uint8_t ressourceId) {
   return waitResource(database->database, ressourceId);
 }
 
-int registerResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId,
-                          unsigned int ammount) {
+int registerResourceProxy(ResourceDataBaseProxy_t* database,
+                          uint8_t ressourceId, unsigned int ammount) {
   registerResource(database->database, ressourceId, ammount);
   return 0;
 }

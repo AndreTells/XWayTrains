@@ -48,8 +48,8 @@ int endResourceDataBaseProxy(ResourceDataBaseProxy_t* dbProxy);
  * @return 0 if the lock was acquired successfully, or a negative value on
  * failure.
  */
-int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId,
-                             int requesterId);
+int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy,
+                             uint8_t ressourceId, int requesterId);
 
 /**
  * @brief Releases a locked resource through the proxy.
@@ -61,7 +61,7 @@ int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId,
  * @param[in] requesterId ID of who is requesting the resource
  * @return 0 on success, or a negative value on failure.
  */
-int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId,
+int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, uint8_t ressourceId,
                          int requesterId);
 
 /**
@@ -74,7 +74,7 @@ int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId,
  * @return 0 when the resource becomes available, or a negative value on
  * failure.
  */
-int waitResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId);
+int waitResourceProxy(ResourceDataBaseProxy_t* database, uint8_t ressourceId);
 
 /**
  * @brief Register a resource that HAS NOT YET been initialized
@@ -87,6 +87,6 @@ int waitResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId);
  * failure.
  * @note does not manage access to the database
  */
-int registerResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId,
-                          unsigned int ammount);
+int registerResourceProxy(ResourceDataBaseProxy_t* database,
+                          uint8_t ressourceId, unsigned int ammount);
 #endif  // RESSOURCE_DATABASE_PROXY_H_

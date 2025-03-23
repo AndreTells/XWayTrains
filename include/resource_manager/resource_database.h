@@ -10,6 +10,7 @@
 
 #ifndef RESSOURCE_DATABASE_H_
 #define RESSOURCE_DATABASE_H_
+#include <stdint.h>
 
 /**
  * @brief Opaque structure representing a resource database.
@@ -47,7 +48,7 @@ int endResourceDataBase(ResourceDataBase_t* database);
  * @return 0 if the lock was acquired successfully, or a negative value on
  * failure.
  */
-int attemptLockResource(ResourceDataBase_t* database, int ressourceId,
+int attemptLockResource(ResourceDataBase_t* database, uint8_t ressourceId,
                         int requesterId);
 
 /**
@@ -60,7 +61,7 @@ int attemptLockResource(ResourceDataBase_t* database, int ressourceId,
  * @param[in] requesterId ID of who is requesting the resource
  * @return 0 on success, or a negative value on failure.
  */
-int releaseResource(ResourceDataBase_t* database, int ressourceId,
+int releaseResource(ResourceDataBase_t* database, uint8_t ressourceId,
                     int requesterId);
 
 /**
@@ -73,7 +74,7 @@ int releaseResource(ResourceDataBase_t* database, int ressourceId,
  * @return 0 when the resource becomes available, or a negative value on
  * failure.
  */
-int waitResource(ResourceDataBase_t* database, int ressourceId);
+int waitResource(ResourceDataBase_t* database, uint8_t ressourceId);
 
 /**
  * @brief Register a resource that HAS NOT YET been initialized
@@ -86,7 +87,7 @@ int waitResource(ResourceDataBase_t* database, int ressourceId);
  * failure.
  * @note does not manage access to the database
  */
-int registerResource(ResourceDataBase_t* database, int ressourceId,
+int registerResource(ResourceDataBase_t* database, uint8_t ressourceId,
                      unsigned int ammount);
 
 #endif  // RESSOURCE_DATABASE_H_

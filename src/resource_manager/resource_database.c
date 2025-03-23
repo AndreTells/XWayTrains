@@ -84,6 +84,12 @@ int releaseResource(ResourceDataBase_t *database, int ressourceId,
 }
 
 int waitResource(ResourceDataBase_t *database, int ressourceId) {
+
+  // if ressource is not registered, register it
+  if (!database->registered[ressourceId]) {
+    (void)registerResource(database, ressourceId, 1);
+  }
+
   struct timespec ts;
   loadTimeSpec(&ts);
   return sem_timedwait(&(database->interest[ressourceId]),&ts);
@@ -94,7 +100,7 @@ int registerResource(ResourceDataBase_t *database, int ressourceId,
   if(ammount > 1){
     // TODO: implement
     return -1;
-  }
+ }
   database->registered[ressourceId] = true;
   database->availability[ressourceId] = ammount;
   sem_init(&(database->interest[ressourceId]), 0, ammount);

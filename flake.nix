@@ -26,6 +26,9 @@
         ];
         shellHook = ''
           echo "Entering dev shell"
+          sudo ip address add 127.0.0.2/8 dev lo
+          ip address show lo
+          zsh
           '';
         };
       }

@@ -59,7 +59,6 @@ int resource_manager_proxy_request_release(void){
 
   assert(requestResource(proxy,RELEASE_RESOURCE, 42, 0) == 0);
 
-
   assert(endResourceManagerProxy(proxy) == 0);
   verbose("[Resource Manager Proxy] Request release ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
   return 0;

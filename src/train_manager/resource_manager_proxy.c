@@ -114,8 +114,7 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
     verbose("[RESOURCE MANAGER PROXY]: Closing pipe ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
   }
 
-  // TODO(andre): end tcp connection (?)
-
+  close(resManager->sock_fd);
   free(resManager);
   verbose("[RESOURCE MANAGER PROXY]: Ending ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
   return 0;
@@ -145,13 +144,19 @@ int requestResource(ResourceManagerProxy_t* resManager,
     verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
     return -1;
   }
-  // send message via socket
 
   sem_post(&(resManager->mutex));
   verbose("[RESOURCE MANAGER PROXY]: Sending Request ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
   verbose("[RESOURCE MANAGER PROXY]: Waiting For Response ... \n");
-  ResourceRequestResponse_t* resp = recvResourceRequestResponse(resManager->outputFd[clientId][0]);
+  ResourceRequestResponse_t* resp;
+  while(!resManager->finished){
+    resp = recvResourceRequestResponse(resManager->outputFd[clientId][0]);
+    if(resp != NULL){
+      break;
+    }
+  }
+
 
   if (resp == NULL){
     verbose("[RESOURCE MANAGER PROXY]: Waiting For Response ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
@@ -161,40 +166,38 @@ int requestResource(ResourceManagerProxy_t* resManager,
 
   verbose("[RESOURCE MANAGER PROXY]: Waiting For Response ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
-  free(req);
-  if(resp->respType != RESOURCE_GRANTED){
-    verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
-    return -1;
-  }
-  free(resp);
+free(req);
+if(resp->respType != RESOURCE_GRANTED){
+  verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+  return -1;
+}
+free(resp);
 
-  verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
-  return 0;
+verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
+return 0;
 }
 
 void* resManagerMsgReceiverThread(void* resourceManagerProxy) {
   ResourceManagerProxy_t* resManager =
       (ResourceManagerProxy_t*)resourceManagerProxy;
   int fd = resManager->sock_fd;
+  verbose("[RESOURCE MANAGER PROXY READER]: Initializing receiver thread on socket %d\n", fd);
 
   while (!resManager->finished) {
-    verbose("[RESOURCE MANAGER PROXY READER]: Waiting For a Message ... \n");
-
     ResourceRequestResponse_t* resp = recvResourceRequestResponse(fd);
     if(resp == NULL){
-      verbose("[RESOURCE MANAGER PROXY READER]: Waiting For a Message Timed Out or Error  \n");
       continue;
     }
 
     verbose("[RESOURCE MANAGER PROXY READER]: Message Received \n");
     int target = resp->requesterId;
 
-    if (resManagerTryRegisterClient(resManager, target) == 0) {
-      verbose("[RESOURCE MANAGER PROXY READER]: Routing Message ... \n");
-      answerResourceRequest(resManager->outputFd[target][1], resp);
-    }
+      if (resManagerTryRegisterClient(resManager, target) == 0) {
+        verbose("[RESOURCE MANAGER PROXY READER]: Routing Message ... \n");
+        answerResourceRequest(resManager->outputFd[target][1], resp);
+      }
 
-    free(resp);
+      free(resp);
   }
 
   pthread_exit(NULL);

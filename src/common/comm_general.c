@@ -16,15 +16,16 @@ int tcpCreateSocketWrapper(bool server, char* ipAddress, int port) {
     return socketFd;
   }
 
+  // client does not require bind
+  if (!server) {
+    return socketFd;
+  }
+
   // invalid information for the server
   if (ipAddress == 0 || port < 0) {
     return -1;
   }
 
-  // client does not require bind
-  if (!server) {
-    return socketFd;
-  }
 
   struct sockaddr_in addr;
   (void)memset(&addr, 0, sizeof(addr));

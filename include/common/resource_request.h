@@ -22,6 +22,7 @@ static const Resource_e MAX_RESOURCE = RESOURCE4;
  * @brief Enumerates types of resource requests.
  */
 typedef enum {
+  UNKNOWN_RES_REQ_TYPE=0,
   LOCK_RESOURCE,
   RELEASE_RESOURCE
 }ResourceRequestType_e;
@@ -31,6 +32,7 @@ typedef enum {
  * @brief Enumerates possible responses to a resource request.
  */
 typedef enum {
+  UNKNOWN_RESP_REQ_TYPE=0,
   RESOURCE_GRANTED,
   RESOURCE_REFUSED
 }ResourceRequestResponseType_e;

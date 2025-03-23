@@ -4,6 +4,7 @@
 CC = clang
 COMMON_SRC_DIR = ./src/common
 TEST_SRC_DIR = ./src/unit_tests
+REMOTE_TEST_SRC_DIR = ./src/remote_test
 RTEST_SRC_DIR = ./src/remote_test
 RESOURCE_MANAGER_SRC_DIR = ./src/resource_manager
 TRAIN_MANAGER_SRC_DIR = ./src/train_manager
@@ -179,6 +180,21 @@ build/test/plc_proxy: $(TEST_SRC_DIR)/unit_test_plc_proxy.c \
 									$(COMMON_SRC_DIR)/verbose.c \
 									$(COMMON_SRC_DIR)/flags.c
 	mkdir -p build/test
+	$(CC) -g $(CFLAGS) $^ -o $@
+
+# --------------------------------------------------------------------- #
+# remote testing PLC                                                    #
+# --------------------------------------------------------------------- #
+
+build/remote_test/resource_manager_client: $(REMOTE_TEST_SRC_DIR)/remote_test_resource_manager_client.c \
+		$(TRAIN_MANAGER_SRC_DIR)/resource_manager_proxy.c \
+		$(COMMON_SRC_DIR)/resource_request.c \
+		$(COMMON_SRC_DIR)/comm_general.c \
+		$(COMMON_SRC_DIR)/time_out.c \
+		$(COMMON_SRC_DIR)/verbose.c \
+		$(COMMON_SRC_DIR)/flags.c
+
+	mkdir -p build/remote_test
 	$(CC) -g $(CFLAGS) $^ -o $@
 
 # --------------------------------------------------------------------- #

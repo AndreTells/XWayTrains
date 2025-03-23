@@ -34,6 +34,7 @@ int fileDescriptorTimedWait(int fd){
     if (ret == -1) {
         // poll() error
         perror("poll");
+        verbose("[TIMED READ]: poll error\n");
         return -1;
     }
 

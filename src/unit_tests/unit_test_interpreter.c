@@ -14,6 +14,7 @@
 #define SERVER_ADDR "10.31.125.14"
 #define PLC_PORT 502
 
+const uint8_t station = 0x28;
 
 void test_executeCommand_nullArguments() {
   verbose("[Interpreter] executeCommand NULL Args ... \n");
@@ -25,10 +26,10 @@ void test_executeCommand_nullArguments() {
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
   Train_t* train = initTrain(plc,resMgr," ");
 
-  assert(executeCommand(NULL, train, plc, resMgr) == -1);
-  assert(executeCommand(cmd, NULL, plc, resMgr) == -1);
-  assert(executeCommand(cmd, train, NULL, resMgr) == -1);
-  assert(executeCommand(cmd, train, plc, NULL) == -1);
+  assert(executeCommand(NULL, train, plc, station, resMgr) == -1);
+  assert(executeCommand(cmd, NULL, plc,station, resMgr) == -1);
+  assert(executeCommand(cmd, train, NULL,station, resMgr) == -1);
+  assert(executeCommand(cmd, train, plc,station, NULL) == -1);
 
   endTrain(train);
   endResourceManagerProxy(resMgr);
@@ -46,7 +47,7 @@ void test_executeCommand_setTrainId_success() {
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
   Train_t* train = initTrain(plc,resMgr," ");
 
-  int ret = executeCommand(cmd, train, plc, resMgr);
+  int ret = executeCommand(cmd, train, plc, station,resMgr);
   assert(ret == 0);
 
   /* Optionally, if your mock updates the train state, verify train id was set to 7 */
@@ -67,7 +68,7 @@ void test_executeCommand_plc_invalidParams() {
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
   Train_t* train = initTrain(plc,resMgr," ");
 
-  int ret = executeCommand(cmd, train, plc, resMgr);
+  int ret = executeCommand(cmd, train, plc,station, resMgr);
   assert(ret == -1);
 
   endTrain(train);
@@ -88,15 +89,15 @@ void test_executeCommand_plc_validParams() {
 
   // setVerbose(true);
   char cmd [20] = "plc rail 22";
-  ret = executeCommand(cmd, train, plc, resMgr);
+  ret = executeCommand(cmd, train, plc,station, resMgr);
   assert(ret == 0);
 
   strcpy(cmd,"plc switch 7");
-  ret = executeCommand(cmd, train, plc, resMgr);
+  ret = executeCommand(cmd, train, plc,station, resMgr);
   assert(ret == 0);
 
   strcpy(cmd, "plc invert 4");
-  ret = executeCommand(cmd, train, plc, resMgr);
+  ret = executeCommand(cmd, train, plc,station, resMgr);
   assert(ret == 0);
 
   endTrain(train);
@@ -115,7 +116,7 @@ void test_executeCommand_resource_invalidParams() {
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
   Train_t* train = initTrain(plc,resMgr," ");
 
-  int ret = executeCommand(cmd, train, plc, resMgr);
+  int ret = executeCommand(cmd, train, plc,station, resMgr);
   assert(ret == -1);
 
   endTrain(train);

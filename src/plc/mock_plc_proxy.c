@@ -53,3 +53,8 @@ PlcMessage_t* readMessagePlcProxy([[maybe_unused]] PlcProxy_t* plc,
                                   [[maybe_unused]] enum TrainId_e clientId) {
   return createPlcMessage();
 }
+
+int setXwayAddrs(PlcProxy_t* plc, uint8_t host_station, uint8_t remote_station,
+                 uint8_t network, uint8_t port) {
+  return 0;
+}

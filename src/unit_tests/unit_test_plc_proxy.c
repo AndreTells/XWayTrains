@@ -45,6 +45,14 @@ void test_initPlcProxy_invalid() {
 void test_init_endPlcProxy() {
   verbose("[Plc Proxy] init & endPlcProxy ... \n");
   PlcProxy_t* proxy = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
+
+  uint8_t pc_station = 0x28;
+  uint8_t plc_station = 0x0E;
+
+  uint8_t network = 1;
+  uint8_t port = 0;
+  setXwayAddrs(proxy,  pc_station, plc_station, network, port);
+
   assert(proxy != NULL);
 
   int ret = endPlcProxy(proxy);
@@ -55,26 +63,20 @@ void test_init_endPlcProxy() {
 void test_sendMessagePlcProxy() {
   verbose("[Plc Proxy] sendMessagePlcProxy ... \n");
   PlcProxy_t* proxy = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
+  uint8_t pc_station = 0x28;
+  uint8_t plc_station = 0x0E;
+
+  uint8_t network = 1;
+  uint8_t port = 0;
+  setXwayAddrs(proxy,  pc_station, plc_station, network, port);
   assert(proxy != NULL);
 
   /* making a message */
   PlcMessage_t* msg = createPlcMessage();
   assert(msg != NULL);
   int res;
-  uint8_t pc_station = 0x28;
-  uint8_t plc_station = 0x0E;
-
-  uint8_t network = 1;
-  uint8_t port = 0;
 
    res = configWritePlcMessage(msg, TOGGLE_SWITCH, pc_station , TRAIN_1, SWITCH_GROUP_31);
-  assert(res == 0);
-
-  /* configure the address information */
-  XwayAddr sender = createXwayAddr(pc_station, network, port);
-  XwayAddr receiver = createXwayAddr(plc_station, network, port);
-  uint8_t extAddr[2] = {0x09, 0x10};
-  res = setNPDU(msg, NPDU_5WAY, sender, receiver, extAddr);
   assert(res == 0);
 
   // attempting to send the message
@@ -134,6 +136,12 @@ void test_readMessagePlcProxy() {
   (void)write(serverFd, &response, 24);
 
   PlcProxy_t* proxy = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
+  uint8_t pc_station = 0x28;
+  uint8_t plc_station = 0x0E;
+
+  uint8_t network = 1;
+  uint8_t port = 0;
+  setXwayAddrs(proxy,  pc_station, plc_station, network, port);
   assert(proxy != NULL);
 
   PlcMessage_t* receivedMsg = readMessagePlcProxy(proxy, TRAIN_1);

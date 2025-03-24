@@ -1,6 +1,7 @@
 #include "plc/plc_proxy.h"
 
 #include <pthread.h>
+#include <string.h>
 #include <semaphore.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -22,6 +23,10 @@ struct PlcProxy_t {
   sem_t mutex;
   int outputFd[MAX_NUM_REGISTRABLE_TRAINS][2];
   bool finished;
+  bool XwayNetworkingSet;
+  XwayAddr hostXwayAddr;
+  XwayAddr remoteXwayAddr;
+  uint8_t extAddr[2];
   int sock_fd;
 };
 
@@ -81,6 +86,12 @@ PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr,
   }
 
   plcProxy->finished = false;
+  // initialising addrs with 0
+  plcProxy->XwayNetworkingSet = false;
+  plcProxy->hostXwayAddr = createXwayAddr(0,0,0);
+  plcProxy->remoteXwayAddr = createXwayAddr(0,0,0);
+  uint8_t zeroExt[2] = {0,0};
+  memcpy(plcProxy->extAddr,zeroExt, 2);
 
   // Initialize the output file descriptors to -1 (invalid)
   for (int i = 0; i < MAX_NUM_REGISTRABLE_TRAINS; i++) {
@@ -150,6 +161,17 @@ int endPlcProxy(PlcProxy_t* plc) {
 }
 
 int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
+  if(!plc->XwayNetworkingSet){
+    return -1;
+  }
+
+  // configuring the networking aspect
+  int res = setNPDU(msg, NPDU_5WAY, plc->hostXwayAddr, plc->remoteXwayAddr, plc->extAddr);
+
+  if(res < 0){
+    return res;
+  }
+
   sem_wait(&(plc->mutex));
 
   sendPlcMessageToFd(msg, plc->sock_fd);
@@ -201,6 +223,8 @@ void* plcProxyMsgReceiverThread(void* plcProxy) {
     }
 
     verbose("[PLC PROXY]: read a line \n");
+    memcpy(plc->extAddr, getPlcExtAddr(msg),2);
+
     // things that aren't write
     if (!compareMsgType(msg, APDU_WRITE_REQ)) {
       continue;
@@ -253,6 +277,20 @@ PlcMessage_t* tryGetPlcMessage(int fd) {
 
   PlcMessage_t* msg = deserializePlcMessage(serMsg);
   return msg;
+}
+
+int setXwayAddrs(PlcProxy_t* plc, uint8_t host_station, uint8_t remote_station,
+                 uint8_t network, uint8_t port){
+
+  // check if it was already set
+  if(plc->XwayNetworkingSet){
+    return -1;
+  }
+  plc->hostXwayAddr = createXwayAddr(host_station, network, port);
+  plc->remoteXwayAddr = createXwayAddr(remote_station, network, port);
+
+  plc->XwayNetworkingSet = true;
+  return 0;
 }
 
 // does not consider the situation where it failed to connect to a server

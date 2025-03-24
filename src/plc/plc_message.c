@@ -212,3 +212,7 @@ uint8_t* getPlcMessageData(PlcMessage_t* msg) {
   XwayAPDU_t* apdu = &(msg->npdu.apdu);
   return apdu->data;
 }
+
+uint8_t* getPlcExtAddr(PlcMessage_t* msg){
+  return &(msg->npdu.extendedAddr);
+}

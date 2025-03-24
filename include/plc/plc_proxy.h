@@ -10,6 +10,7 @@
 
 #include "plc/model_info.h"
 #include "plc/plc_message.h"
+#include <stdint.h>
 
 /**
  * @brief Opaque handle for the PLC Proxy instance
@@ -56,5 +57,8 @@ int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg);
  * @note the caller is in charge of freeing memory of the received message
  */
 PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, enum TrainId_e cliendtId);
+
+int setXwayAddrs(PlcProxy_t* plc, uint8_t host_station, uint8_t remote_station,
+                 uint8_t network, uint8_t port);
 
 #endif  // PLC_PROXY_H_

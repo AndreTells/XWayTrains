@@ -164,4 +164,6 @@ bool compareMsgType(PlcMessage_t* msg, XwayAPDUCode_e code);
  */
 uint8_t* getPlcMessageData(PlcMessage_t* msg);
 
+uint8_t* getPlcExtAddr(PlcMessage_t* msg);
+
 #endif  // PLC_MESSAGE_H_

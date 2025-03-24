@@ -57,7 +57,7 @@ char* readPathLine(Path_t path) {
 
 const char separator[] = " ";
 
-int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
+int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc, uint8_t XwayStation,
                    ResourceManagerProxy_t* resManager) {
   verbose("[Interpreter]: Executing Command ... \n");
   if (cmdLine == NULL || state == NULL || plc == NULL || resManager == NULL) {
@@ -155,9 +155,8 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
       }
 
       PlcMessage_t* msg = NULL;
-      const uint16_t station = 0;
-      res = configWritePlcMessage(msg, plcMsgType, station, getTrainId(state),
-                                  targetId);  // TODO: get station from proxy
+      res = configWritePlcMessage(msg, plcMsgType, XwayStation, getTrainId(state),
+                                  targetId);
 
       if (res == -1) {
         verbose("[Interpreter]: Contacting the PLC ... " VERBOSE_KRED
@@ -184,8 +183,6 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
         res = -1;
         break;
       }
-
-      // TODO: update Train state
 
       free(msg);
       free(plcResp);
@@ -280,6 +277,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
             "success \n" VERBOSE_RESET);
       }
       break;
+
     case UNKNOWN:
       verbose("[Interpreter]: Invalid command \n");
       break;

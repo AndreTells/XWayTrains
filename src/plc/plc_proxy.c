@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "common/comm_general.h"
 #include "common/time_out.h"
@@ -31,6 +32,8 @@ struct PlcProxy_t {
 };
 
 PlcMessage_t* tryGetPlcMessage(int fd);
+
+void print_data_hex(const uint8_t *data);
 
 int sendPlcMessageToFd(PlcMessage_t* msg, int fd);
 
@@ -68,6 +71,7 @@ PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr,
   }
 
   plcProxy->sock_fd = tcpCreateSocketWrapper(false, hostIpAddr, port);
+
 
   if (plcProxy->sock_fd == -1) {
     free(plcProxy);
@@ -165,6 +169,7 @@ int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
     return -1;
   }
 
+  verbose("[PLC PROXY]:attempting to send message to plc\n");
   // configuring the networking aspect
   int res = setNPDU(msg, NPDU_5WAY, plc->hostXwayAddr, plc->remoteXwayAddr, plc->extAddr);
 
@@ -174,11 +179,15 @@ int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
 
   sem_wait(&(plc->mutex));
 
-  sendPlcMessageToFd(msg, plc->sock_fd);
+  int sendRes = sendPlcMessageToFd(msg, plc->sock_fd);
+
+  if(sendRes < 0){
+    verbose("failed with errno %d \n", errno);
+  }
 
   sem_post(&(plc->mutex));
 
-  return 0;
+  return sendRes;
 }
 
 PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, enum TrainId_e clientId) {
@@ -197,9 +206,20 @@ PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, enum TrainId_e clientId) {
     return msg;
   }
 
+  verbose("[PLC PROXY]: sending read ack to plc\n");
+
   PlcMessage_t* ack = createACK(msg, true);
 
-  int sendRes = sendMessagePlcProxy(plc, ack);
+  sem_wait(&(plc->mutex));
+
+  int sendRes = sendPlcMessageToFd(ack, plc->sock_fd);
+
+  if(sendRes < 0){
+    verbose("failed with errno %d \n", errno);
+  }
+
+  sem_post(&(plc->mutex));
+
   free(ack);
 
   if (sendRes < -1) {
@@ -212,8 +232,9 @@ PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, enum TrainId_e clientId) {
 
 void* plcProxyMsgReceiverThread(void* plcProxy) {
   PlcProxy_t* plc = (PlcProxy_t*)plcProxy;
+
+  verbose("[PLC PROXY]: Receiver thread initialized \n");
   while (!plc->finished) {
-    verbose("[PLC PROXY]: Attempting to get a line: \n");
 
     PlcMessage_t* msg = tryGetPlcMessage(plc->sock_fd);
 
@@ -223,7 +244,6 @@ void* plcProxyMsgReceiverThread(void* plcProxy) {
     }
 
     verbose("[PLC PROXY]: read a line \n");
-    memcpy(plc->extAddr, getPlcExtAddr(msg),2);
 
     // things that aren't write
     if (!compareMsgType(msg, APDU_WRITE_REQ)) {
@@ -270,12 +290,16 @@ PlcMessage_t* tryGetPlcMessage(int fd) {
     return NULL;
   }
 
-  ssize_t resSize = read(fd, serMsg, MAX_MSG_SIZE);
-  if (resSize == 0) {
+  ssize_t res = read(fd, serMsg, MAX_MSG_SIZE);
+
+  if (res == -1) {
     return NULL;
   }
 
+  print_data_hex(serMsg);
+
   PlcMessage_t* msg = deserializePlcMessage(serMsg);
+
   return msg;
 }
 
@@ -288,6 +312,8 @@ int setXwayAddrs(PlcProxy_t* plc, uint8_t host_station, uint8_t remote_station,
   }
   plc->hostXwayAddr = createXwayAddr(host_station, network, port);
   plc->remoteXwayAddr = createXwayAddr(remote_station, network, port);
+  plc->extAddr[0] = 0x09;
+  plc->extAddr[1] = 0x10;
 
   plc->XwayNetworkingSet = true;
   return 0;
@@ -296,10 +322,26 @@ int setXwayAddrs(PlcProxy_t* plc, uint8_t host_station, uint8_t remote_station,
 // does not consider the situation where it failed to connect to a server
 int sendPlcMessageToFd(PlcMessage_t* msg, int fd) {
   uint8_t serMsg[MAX_MSG_SIZE];
+  memset(serMsg, 0, MAX_MSG_SIZE);
 
   size_t serSize = serializePlcMessage(msg, serMsg);
+  print_data_hex(serMsg);
 
   int writeRes = (int)write(fd, serMsg, serSize);
 
   return writeRes;
+}
+
+void print_data_hex(const uint8_t *data) {
+  verbose("\tData (HEX): ");
+  int len = data[5] + 6;
+  for (int i = 0; i < len; i++) {
+    if (i == 5 || i == 6 || i == 8 || i == 18) verbose("| ");
+    verbose("%02X ", data[i]);
+  }
+  verbose("\n");
+  verbose(
+      "\tPosition:    0  1  2  3  4 |  5 |  6  7 |  8  9 10 11 12 13 14 15 16 "
+      "17 | 18 "
+      "19 20 21 22 23 24 25 26 27\n\n");
 }

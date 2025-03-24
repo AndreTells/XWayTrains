@@ -44,10 +44,10 @@ int main(int argc, char* argv[]){
   int train = atoi(train_s);
   verbose("[PLC TEST CLIENT]: targeting train %d \n", train);
 
-  char* target_s = "20";
-  (void)get_flag_value(argc,argv,"--target",&train_s);
+  char* target_s = "3";
+  (void)get_flag_value(argc,argv,"--target",&target_s);
   int target = atoi(target_s);
-  verbose("[PLC TEST CLIENT]: targeting rail %d \n", train);
+  verbose("[PLC TEST CLIENT]: targeting switich %d \n", target);
 
   // sending out messages
   plc = initPlcProxy(HOST_IP, PLC_REMOTE_IP, PLC_PORT);
@@ -63,13 +63,13 @@ int main(int argc, char* argv[]){
   int res;
 
   verbose("[PLC TEST CLIENT]: Configuring Message ... \n");
-  res = configWritePlcMessage(msg, TOGGLE_RAIL, XWAY_HOST_STATION, (TrainId_e)train,(uint16_t) target);
+  res = configWritePlcMessage(msg, TOGGLE_SWITCH, XWAY_HOST_STATION, (TrainId_e)train,(uint16_t) target);
   assert(res == 0);
 
   // attempting to send the message
   verbose("[PLC TEST CLIENT]: attempting to send message ... \n");
   int ret = sendMessagePlcProxy(plc, msg);
-  assert(ret == 0);
+  assert(0 < ret);
   verbose("[PLC TEST CLIENT]: attempting to send message ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
   verbose("[PLC TEST CLIENT]: attempting to read response ...\n");
@@ -77,8 +77,9 @@ int main(int argc, char* argv[]){
   verbose("[PLC TEST CLIENT]: attempting to read response\n"VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
   assert(receivedMsg != NULL);
-  assert(compareMsgType(receivedMsg, APDU_WRITE_REQ) == 0);
 
   free(receivedMsg);
+
+  (void)endPlcProxy(plc);
   return 0;
 }

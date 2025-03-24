@@ -52,7 +52,7 @@ int main(int argc, char* argv[]){
   assert(resManager != NULL);
 
   verbose("[INTERPRETER TEST] connecting to plc\n");
-  plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
+  plc = initPlcProxy(HOST_IP, PLC_REMOTE_IP, PLC_PORT);
 
   uint8_t pc_station = 0x28;
   uint8_t plc_station = 0x0E;

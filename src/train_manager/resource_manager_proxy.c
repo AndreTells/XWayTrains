@@ -2,7 +2,6 @@
 
 #include <pthread.h>
 #include <semaphore.h>
-#include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,13 +25,13 @@ struct ResourceManagerProxy_t {
 void* resManagerMsgReceiverThread(void* resourceManagerProxy);
 
 int resManagerTryRegisterClient(ResourceManagerProxy_t* resManager,
-                                int clientId);
+                                const enum TrainId_e clientId);
 
 ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr,
                                                  const uint16_t port) {
   // check if it's a valid IP address
   verbose("[RESOURCE MANAGER PROXY]: Initializing ... \n");
-  if (resManagerIpAddr == NULL || port < 0) {
+  if (resManagerIpAddr == NULL) {
     verbose("[RESOURCE MANAGER PROXY]: Initializing ... " VERBOSE_KRED
             "fail \n" VERBOSE_RESET);
     return NULL;
@@ -135,7 +134,7 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
 }
 
 int requestResource(ResourceManagerProxy_t* resManager,
-                    ResourceRequestType_e reqType, int resourceId,
+                    ResourceRequestType_e reqType, uint8_t resourceId,
                     const enum TrainId_e clientId) {
   int res;
   verbose("[RESOURCE MANAGER PROXY]: Resource Request ... \n");
@@ -220,7 +219,7 @@ void* resManagerMsgReceiverThread(void* resourceManagerProxy) {
     }
 
     verbose("[RESOURCE MANAGER PROXY READER]: Message Received \n");
-    int target = resp->requesterId;
+    uint32_t target = resp->requesterId;
 
     if (resManagerTryRegisterClient(resManager, target) == 0) {
       verbose("[RESOURCE MANAGER PROXY READER]: Routing Message ... \n");
@@ -234,7 +233,7 @@ void* resManagerMsgReceiverThread(void* resourceManagerProxy) {
 }
 
 int resManagerTryRegisterClient(ResourceManagerProxy_t* resManager,
-                                int clientId) {
+                                const enum TrainId_e clientId) {
   // index out of range
   if (clientId < 0 || clientId > MAX_NUM_REGISTRABLE_TRAINS - 1) {
     return -1;

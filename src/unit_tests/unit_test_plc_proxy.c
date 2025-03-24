@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include <signal.h>
+
 #include "plc/plc_proxy.h"
 #include "plc/plc_message.h"
 #include "plc/plc_facade.h"
@@ -37,7 +37,7 @@ PlcMessage_t* unitTestTryGetPlcMessage(int fd){
 
 void test_initPlcProxy_invalid() {
   verbose("[Plc Proxy] initPlcProxy Invalid ... \n");
-  PlcProxy_t* proxy = initPlcProxy(NULL, NULL, -1);
+  PlcProxy_t* proxy = initPlcProxy(NULL, NULL, 0);
   assert(proxy == NULL);
   verbose("[Plc Proxy] initPlcProxy Invalid ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }

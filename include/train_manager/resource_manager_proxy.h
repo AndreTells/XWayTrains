@@ -48,7 +48,7 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager);
  * @return int Status code (0 on success, non-zero error code on failure).
  */
 int requestResource(ResourceManagerProxy_t* resManager,
-                    ResourceRequestType_e reqType, int resourceId,
+                    ResourceRequestType_e reqType, uint8_t resourceId,
                     const enum TrainId_e clientId);
 
 #endif  // RESOURCE_MANAGER_PROXY_H_

@@ -11,7 +11,7 @@ int configWritePlcMessage(PlcMessage_t* msg, const PlcMessageType_e msgType,
                           const uint16_t target) {
   uint8_t data[13];
   memset(data, 0, sizeof(data));
-  int dataLen = 13;
+  size_t dataLen = 13;
 
   data[0] = (uint8_t)PLC_CATEGORY;
   data[1] = (uint8_t)INTERNAL_DATA_SPACE;

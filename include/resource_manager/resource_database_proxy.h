@@ -40,53 +40,53 @@ int endResourceDataBaseProxy(ResourceDataBaseProxy_t* dbProxy);
 /**
  * @brief Attempts to lock a specific resource through the proxy.
  *
- * Tries to acquire a lock on the resource identified by ressourceId.
+ * Tries to acquire a lock on the resource identified by resourceId.
  *
  * @param[in] db_proxy Pointer to the resource database proxy instance.
- * @param[in] ressourceId ID of the resource to lock.
+ * @param[in] resourceId ID of the resource to lock.
  * @param[in] requesterId ID of who is requesting the resource
  * @return 0 if the lock was acquired successfully, or a negative value on
  * failure.
  */
-int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId,
-                             int requesterId);
+int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy,
+                             uint8_t resourceId, uint32_t requesterId);
 
 /**
  * @brief Releases a locked resource through the proxy.
  *
- * Unlocks the resource identified by ressourceId.
+ * Unlocks the resource identified by resourceId.
  *
  * @param[in] db_proxy Pointer to the resource database proxy instance.
- * @param[in] ressourceId ID of the resource to release.
+ * @param[in] resourceId ID of the resource to release.
  * @param[in] requesterId ID of who is requesting the resource
  * @return 0 on success, or a negative value on failure.
  */
-int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId,
-                         int requesterId);
+int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, uint8_t resourceId,
+                         uint32_t requesterId);
 
 /**
  * @brief Waits for a resource to become available through the proxy.
  *
- * Blocks until the resource identified by ressourceId is available.
+ * Blocks until the resource identified by resourceId is available.
  *
  * @param[in] database Pointer to the resource database proxy instance.
- * @param[in] ressourceId ID of the resource to wait for.
+ * @param[in] resourceId ID of the resource to wait for.
  * @return 0 when the resource becomes available, or a negative value on
  * failure.
  */
-int waitResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId);
+int waitResourceProxy(ResourceDataBaseProxy_t* database, uint8_t resourceId);
 
 /**
  * @brief Register a resource that HAS NOT YET been initialized
  *
  * @param[in] database Pointer to the resource database instance.
- * @param[in] ressourceId ID of the resource to lock.
+ * @param[in] resourceId ID of the resource to lock.
  * @param[in] ammount The ammount of times this resource can be unlocked without
  * consequences
  * @return 0 if the lock was acquired successfully, or a negative value on
  * failure.
  * @note does not manage access to the database
  */
-int registerResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId,
-                          int ammount);
+int registerResourceProxy(ResourceDataBaseProxy_t* database, uint8_t resourceId,
+                          unsigned int ammount);
 #endif  // RESSOURCE_DATABASE_PROXY_H_

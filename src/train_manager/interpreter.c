@@ -222,8 +222,8 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
 
       ResourceRequestType_e reqType = (ResourceRequestType_e)reqTypeInt;
 
-      int resourceList[MAX_RESOURCE_REQUEST_AMM];
-      memset(resourceList, 0, MAX_RESOURCE_REQUEST_AMM * sizeof(int));
+      uint8_t resourceList[MAX_RESOURCE_REQUEST_AMM];
+      memset(resourceList, 0, MAX_RESOURCE_REQUEST_AMM * sizeof(uint8_t));
       size_t len = 0;
       char* resIdStr = strtok_r(NULL, separator, &nextToken);
 
@@ -243,7 +243,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
           break;
         }
 
-        resourceList[len] = tmp;
+        resourceList[len] = (uint8_t)tmp;
 
         len += 1;
         if (len >= MAX_RESOURCE_REQUEST_AMM) {

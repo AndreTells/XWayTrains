@@ -36,9 +36,9 @@ int main(int argc, char* argv[]) {
   bool verbose_mode = get_flag_value(argc, argv, VERBOSE_FLAG, NULL);
   setVerbose(verbose_mode);
 
-  char* ressource_s = "0";
-  (void)get_flag_value(argc, argv, "--resource", &ressource_s);
-  int resource = atoi(ressource_s);
+  char* resource_s = "0";
+  (void)get_flag_value(argc, argv, "--resource", &resource_s);
+  int resource = atoi(resource_s);
 
   verbose("[RESOURCE MANAGER TEST CLIENT]: Creating the socket\n");
   char* ip_address;

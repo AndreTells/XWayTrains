@@ -11,6 +11,8 @@
 
 #ifndef RESOURCE_MANAGER_H_
 #define RESOURCE_MANAGER_H_
+#include <stdint.h>
+
 #include "resource_manager/resource_database_proxy.h"
 
 /**
@@ -37,7 +39,7 @@ typedef struct ResourceManager_t ResourceManager_t;
  * initialization fails.
  */
 ResourceManager_t* initResourceManager(ResourceDataBaseProxy_t* safeDatabase,
-                                       char* ipAddress, int port);
+                                       char* ipAddress, const uint16_t port);
 
 /**
  * @brief Terminates a Resource Manager instance.

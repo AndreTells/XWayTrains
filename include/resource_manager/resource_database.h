@@ -10,6 +10,7 @@
 
 #ifndef RESSOURCE_DATABASE_H_
 #define RESSOURCE_DATABASE_H_
+#include <stdint.h>
 
 /**
  * @brief Opaque structure representing a resource database.
@@ -42,51 +43,51 @@ int endResourceDataBase(ResourceDataBase_t* database);
  * @brief Attempts to lock a specific resource.
  *
  * @param[in] database Pointer to the resource database instance.
- * @param[in] ressourceId ID of the resource to lock.
+ * @param[in] resourceId ID of the resource to lock.
  * @param[in] requesterId ID of who is requesting the resource
  * @return 0 if the lock was acquired successfully, or a negative value on
  * failure.
  */
-int attemptLockResource(ResourceDataBase_t* database, int ressourceId,
-                        int requesterId);
+int attemptLockResource(ResourceDataBase_t* database, uint8_t resourceId,
+                        uint32_t requesterId);
 
 /**
  * @brief Releases a locked resource.
  *
- * Unlocks the resource identified by ressourceId.
+ * Unlocks the resource identified by resourceId.
  *
  * @param[in] database Pointer to the resource database instance.
- * @param[in] ressourceId ID of the resource to release.
+ * @param[in] resourceId ID of the resource to release.
  * @param[in] requesterId ID of who is requesting the resource
  * @return 0 on success, or a negative value on failure.
  */
-int releaseResource(ResourceDataBase_t* database, int ressourceId,
-                    int requesterId);
+int releaseResource(ResourceDataBase_t* database, uint8_t resourceId,
+                    uint32_t requesterId);
 
 /**
  * @brief Waits for a resource to become available.
  *
- * Blocks until the resource identified by ressourceId is available.
+ * Blocks until the resource identified by resourceId is available.
  *
  * @param[in] database Pointer to the resource database instance.
- * @param[in] ressourceId ID of the resource to wait for.
+ * @param[in] resourceId ID of the resource to wait for.
  * @return 0 when the resource becomes available, or a negative value on
  * failure.
  */
-int waitResource(ResourceDataBase_t* database, int ressourceId);
+int waitResource(ResourceDataBase_t* database, uint8_t resourceId);
 
 /**
  * @brief Register a resource that HAS NOT YET been initialized
  *
  * @param[in] database Pointer to the resource database instance.
- * @param[in] ressourceId ID of the resource to lock.
+ * @param[in] resourceId ID of the resource to lock.
  * @param[in] ammount The ammount of times this resource can be unlocked without
  * consequences
  * @return 0 if the lock was acquired successfully, or a negative value on
  * failure.
  * @note does not manage access to the database
  */
-int registerResource(ResourceDataBase_t* database, int ressourceId,
-                     int ammount);
+int registerResource(ResourceDataBase_t* database, uint8_t resourceId,
+                     unsigned int ammount);
 
 #endif  // RESSOURCE_DATABASE_H_

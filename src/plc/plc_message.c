@@ -11,7 +11,7 @@
 
 typedef struct {
   XwayAPDUCode_e code;
-  int dataLen;
+  size_t dataLen;
   uint8_t data[MAX_DATA_SIZE];
 } XwayAPDU_t;
 
@@ -57,7 +57,7 @@ PlcMessage_t* createACK(PlcMessage_t* msg, bool res) {
 }
 
 int setAPDU(PlcMessage_t* msg, XwayAPDUCode_e code, uint8_t* data,
-            int dataLen) {
+            size_t dataLen) {
   XwayAPDU_t* apdu = &(msg->npdu.apdu);
 
   if (code == APDU_WRITE_RESP && dataLen > 0) {
@@ -69,7 +69,7 @@ int setAPDU(PlcMessage_t* msg, XwayAPDUCode_e code, uint8_t* data,
 
   msg->npduLen += dataLen;
 
-  for (int i = 0; i < dataLen; i++) {
+  for (size_t i = 0; i < dataLen; i++) {
     apdu->data[i] = data[i];
   }
 
@@ -94,14 +94,15 @@ int setNPDU(PlcMessage_t* msg, XwayNPDUType_e code, XwayAddr sender,
 }
 
 XwayAddr createXwayAddr(uint8_t station, uint8_t network, uint8_t port) {
-  uint16_t expandedStation = (int16_t)station;
-  return (expandedStation << BYTE_SIZE) + (network << (BYTE_SIZE / 2)) +
-         (port & 0x0F);
+  uint16_t expandedStation = (uint16_t)station;
+  return (XwayAddr)(expandedStation << BYTE_SIZE) +
+         (XwayAddr)(network << (BYTE_SIZE / 2)) + (port & 0x0F);
 }
 
 // returns the msg size
+// BUG: calls the same indix multiple times
 size_t serializePlcMessage(PlcMessage_t* msg, uint8_t* serMsg) {
-  uint8_t* initSerMsg = serMsg;
+  const uint8_t* initSerMsg = serMsg;
   // setting preamble
   memcpy(serMsg, msg->modbusId, 5 * sizeof(uint8_t));
   serMsg += 5;
@@ -143,7 +144,7 @@ size_t serializePlcMessage(PlcMessage_t* msg, uint8_t* serMsg) {
     serMsg += apdu->dataLen;
   }
 
-  return sizeof(uint8_t) * (serMsg - initSerMsg - 1);
+  return sizeof(uint8_t) * (size_t)(serMsg - initSerMsg - 1);
 }
 
 // returns the msg

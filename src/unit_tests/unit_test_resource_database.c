@@ -39,7 +39,6 @@ int resource_database_test(void) {
   assert(releaseResource(database, 5, 3) == 0);
 
   // Test invalid locks/unlocks
-  assert(attemptLockResource(database, -1, 0) == -1);
   assert(attemptLockResource(database, 51, 0) == -1);
   assert(releaseResource(database, 5, 99) == -1); // Invalid owner
 

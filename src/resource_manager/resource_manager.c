@@ -44,7 +44,7 @@ void* producerThread(void* data);
 void* consumerThread(void* data);
 
 ResourceManager_t* initResourceManager(ResourceDataBaseProxy_t* safeDatabase,
-                                       char* ipAddress, int port) {
+                                       char* ipAddress, const uint16_t port) {
   ResourceManager_t* manager =
       (ResourceManager_t*)malloc(sizeof(ResourceManager_t));
   // not checking for error in malloc

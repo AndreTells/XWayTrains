@@ -94,7 +94,8 @@ PlcMessage_t* createACK(PlcMessage_t* msg, bool res);
  * @param dataLen Length of the data.
  * @return int Status code (0 for success, negative for error).
  */
-int setAPDU(PlcMessage_t* msg, XwayAPDUCode_e code, uint8_t* data, int dataLen);
+int setAPDU(PlcMessage_t* msg, XwayAPDUCode_e code, uint8_t* data,
+            size_t dataLen);
 
 /**
  * @brief Sets the NPDU portion of a PLC message.

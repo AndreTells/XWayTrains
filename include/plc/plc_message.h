@@ -30,7 +30,7 @@ typedef uint16_t XwayAddr;
  * @enum XwayAPDUCode_e
  * @brief Enumeration of APDU codes used in PLC messages.
  */
-typedef enum { APDU_WRITE_RESP = 0xFE, APDU_WRITE_REQ = 0x37 } XwayAPDUCode_e;
+typedef enum { APDU_WRITE_RESP = 0xFE, APDU_WRITE_REQ = 0x37, APDU_ERR = 0xFF } XwayAPDUCode_e;
 
 /**
  * @enum XwayNPDUType_e

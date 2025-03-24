@@ -54,7 +54,9 @@ PlcMessage_t* readMessagePlcProxy([[maybe_unused]] PlcProxy_t* plc,
   return createPlcMessage();
 }
 
-int setXwayAddrs(PlcProxy_t* plc, uint8_t host_station, uint8_t remote_station,
-                 uint8_t network, uint8_t port) {
+int setXwayAddrs([[maybe_unused]] PlcProxy_t* plc,[[maybe_unused]] uint8_t
+                 host_station,[[maybe_unused]] uint8_t
+                 remote_station,[[maybe_unused]] uint8_t network,
+                 [[maybe_unused]] uint8_t port) {
   return 0;
 }

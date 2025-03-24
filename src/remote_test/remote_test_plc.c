@@ -45,20 +45,17 @@ int main(int argc, char* argv[]){
   verbose("[PLC TEST CLIENT]: targeting rail %d \n", train);
 
   // sending out messages
-  PlcProxy_t* proxy = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
+  plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
 
   uint8_t pc_station = 0x28;
   uint8_t plc_station = 0x0E;
 
   uint8_t network = 1;
   uint8_t port = 0;
+  int netRes = setXwayAddrs(plc ,  pc_station, plc_station, network, port);
 
-  /* configure the address information */
-  XwayAddr sender = createXwayAddr(pc_station, network, port);
-  XwayAddr receiver = createXwayAddr(plc_station, network, port);
-  setXwayAddrs(proxy,  pc_station, plc_station, network, port);
-
-  assert(proxy != NULL);
+  assert(plc != NULL);
+  assert(netRes == 0);
 
   /* making a message */
   PlcMessage_t* msg = createPlcMessage();
@@ -70,12 +67,12 @@ int main(int argc, char* argv[]){
 
   // attempting to send the message
   verbose("[PLC TEST CLIENT]: attempting to send message ... \n");
-  int ret = sendMessagePlcProxy(proxy, msg);
+  int ret = sendMessagePlcProxy(plc, msg);
   assert(ret == 0);
   verbose("[PLC TEST CLIENT]: attempting to send message ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
   verbose("[PLC TEST CLIENT]: attempting to read response ...\n");
-  PlcMessage_t* receivedMsg = readMessagePlcProxy(proxy, TRAIN_1);
+  PlcMessage_t* receivedMsg = readMessagePlcProxy(plc, TRAIN_1);
   verbose("[PLC TEST CLIENT]: attempting to read response\n"VERBOSE_KGRN "success \n" VERBOSE_RESET);
   assert(receivedMsg != NULL);
   assert(compareMsgType(receivedMsg, APDU_WRITE_REQ) == 0);

@@ -50,8 +50,6 @@ void test_executeCommand_setTrainId_success() {
   int ret = executeCommand(cmd, train, plc, station,resMgr);
   assert(ret == 0);
 
-  /* Optionally, if your mock updates the train state, verify train id was set to 7 */
-
   endTrain(train);
   endResourceManagerProxy(resMgr);
   endPlcProxy(plc);

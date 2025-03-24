@@ -50,7 +50,7 @@ int main(int argc, char* argv[]){
   verbose("[PLC TEST CLIENT]: targeting rail %d \n", train);
 
   // sending out messages
-  plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
+  plc = initPlcProxy(HOST_IP, PLC_REMOTE_IP, PLC_PORT);
   int netRes = setXwayAddrs(plc ,  XWAY_HOST_STATION, XWAY_REMOTE_STATION,
                             XWAY_NETWORK, XWAY_PORT);
 
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]){
   int res;
 
   verbose("[PLC TEST CLIENT]: Configuring Message ... \n");
-  res = configWritePlcMessage(msg, TOGGLE_RAIL, XWAY_HOST_STATION, train, target);
+  res = configWritePlcMessage(msg, TOGGLE_RAIL, XWAY_HOST_STATION, (TrainId_e)train,(uint16_t) target);
   assert(res == 0);
 
   // attempting to send the message

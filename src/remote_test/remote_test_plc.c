@@ -7,9 +7,14 @@
 #include "common/flags.h"
 #include "common/verbose.h"
 
-#define HOST_ADDR "172.31.71.25"
-#define SERVER_ADDR "10.31.125.14"
+#define HOST_IP "172.31.71.25"
+
+#define PLC_REMOTE_IP "10.31.125.14"
 #define PLC_PORT 502
+#define XWAY_HOST_STATION 0x28
+#define XWAY_REMOTE_STATION 0x0E
+#define XWAY_NETWORK 1
+#define XWAY_PORT 0
 
 PlcProxy_t* plc = NULL;
 
@@ -46,13 +51,8 @@ int main(int argc, char* argv[]){
 
   // sending out messages
   plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
-
-  uint8_t pc_station = 0x28;
-  uint8_t plc_station = 0x0E;
-
-  uint8_t network = 1;
-  uint8_t port = 0;
-  int netRes = setXwayAddrs(plc ,  pc_station, plc_station, network, port);
+  int netRes = setXwayAddrs(plc ,  XWAY_HOST_STATION, XWAY_REMOTE_STATION,
+                            XWAY_NETWORK, XWAY_PORT);
 
   assert(plc != NULL);
   assert(netRes == 0);
@@ -62,7 +62,8 @@ int main(int argc, char* argv[]){
   assert(msg != NULL);
   int res;
 
-   res = configWritePlcMessage(msg, TOGGLE_RAIL, pc_station , train, target);
+  verbose("[PLC TEST CLIENT]: Configuring Message ... \n");
+  res = configWritePlcMessage(msg, TOGGLE_RAIL, XWAY_HOST_STATION, train, target);
   assert(res == 0);
 
   // attempting to send the message
@@ -74,6 +75,7 @@ int main(int argc, char* argv[]){
   verbose("[PLC TEST CLIENT]: attempting to read response ...\n");
   PlcMessage_t* receivedMsg = readMessagePlcProxy(plc, TRAIN_1);
   verbose("[PLC TEST CLIENT]: attempting to read response\n"VERBOSE_KGRN "success \n" VERBOSE_RESET);
+
   assert(receivedMsg != NULL);
   assert(compareMsgType(receivedMsg, APDU_WRITE_REQ) == 0);
 

@@ -301,16 +301,15 @@ const char* get_filename_ext(const char* filename) {
 
 Path_t initPath(const char* filePath) {
   const char* ext = get_filename_ext(filePath);
-  if (strncmp(ext, "csv", 4) == 0) {
-    verbose("[Interpreter]: Parsing filename ... " VERBOSE_KGRN
-            "success \n" VERBOSE_RESET);
-    FILE* fp = fopen(filePath, "r");
-    return fp;
-  } else {
+  if (strncmp(ext, "route", 5) != 0) {
     verbose("[Interpreter]: Parsing filename ... " VERBOSE_KRED
             "fail \n" VERBOSE_RESET);
-    return NULL;
   }
+
+  verbose("[Interpreter]: Parsing filename ... " VERBOSE_KGRN
+          "success \n" VERBOSE_RESET);
+  FILE* fp = fopen(filePath, "r");
+  return fp;
 }
 
 int destroyInterpreter(Path_t path) { return fclose(path); }

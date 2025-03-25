@@ -247,6 +247,23 @@ build/remote_test/interpreter: $(REMOTE_TEST_SRC_DIR)/remote_test_interpreter.c 
 	mkdir -p build/remote_test
 	$(CC) -g $(CFLAGS) $^ -o $@
 
+build/remote_test/train: $(REMOTE_TEST_SRC_DIR)/remote_test_train.c \
+		$(TRAIN_MANAGER_SRC_DIR)/interpreter.c \
+		$(TRAIN_MANAGER_SRC_DIR)/train.c \
+		$(TRAIN_MANAGER_SRC_DIR)/resource_manager_proxy.c \
+		$(COMMON_SRC_DIR)/resource_request.c \
+		$(PLC_MANAGER_SRC_DIR)/plc_proxy.c \
+		$(PLC_MANAGER_SRC_DIR)/plc_message.c \
+		$(PLC_MANAGER_SRC_DIR)/plc_facade.c \
+		$(PLC_MANAGER_SRC_DIR)/model_info.c \
+		$(COMMON_SRC_DIR)/comm_general.c \
+		$(COMMON_SRC_DIR)/time_out.c \
+		$(COMMON_SRC_DIR)/verbose.c \
+		$(COMMON_SRC_DIR)/flags.c
+
+	mkdir -p build/remote_test
+	$(CC) -g $(CFLAGS) $^ -o $@
+
 # --------------------------------------------------------------------- #
 # Building Final Version                                                #
 # --------------------------------------------------------------------- #

@@ -165,9 +165,9 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc, uint8_t XwayS
         break;
       }
 
-      res = sendMessagePlcProxy(plc, msg);
+      ssize_t sentMsgSize= sendMessagePlcProxy(plc, msg);
 
-      if (res == -1) {
+      if (sentMsgSize == -1) {
         verbose("[Interpreter]: Contacting the PLC ... " VERBOSE_KRED
                 "fail \n" VERBOSE_RESET);
         free(msg);

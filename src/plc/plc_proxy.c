@@ -164,7 +164,7 @@ int endPlcProxy(PlcProxy_t* plc) {
   return 0;
 }
 
-int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
+ssize_t sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
   if(!plc->XwayNetworkingSet){
     return -1;
   }
@@ -312,7 +312,7 @@ int setXwayAddrs(PlcProxy_t* plc, uint8_t host_station, uint8_t remote_station,
   }
   plc->hostXwayAddr = createXwayAddr(host_station, network, port);
   plc->remoteXwayAddr = createXwayAddr(remote_station, network, port);
-  plc->extAddr[0] = 0x09;
+  plc->extAddr[0] = (uint8_t) SEND_CODE;
   plc->extAddr[1] = 0x10;
 
   plc->XwayNetworkingSet = true;

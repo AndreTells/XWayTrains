@@ -44,7 +44,7 @@ int endPlcProxy(PlcProxy_t* plc) {
   return 0;
 }
 
-int sendMessagePlcProxy([[maybe_unused]] PlcProxy_t* plc,
+ssize_t sendMessagePlcProxy([[maybe_unused]] PlcProxy_t* plc,
                         [[maybe_unused]] PlcMessage_t* msg) {
   return 0;
 }

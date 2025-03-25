@@ -58,7 +58,7 @@ PlcMessage_t* createACK(PlcMessage_t* msg, bool res) {
   }
 
   uint8_t ext[2];
-  ext[0] = 0x19;
+  ext[0] = (uint8_t) RECEIVER_CODE;
   ext[1] = msg->npdu.extendedAddr[1];
 
   setNPDU(ack, msg->npdu.type, msg->npdu.receiver, msg->npdu.sender,

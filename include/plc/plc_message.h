@@ -68,6 +68,8 @@ typedef enum {
   UNITE_TYPE_DOUBLE = 8,
 } UniteObjectType_e;
 
+typedef enum {SEND_CODE = 0x09, RECEIVER_CODE = 0x19} ExtMsgSendType_e;
+
 /**
  * @brief Creates a new PLC message.
  *

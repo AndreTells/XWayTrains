@@ -68,8 +68,8 @@ int main(int argc, char* argv[]){
 
   // attempting to send the message
   verbose("[PLC TEST CLIENT]: attempting to send message ... \n");
-  int ret = sendMessagePlcProxy(plc, msg);
-  assert(0 < ret);
+  ssize_t msgSize = sendMessagePlcProxy(plc, msg);
+  assert(0 < msgSize);
   verbose("[PLC TEST CLIENT]: attempting to send message ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
   verbose("[PLC TEST CLIENT]: attempting to read response ...\n");

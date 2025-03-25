@@ -76,13 +76,12 @@ void test_sendMessagePlcProxy() {
   assert(msg != NULL);
   int res;
 
-   res = configWritePlcMessage(msg, TOGGLE_SWITCH, pc_station , TRAIN_1, SWITCH_GROUP_31);
+  res = configWritePlcMessage(msg, TOGGLE_SWITCH, pc_station , TRAIN_1, SWITCH_GROUP_31);
   assert(res == 0);
-
   // attempting to send the message
 
-  int ret = sendMessagePlcProxy(proxy, msg);
-  assert(ret == 0);
+  ssize_t ret = sendMessagePlcProxy(proxy, msg);
+  assert(ret > 0);
 
   freeMessage(msg);
   ret = endPlcProxy(proxy);

@@ -45,9 +45,9 @@ int endPlcProxy(PlcProxy_t* plc);
  * @brief Send a message to the PLC
  * @param[in] plc Proxy instance handle
  * @param[in] msg Pointer to the message to send
- * @return 0 on success, non-zero error code on failure
+ * @return the size of the message sent or -1 on error
  */
-int sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg);
+ssize_t sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg);
 
 /**
  * @brief Read a message from the PLC

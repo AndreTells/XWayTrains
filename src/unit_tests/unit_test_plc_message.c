@@ -205,7 +205,7 @@ void test_ackMessage(){
   response[10] = 0x0E;
   response[11] = 0x10;
 
-  response[12] = 0x09;
+  response[12] = 0x19;
   response[13] = 0x34;
 
   response[14] = 0xFE;
@@ -222,7 +222,7 @@ void test_ackMessage(){
   XwayAddr sender = createXwayAddr( 0x0E, 1, 0);
   XwayAddr receiver = createXwayAddr(0x28, 1 , 0);
 
-  uint8_t extAddr[2] = {0x09, 0x34};
+  uint8_t extAddr[2] = {0x19, 0x34};
   ret = setNPDU(msg, NPDU_5WAY, sender, receiver, extAddr);
   assert(ret == 0);
 

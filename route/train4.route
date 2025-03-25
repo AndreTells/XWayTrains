@@ -1,0 +1,20 @@
+trainId 4
+resource lock 1
+plc switch 10
+plc switch 12
+plc switch 13
+plc switch 23
+plc switch 33
+plc rail 7
+plc rail 29
+plc invert 9
+plc switch 33
+plc switch 23
+plc switch 13
+plc switch 12
+plc switch 10
+plc rail 9
+plc rail 28
+plc rail 27
+plc invert 7
+resource release 1

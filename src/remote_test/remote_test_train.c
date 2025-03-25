@@ -1,3 +1,9 @@
+/*
+ * BUG: in the train 4's route the train does not invert at the end, maybe
+ * consider adding a pause command to the interpreter to wait for the train
+ * stop before attempting to invert
+ */
+#include <unistd.h>
 #include <signal.h>
 #include <assert.h>
 #include "plc/plc_proxy.h"
@@ -73,6 +79,7 @@ int main(int argc, char* argv[]){
   assert(train != NULL);
 
   int execRes = executeRoute(train, XWAY_HOST_STATION);
+  sleep(3);
 
   assert(execRes == 0);
 

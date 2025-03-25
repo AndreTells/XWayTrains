@@ -12,7 +12,7 @@
 #include "common/verbose.h"
 #include "plc/model_info.h"
 
-#define MAX_NUM_REGISTRABLE_TRAINS 4
+#define MAX_NUM_REGISTRABLE_TRAINS 6
 
 struct ResourceManagerProxy_t {
   pthread_t readerThreadTid;

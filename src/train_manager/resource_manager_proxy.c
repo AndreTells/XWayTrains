@@ -48,7 +48,14 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr,
   }
 
   resManager->sock_fd = tcpCreateSocketWrapper(false, NULL, port);
-  tcpConnectWrapper(resManager->sock_fd, resManagerIpAddr, port);
+  int connectRes = tcpConnectWrapper(resManager->sock_fd, resManagerIpAddr, port);
+
+  if(connectRes == -1){
+    verbose("[RESOURCE MANAGER PROXY]: Initializing ... " VERBOSE_KRED
+            "fail \n" VERBOSE_RESET);
+    free(resManager);
+    return NULL;
+  }
 
   resManager->finished = false;
 

@@ -63,7 +63,7 @@ int main(int argc, char* argv[]){
   int res;
 
   verbose("[PLC TEST CLIENT]: Configuring Message ... \n");
-  res = configWritePlcMessage(msg, TOGGLE_SWITCH, XWAY_HOST_STATION, (TrainId_e)train,(uint16_t) target);
+  res = configWritePlcMessage(msg, TOGGLE_RAIL, XWAY_HOST_STATION, (TrainId_e)train,(uint16_t) target);
   assert(res == 0);
 
   // attempting to send the message

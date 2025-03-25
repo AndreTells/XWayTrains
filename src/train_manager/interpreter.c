@@ -154,7 +154,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc, uint8_t XwayS
         break;
       }
 
-      PlcMessage_t* msg = NULL;
+      PlcMessage_t* msg = createPlcMessage();
       res = configWritePlcMessage(msg, plcMsgType, XwayStation, getTrainId(state),
                                   targetId);
 
@@ -235,7 +235,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc, uint8_t XwayS
 
       while (resIdStr) {
         int tmp = atoi(resIdStr);
-        if (!(tmp > 0 && tmp < (int)MAX_RESOURCE)) {
+        if (!(tmp > 0 && tmp <= (int)MAX_RESOURCE)) {
           res = -1;
           break;
         }

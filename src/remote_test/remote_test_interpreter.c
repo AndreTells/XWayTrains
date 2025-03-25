@@ -69,9 +69,50 @@ int main(int argc, char* argv[]){
   char cmd1[] = "trainId 1";
   assert(executeCommand(cmd1, train, plc, XWAY_HOST_STATION, resManager) == 0);
 
-  verbose("[INTERPRETER TEST] setting rail 22\n");
-  char cmd2[] = "plc rail 22";
-  assert(executeCommand(cmd2, train, plc, XWAY_HOST_STATION, resManager) == 0);
+  verbose("[INTERPRETER TEST] taking resource resource 0\n");
+  char cmdr1[] = "resource lock 3";
+  assert(executeCommand(cmdr1, train, plc, XWAY_HOST_STATION, resManager) == 0);
 
+  verbose("[INTERPRETER TEST] setting switch 31\n");
+  char cmds1[] = "plc switch 31";
+  assert(executeCommand(cmds1, train, plc, XWAY_HOST_STATION, resManager) == 0);
+
+  verbose("[INTERPRETER TEST] setting switch 31\n");
+  char cmds2[] = "plc switch 22";
+  assert(executeCommand(cmds2, train, plc, XWAY_HOST_STATION, resManager) == 0);
+
+  verbose("[INTERPRETER TEST] setting switch 31\n");
+  char cmds3[] = "plc switch 33";
+  assert(executeCommand(cmds3, train, plc, XWAY_HOST_STATION, resManager) == 0);
+
+  verbose("[INTERPRETER TEST] setting switch 31\n");
+  char cmds4[] = "plc switch 23";
+  assert(executeCommand(cmds4, train, plc, XWAY_HOST_STATION, resManager) == 0);
+
+  for(int i=0;i<3;i++){
+    verbose("[INTERPRETER TEST] setting rail 3\n");
+    char cmd2[] = "plc rail 3";
+    assert(executeCommand(cmd2, train, plc, XWAY_HOST_STATION, resManager) == 0);
+
+    verbose("[INTERPRETER TEST] setting rail 23\n");
+    char cmd3[] = "plc rail 23";
+    assert(executeCommand(cmd3, train, plc, XWAY_HOST_STATION, resManager) == 0);
+
+    verbose("[INTERPRETER TEST] setting rail 10\n");
+    char cmd4[] = "plc rail 10";
+    assert(executeCommand(cmd4, train, plc, XWAY_HOST_STATION, resManager) == 0);
+
+    verbose("[INTERPRETER TEST] setting rail 29\n");
+    char cmd5[] = "plc rail 29";
+    assert(executeCommand(cmd5, train, plc, XWAY_HOST_STATION, resManager) == 0);
+
+    verbose("[INTERPRETER TEST] setting rail 19\n");
+    char cmd6[] = "plc rail 19";
+    assert(executeCommand(cmd6, train, plc, XWAY_HOST_STATION, resManager) == 0);
+  }
+
+
+  endResourceManagerProxy(resManager);
+  endPlcProxy(plc);
   return 0;
 }

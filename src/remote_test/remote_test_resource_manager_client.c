@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 
   verbose("[RESOURCE MANAGER TEST CLIENT]: Requesting Ressource\n");
 
-  int reqResp = requestResource(resManager, LOCK_RESOURCE, resource, 0);
+  int reqResp = requestResource(resManager, LOCK_RESOURCE, (uint8_t)resource, 0);
   assert(reqResp == 0);
 
   verbose("[RESOURCE MANAGER TEST CLIENT]: Request Granted\n");

@@ -203,7 +203,7 @@ build/test/plc_proxy: $(TEST_SRC_DIR)/unit_test_plc_proxy.c \
 	$(CC) -g $(CFLAGS) $^ -o $@
 
 # --------------------------------------------------------------------- #
-# remote testing PLC                                                    #
+# remote testing                                                        #
 # --------------------------------------------------------------------- #
 
 build/remote_test/resource_manager_client: $(REMOTE_TEST_SRC_DIR)/remote_test_resource_manager_client.c \
@@ -218,6 +218,23 @@ build/remote_test/resource_manager_client: $(REMOTE_TEST_SRC_DIR)/remote_test_re
 	$(CC) -g $(CFLAGS) $^ -o $@
 
 build/remote_test/plc: $(REMOTE_TEST_SRC_DIR)/remote_test_plc.c \
+		$(PLC_MANAGER_SRC_DIR)/plc_proxy.c \
+		$(PLC_MANAGER_SRC_DIR)/plc_message.c \
+		$(PLC_MANAGER_SRC_DIR)/plc_facade.c \
+		$(PLC_MANAGER_SRC_DIR)/model_info.c \
+		$(COMMON_SRC_DIR)/comm_general.c \
+		$(COMMON_SRC_DIR)/time_out.c \
+		$(COMMON_SRC_DIR)/verbose.c \
+		$(COMMON_SRC_DIR)/flags.c
+
+	mkdir -p build/remote_test
+	$(CC) -g $(CFLAGS) $^ -o $@
+
+build/remote_test/interpreter: $(REMOTE_TEST_SRC_DIR)/remote_test_interpreter.c \
+		$(TRAIN_MANAGER_SRC_DIR)/interpreter.c \
+		$(TRAIN_MANAGER_SRC_DIR)/mock_train.c \
+		$(TRAIN_MANAGER_SRC_DIR)/resource_manager_proxy.c \
+		$(COMMON_SRC_DIR)/resource_request.c \
 		$(PLC_MANAGER_SRC_DIR)/plc_proxy.c \
 		$(PLC_MANAGER_SRC_DIR)/plc_message.c \
 		$(PLC_MANAGER_SRC_DIR)/plc_facade.c \

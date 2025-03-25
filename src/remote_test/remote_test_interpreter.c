@@ -1,6 +1,8 @@
+#include <signal.h>
 #include <assert.h>
 #include "plc/plc_proxy.h"
 #include "train_manager/train.h"
+#include "train_manager/interpreter.h"
 #include "train_manager/resource_manager_proxy.h"
 #include "common/flags.h"
 #include "common/verbose.h"
@@ -53,12 +55,6 @@ int main(int argc, char* argv[]){
 
   verbose("[INTERPRETER TEST] connecting to plc\n");
   plc = initPlcProxy(HOST_IP, PLC_REMOTE_IP, PLC_PORT);
-
-  uint8_t pc_station = 0x28;
-  uint8_t plc_station = 0x0E;
-
-  uint8_t network = 1;
-  uint8_t port = 0;
   int netRes = setXwayAddrs(plc ,  XWAY_HOST_STATION, XWAY_REMOTE_STATION,
                             XWAY_NETWORK, XWAY_PORT);
 

@@ -42,7 +42,7 @@ CFLAGS += -g
 # --------------------------------------------------------------------- #
 LDFLAGS = -lrt
 
-all: format_code static_analyser test
+all: format_code static_analyser build test
 
 
 format_code:
@@ -59,7 +59,7 @@ format_code:
 static_analyser:
 # 	clang-tidy src/* -- -std=c11 -I include
 
-test: clean \
+test: \
 		build/test/remote build/test/resource_database\
 		build/test/resource_manager_proxy \
 		build/test/request_queue \
@@ -90,6 +90,7 @@ test: clean \
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/comm -s
 	@printf "\nDone unit testing\n"
 
+build: build/remote_test/train
 
 build/test/remote: $(RTEST_SRC_DIR)/main.c \
 					$(RTEST_SRC_DIR)/comm.c \

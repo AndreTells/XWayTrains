@@ -5,15 +5,28 @@
 #ifndef TRAIN_H_
 #define TRAIN_H_
 #include <pthread.h>
+#include <stdio.h>
 
 #include "plc/model_info.h"
 #include "plc/plc_proxy.h"
 #include "train_manager/resource_manager_proxy.h"
 
 /**
+ * @typedef Path_t
+ * @brief Represents a file handle for reading command paths.
+ */
+typedef FILE* Path_t;
+
+struct Train_t {
+  enum TrainId_e trainId;
+  PlcProxy_t* plc;
+  ResourceManagerProxy_t* resManager;
+  Path_t path;
+};
+
+/**
  * @brief Opaque handle for the Train instance
  * @details Encapsulates all train-related state and functionality.
- *          Implementation details are hidden in the corresponding .c file.
  */
 typedef struct Train_t Train_t;
 

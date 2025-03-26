@@ -6,7 +6,6 @@
 
 #include "common/comm_general.h"
 #include "common/verbose.h"
-#include "plc/model_info.h"
 #include "plc/plc_facade.h"
 #include "plc/plc_message.h"
 #include "train_manager/train.h"

@@ -7,15 +7,8 @@
  */
 #ifndef INTERPRETER_H_
 #define INTERPRETER_H_
-#include <stdio.h>
 
 #include "train_manager/train.h"
-
-/**
- * @typedef Path_t
- * @brief Represents a file handle for reading command paths.
- */
-typedef FILE* Path_t;
 
 /**
  * @enum InterpreterCommandType_e

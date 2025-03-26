@@ -33,7 +33,7 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr,
   verbose("[RESOURCE MANAGER PROXY]: Initializing ... \n");
   if (resManagerIpAddr == NULL) {
     verbose("[RESOURCE MANAGER PROXY]: Initializing ... " VERBOSE_KRED
-            "fail \n" VERBOSE_RESET);
+            "fail: invalid IP address \n" VERBOSE_RESET);
     return NULL;
   }
 
@@ -43,7 +43,7 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr,
   // check if malloc failed
   if (resManager == NULL) {
     verbose("[RESOURCE MANAGER PROXY]: Initializing ... " VERBOSE_KRED
-            "fail \n" VERBOSE_RESET);
+            "fail: malloc \n" VERBOSE_RESET);
     return NULL;
   }
 
@@ -53,7 +53,7 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr,
 
   if (connectRes == -1) {
     verbose("[RESOURCE MANAGER PROXY]: Initializing ... " VERBOSE_KRED
-            "fail \n" VERBOSE_RESET);
+            "fail: tcpConnectWrapper \n" VERBOSE_RESET);
     free(resManager);
     return NULL;
   }
@@ -70,7 +70,7 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr,
   // check if sem_init failed
   if (resSemInit != 0) {
     verbose("[RESOURCE MANAGER PROXY]: Initializing ... " VERBOSE_KRED
-            "fail \n" VERBOSE_RESET);
+            "fail: sem_init \n" VERBOSE_RESET);
     free(resManager);
     return NULL;
   }
@@ -84,9 +84,9 @@ ResourceManagerProxy_t* initResourceManagerProxy(char* resManagerIpAddr,
   if (resPthreadCreate != 0) {
     verbose(
         "[RESOURCE MANAGER PROXY]: Initializing Reader Thread ... " VERBOSE_KRED
-        "fail \n" VERBOSE_RESET);
+        "fail: pthread create \n" VERBOSE_RESET);
     verbose("[RESOURCE MANAGER PROXY]: Initializing ... " VERBOSE_KRED
-            "fail \n" VERBOSE_RESET);
+            "fail: pthread create \n" VERBOSE_RESET);
     free(resManager);
     return NULL;
   }

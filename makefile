@@ -90,7 +90,8 @@ test: \
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/comm -s
 	@printf "\nDone unit testing\n"
 
-build: build/remote_test/train
+build: build/remote_test/train \
+	build/train_manager
 
 build/test/remote: $(RTEST_SRC_DIR)/main.c \
 					$(RTEST_SRC_DIR)/comm.c \
@@ -281,6 +282,25 @@ build/resource_manager: $(RESOURCE_MANAGER_SRC_DIR)/resource_manager_main.c \
 						$(COMMON_SRC_DIR)/flags.c
 	mkdir -p build
 	$(CC) -g $(CFLAGS) $^ -o $@
+
+build/train_manager: $(TRAIN_MANAGER_SRC_DIR)/train_manager.c \
+			$(TRAIN_MANAGER_SRC_DIR)/interpreter.c \
+			$(TRAIN_MANAGER_SRC_DIR)/train.c \
+			$(TRAIN_MANAGER_SRC_DIR)/resource_manager_proxy.c \
+			\
+			$(COMMON_SRC_DIR)/comm_general.c \
+			$(COMMON_SRC_DIR)/verbose.c \
+			$(COMMON_SRC_DIR)/resource_request.c \
+			$(COMMON_SRC_DIR)/time_out.c \
+			$(COMMON_SRC_DIR)/flags.c \
+			\
+			$(PLC_MANAGER_SRC_DIR)/plc_proxy.c \
+			$(PLC_MANAGER_SRC_DIR)/plc_message.c \
+			$(PLC_MANAGER_SRC_DIR)/plc_facade.c \
+			$(PLC_MANAGER_SRC_DIR)/model_info.c
+	mkdir -p build
+	$(CC) -g $(CFLAGS) $^ -o $@
+
 
 clean:
 	rm -fr build/* vgcore.*

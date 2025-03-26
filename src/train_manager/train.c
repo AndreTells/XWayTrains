@@ -11,13 +11,6 @@
 #include "train_manager/interpreter.h"
 #include "train_manager/resource_manager_proxy.h"
 
-struct Train_t {
-  enum TrainId_e trainId;
-  PlcProxy_t* plc;
-  ResourceManagerProxy_t* resManager;
-  Path_t path;
-};
-
 Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
                    char* routeFilePath) {
   verbose("[Train]: initialisation ... \n");

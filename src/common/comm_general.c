@@ -4,17 +4,22 @@
 #include <errno.h>
 #include <netinet/in.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+
+#include "common/verbose.h"
 
 #define MAX_BACKLOG 10
 
 int tcpCreateSocketWrapper(bool server, char* ipAddress, const uint16_t port) {
   // Create TCP socket:
   int socketFd = socket(AF_INET, SOCK_STREAM, 0);
+  verbose("[tcpCreateSocketWrapper] Creating socket %d...\n", socketFd);
 
   if (socketFd < 0) {
+    perror("[tcpCreateSocketWrapper]: socket \n");
     return socketFd;
   }
 
@@ -25,6 +30,7 @@ int tcpCreateSocketWrapper(bool server, char* ipAddress, const uint16_t port) {
 
   // invalid information for the server
   if (ipAddress == 0) {
+    verbose("[tcpCreateSocketWrapper]: " VERBOSE_KRED "fail: invalid IP \n");
     return -1;
   }
 
@@ -38,6 +44,7 @@ int tcpCreateSocketWrapper(bool server, char* ipAddress, const uint16_t port) {
   // Bind to the set port and IP:
   int bindRes = bind(socketFd, (struct sockaddr*)&addr, sizeof(addr));
   if (bindRes < 0) {
+    perror("[tcpCreateSocketWrapper]: fail bind");
     return -1;
   }
 
@@ -56,7 +63,9 @@ int tcpConnectWrapper(int sockFd, char* ipAddress, const uint16_t port) {
   addr.sin_addr.s_addr = inet_addr(ipAddress);
 
   int resConnect = connect(sockFd, (struct sockaddr*)&addr, sizeof(addr));
-
+  if (resConnect == -1) {
+    perror("[tcpConnectWrapper]: ");
+  }
   return resConnect;
 }
 

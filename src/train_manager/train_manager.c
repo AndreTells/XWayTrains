@@ -1,15 +1,132 @@
-#include "train_manager/interpreter.h"
+#include <assert.h>
+#include <signal.h>
+#include <unistd.h>
+
+#include "common/comm_general.h"
+#include "common/flags.h"
+#include "common/verbose.h"
+#include "plc/model_info.h"
 #include "train_manager/train.h"
+
+#define HOST_IP "172.31.71.25"
+
+#define RES_MANAGER_REMOTE_IP "127.0.0.1"
+#define RES_MANAGER_PORT 8080
+
+#define PLC_REMOTE_IP "10.31.125.14"
+#define PLC_PORT 502
+#define XWAY_HOST_STATION 0x28
+#define XWAY_REMOTE_STATION 0x0E
+#define XWAY_NETWORK 1
+#define XWAY_PORT 0
+
+PlcProxy_t* plc = NULL;
+
+ResourceManagerProxy_t* resManager = NULL;
+
+void handle_sigint(int sig) {
+  if (sig != SIGINT) {
+    return;
+  }
+  verbose("\n[INTERPRETER TEST]: Ctrl-C Captured. Exiting Program \n");
+
+  if (resManager != NULL) {
+    (void)endResourceManagerProxy(resManager);
+  }
+
+  if (plc != NULL) {
+    (void)endPlcProxy(plc);
+  }
+
+  exit(0);
+}
+
+TrainId_e str_to_train_id(const char* id_str) {
+  uint16_t id;
+  if (str_to_uint16(id_str, &id) == -1) {
+    verbose("[str_to_train_id] " VERBOSE_KRED
+            "Fail: Train id out of uint16_t range \n" VERBOSE_RESET);
+    exit(EXIT_FAILURE);
+  }
+
+  switch (id) {
+    case TRAIN_1:
+    case TRAIN_2:
+    case TRAIN_3:
+    case TRAIN_4:
+      return id;
+    default:
+      verbose("[str_to_train_id] " VERBOSE_KRED "Fail: Invalid Train Id \n");
+      exit(EXIT_FAILURE);
+  }
+}
 
 void trainManagerThread() {}
 
-int main(int argc, char **argv) {
-  // create 2 threads
-  struct Train_t train1;
-  train1.trainId = 1;
-  train1.plc;
-  train1.resManager;
-  train1.path = initPath("route/train1.route");
+int main(const int argc, char** argv) {
+  signal(SIGINT, handle_sigint);
 
+  // checking for flags
+  bool verbose_mode = get_flag_value(argc, argv, VERBOSE_FLAG, NULL);
+  setVerbose(verbose_mode);
+
+  char* routeFilePath1;
+  if (!get_flag_value(argc, argv, "--route1", &routeFilePath1)) {
+    verbose("[Train Manager] no route1 specified\n");
+    exit(EXIT_FAILURE);
+  }
+  verbose("[Train Manager]: using route1 %s \n", routeFilePath1);
+
+  char* routeFilePath2;
+  if (!get_flag_value(argc, argv, "--route2", &routeFilePath2)) {
+    verbose("[Train Manager] no route2 specified\n");
+    exit(EXIT_FAILURE);
+  }
+  verbose("[Train Manager]: using route2 %s \n", routeFilePath2);
+
+  char* trainIdStr1;
+  if (!get_flag_value(argc, argv, "--train1", &trainIdStr1)) {
+    verbose("[Train Manager] no train1 specified\n");
+    exit(EXIT_FAILURE);
+  }
+  const TrainId_e trainId1 = str_to_train_id(trainIdStr1);
+  verbose("[Train Manager]: using train1 %d \n", trainId1);
+
+  char* trainIdStr2;
+  if (!get_flag_value(argc, argv, "--train2", &trainIdStr2)) {
+    verbose("[Train Manager] no train2 specified\n");
+    exit(EXIT_FAILURE);
+  }
+  const TrainId_e trainId2 = str_to_train_id(trainIdStr1);
+  verbose("[Train Manager]: using train2 %d \n", trainId2);
+
+  // create 2 threads
+  // TODO thread
+  verbose("[Train Test] connecting to ressource manager\n");
+  resManager =
+      initResourceManagerProxy(RES_MANAGER_REMOTE_IP, RES_MANAGER_PORT);
+  assert(resManager != NULL);
+
+  verbose("[Train Test] connecting to plc\n");
+  plc = initPlcProxy(HOST_IP, PLC_REMOTE_IP, PLC_PORT);
+  int netRes = setXwayAddrs(plc, XWAY_HOST_STATION, XWAY_REMOTE_STATION,
+                            XWAY_NETWORK, XWAY_PORT);
+
+  assert(plc != NULL);
+  assert(netRes == 0);
+
+  Train_t* train = initTrain(plc, resManager, routeFilePath1);
+  assert(train != NULL);
+
+  int execRes = executeRoute(train, XWAY_HOST_STATION);
+  sleep(3);
+
+  assert(execRes == 0);
+
+  endTrain(train);
+  endResourceManagerProxy(resManager);
+  endPlcProxy(plc);
   return 0;
+
+  exit(EXIT_SUCCESS);
 }

@@ -8,12 +8,6 @@
 #include "train_manager/resource_manager_proxy.h"
 #include "train_manager/train.h"
 
-struct Train_t {
-  enum TrainId_e trainId;
-  PlcProxy_t* plc;
-  ResourceManagerProxy_t* resManager;
-};
-
 Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
                    [[maybe_unused]] char* routeFilePath) {
   // accounting for invalid inputs

@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <bits/pthreadtypes.h>
 #include <signal.h>
 #include <unistd.h>
 
@@ -61,7 +62,27 @@ TrainId_e str_to_train_id(const char* id_str) {
   }
 }
 
-void trainManagerThread() {}
+/**
+ * @brief Entry point for the train thread
+ * @param[in] data Pointer to the Train_t instance
+ * @return Thread exit status (always NULL)
+ */
+void * trainThread(char* routeFilePath) {
+  verbose("[TrainThread][%s] Initializing ... \n", routeFilePath);
+  Train_t* train = initTrain(plc, resManager, routeFilePath);
+  assert(train != NULL);
+
+  int execRes = executeRoute(train, XWAY_HOST_STATION);
+  sleep(3);
+
+  assert(execRes == 0);
+
+  endTrain(train);
+  endResourceManagerProxy(resManager);
+  endPlcProxy(plc);
+
+  return NULL;
+}
 
 int main(const int argc, char** argv) {
   signal(SIGINT, handle_sigint);
@@ -100,8 +121,6 @@ int main(const int argc, char** argv) {
   const TrainId_e trainId2 = str_to_train_id(trainIdStr1);
   verbose("[Train Manager]: using train2 %d \n", trainId2);
 
-  // create 2 threads
-  // TODO thread
   verbose("[Train Test] connecting to ressource manager\n");
   resManager =
       initResourceManagerProxy(RES_MANAGER_REMOTE_IP, RES_MANAGER_PORT);
@@ -115,17 +134,18 @@ int main(const int argc, char** argv) {
   assert(plc != NULL);
   assert(netRes == 0);
 
-  Train_t* train = initTrain(plc, resManager, routeFilePath1);
-  assert(train != NULL);
+  // create 2 threads
+  // TODO thread
+  pthread_t thread1;
+  pthread_t thread2;
 
-  int execRes = executeRoute(train, XWAY_HOST_STATION);
-  sleep(3);
+  pthread_create(&thread1, NULL, (void*(*)(void*))trainThread, routeFilePath1);
+  pthread_create(&thread2, NULL, (void*(*)(void*))trainThread, routeFilePath2);
 
-  assert(execRes == 0);
+  // wait for threads to end, even if they should be infinite loops
+  pthread_join(thread1, NULL);
+  pthread_join(thread2, NULL);
 
-  endTrain(train);
-  endResourceManagerProxy(resManager);
-  endPlcProxy(plc);
   return 0;
 
   exit(EXIT_SUCCESS);

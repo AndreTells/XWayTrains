@@ -45,7 +45,7 @@ int endPlcProxy(PlcProxy_t* plc) {
 }
 
 ssize_t sendMessagePlcProxy([[maybe_unused]] PlcProxy_t* plc,
-                        [[maybe_unused]] PlcMessage_t* msg) {
+                            [[maybe_unused]] PlcMessage_t* msg) {
   return 0;
 }
 
@@ -54,9 +54,10 @@ PlcMessage_t* readMessagePlcProxy([[maybe_unused]] PlcProxy_t* plc,
   return createPlcMessage();
 }
 
-int setXwayAddrs([[maybe_unused]] PlcProxy_t* plc,[[maybe_unused]] uint8_t
-                 host_station,[[maybe_unused]] uint8_t
-                 remote_station,[[maybe_unused]] uint8_t network,
+int setXwayAddrs([[maybe_unused]] PlcProxy_t* plc,
+                 [[maybe_unused]] uint8_t host_station,
+                 [[maybe_unused]] uint8_t remote_station,
+                 [[maybe_unused]] uint8_t network,
                  [[maybe_unused]] uint8_t port) {
   return 0;
 }

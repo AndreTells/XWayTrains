@@ -57,8 +57,8 @@ char* readPathLine(Path_t path) {
 
 const char separator[] = " ";
 
-int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc, uint8_t XwayStation,
-                   ResourceManagerProxy_t* resManager) {
+int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
+                   uint8_t XwayStation, ResourceManagerProxy_t* resManager) {
   verbose("[Interpreter]: Executing Command ... \n");
   if (cmdLine == NULL || state == NULL || plc == NULL || resManager == NULL) {
     verbose("[Interpreter]: Executing Command ... " VERBOSE_KRED
@@ -155,8 +155,8 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc, uint8_t XwayS
       }
 
       PlcMessage_t* msg = createPlcMessage();
-      res = configWritePlcMessage(msg, plcMsgType, XwayStation, getTrainId(state),
-                                  targetId);
+      res = configWritePlcMessage(msg, plcMsgType, XwayStation,
+                                  getTrainId(state), targetId);
 
       if (res == -1) {
         verbose("[Interpreter]: Contacting the PLC ... " VERBOSE_KRED
@@ -165,7 +165,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc, uint8_t XwayS
         break;
       }
 
-      ssize_t sentMsgSize= sendMessagePlcProxy(plc, msg);
+      ssize_t sentMsgSize = sendMessagePlcProxy(plc, msg);
 
       if (sentMsgSize == -1) {
         verbose("[Interpreter]: Contacting the PLC ... " VERBOSE_KRED

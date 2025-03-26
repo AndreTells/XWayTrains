@@ -8,9 +8,10 @@
 #ifndef PLC_PROXY_H_
 #define PLC_PROXY_H_
 
+#include <stdint.h>
+
 #include "plc/model_info.h"
 #include "plc/plc_message.h"
-#include <stdint.h>
 
 /**
  * @brief Opaque handle for the PLC Proxy instance

@@ -1,14 +1,15 @@
+#include "train_manager/train.h"
+
 #include <pthread.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "common/verbose.h"
 #include "plc/model_info.h"
 #include "plc/plc_proxy.h"
 #include "train_manager/interpreter.h"
 #include "train_manager/resource_manager_proxy.h"
-#include "train_manager/train.h"
-#include "common/verbose.h"
 
 struct Train_t {
   enum TrainId_e trainId;
@@ -19,7 +20,7 @@ struct Train_t {
 
 Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
                    char* routeFilePath) {
-  verbose("[Train]: initialisation ... \n" );
+  verbose("[Train]: initialisation ... \n");
   // accounting for invalid inputs
   if (plc == NULL || resManager == NULL) {
     return NULL;
@@ -32,9 +33,9 @@ Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
   train->plc = plc;
   train->resManager = resManager;
 
-  verbose("[Train]: Opening route file ... \n" );
+  verbose("[Train]: Opening route file ... \n");
   train->path = initPath(routeFilePath);
-  if(train->path == NULL){
+  if (train->path == NULL) {
     verbose("[Train]: Opening route file ... " VERBOSE_KRED
             "fail \n" VERBOSE_RESET);
 
@@ -65,22 +66,23 @@ int setTrainId(Train_t* train, int id) {
 
 enum TrainId_e getTrainId(Train_t* train) { return train->trainId; }
 
-int executeRoute(Train_t* train, uint8_t station){
-  verbose("[Train]: Executing Train route ... \n" );
+int executeRoute(Train_t* train, uint8_t station) {
+  verbose("[Train]: Executing Train route ... \n");
 
   // read a line
-  while(true){
-    verbose("[Train]: reading a new line ... \n" );
+  while (true) {
+    verbose("[Train]: reading a new line ... \n");
     char* cmd = readPathLine(train->path);
-    if(cmd == NULL){
+    if (cmd == NULL) {
       break;
     }
 
-    verbose("[Train]: Executing command ... \n" );
-    int execRes = executeCommand(cmd, train, train->plc, station, train->resManager);
-    if(execRes != 0){
+    verbose("[Train]: Executing command ... \n");
+    int execRes =
+        executeCommand(cmd, train, train->plc, station, train->resManager);
+    if (execRes != 0) {
       verbose("[Train]: Executing command ... \n" VERBOSE_KRED
-            "fail \n" VERBOSE_RESET);
+              "fail \n" VERBOSE_RESET);
 
       return -1;
     }

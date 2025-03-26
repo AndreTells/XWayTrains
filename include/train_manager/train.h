@@ -55,6 +55,5 @@ int setTrainId(Train_t* train, int id);
  */
 enum TrainId_e getTrainId(Train_t* train);
 
-
 int executeRoute(Train_t* train, uint8_t station);
 #endif  // TRAIN_H_

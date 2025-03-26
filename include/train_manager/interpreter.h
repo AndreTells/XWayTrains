@@ -57,8 +57,8 @@ char* readPathLine(Path_t path);
  * @param resManager Pointer to the resource manager proxy.
  * @return int Status code (0 on success, non-zero error code on failure).
  */
-int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc, uint8_t XwayStation,
-                   ResourceManagerProxy_t* resManager);
+int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
+                   uint8_t XwayStation, ResourceManagerProxy_t* resManager);
 /**
  * @brief Initializes a file path for reading commands.
  *

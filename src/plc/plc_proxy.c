@@ -1,15 +1,15 @@
 #include "plc/plc_proxy.h"
 
+#include <errno.h>
 #include <pthread.h>
-#include <string.h>
 #include <semaphore.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
-#include <errno.h>
 
 #include "common/comm_general.h"
 #include "common/time_out.h"
@@ -33,7 +33,7 @@ struct PlcProxy_t {
 
 PlcMessage_t* tryGetPlcMessage(int fd);
 
-void print_data_hex(const uint8_t *data);
+void print_data_hex(const uint8_t* data);
 
 int sendPlcMessageToFd(PlcMessage_t* msg, int fd);
 
@@ -72,7 +72,6 @@ PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr,
 
   plcProxy->sock_fd = tcpCreateSocketWrapper(false, hostIpAddr, port);
 
-
   if (plcProxy->sock_fd == -1) {
     free(plcProxy);
     verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED
@@ -92,10 +91,10 @@ PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr,
   plcProxy->finished = false;
   // initialising addrs with 0
   plcProxy->XwayNetworkingSet = false;
-  plcProxy->hostXwayAddr = createXwayAddr(0,0,0);
-  plcProxy->remoteXwayAddr = createXwayAddr(0,0,0);
-  uint8_t zeroExt[2] = {0,0};
-  memcpy(plcProxy->extAddr,zeroExt, 2);
+  plcProxy->hostXwayAddr = createXwayAddr(0, 0, 0);
+  plcProxy->remoteXwayAddr = createXwayAddr(0, 0, 0);
+  uint8_t zeroExt[2] = {0, 0};
+  memcpy(plcProxy->extAddr, zeroExt, 2);
 
   // Initialize the output file descriptors to -1 (invalid)
   for (int i = 0; i < MAX_NUM_REGISTRABLE_TRAINS; i++) {
@@ -165,15 +164,16 @@ int endPlcProxy(PlcProxy_t* plc) {
 }
 
 ssize_t sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
-  if(!plc->XwayNetworkingSet){
+  if (!plc->XwayNetworkingSet) {
     return -1;
   }
 
   verbose("[PLC PROXY]:attempting to send message to plc\n");
   // configuring the networking aspect
-  int res = setNPDU(msg, NPDU_5WAY, plc->hostXwayAddr, plc->remoteXwayAddr, plc->extAddr);
+  int res = setNPDU(msg, NPDU_5WAY, plc->hostXwayAddr, plc->remoteXwayAddr,
+                    plc->extAddr);
 
-  if(res < 0){
+  if (res < 0) {
     return res;
   }
 
@@ -181,7 +181,7 @@ ssize_t sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
 
   int sendRes = sendPlcMessageToFd(msg, plc->sock_fd);
 
-  if(sendRes < 0){
+  if (sendRes < 0) {
     verbose("failed with errno %d \n", errno);
   }
 
@@ -195,9 +195,9 @@ PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, enum TrainId_e clientId) {
     return NULL;
   }
   PlcMessage_t* msg;
-  while(!plc->finished){
-     msg = tryGetPlcMessage(plc->outputFd[clientId][0]);
-    if(msg != NULL){
+  while (!plc->finished) {
+    msg = tryGetPlcMessage(plc->outputFd[clientId][0]);
+    if (msg != NULL) {
       break;
     }
   }
@@ -214,7 +214,7 @@ PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, enum TrainId_e clientId) {
 
   int sendRes = sendPlcMessageToFd(ack, plc->sock_fd);
 
-  if(sendRes < 0){
+  if (sendRes < 0) {
     verbose("failed with errno %d \n", errno);
   }
 
@@ -235,7 +235,6 @@ void* plcProxyMsgReceiverThread(void* plcProxy) {
 
   verbose("[PLC PROXY]: Receiver thread initialized \n");
   while (!plc->finished) {
-
     PlcMessage_t* msg = tryGetPlcMessage(plc->sock_fd);
 
     // if failed to get a msg, retry
@@ -304,15 +303,14 @@ PlcMessage_t* tryGetPlcMessage(int fd) {
 }
 
 int setXwayAddrs(PlcProxy_t* plc, uint8_t host_station, uint8_t remote_station,
-                 uint8_t network, uint8_t port){
-
+                 uint8_t network, uint8_t port) {
   // check if it was already set
-  if(plc->XwayNetworkingSet){
+  if (plc->XwayNetworkingSet) {
     return -1;
   }
   plc->hostXwayAddr = createXwayAddr(host_station, network, port);
   plc->remoteXwayAddr = createXwayAddr(remote_station, network, port);
-  plc->extAddr[0] = (uint8_t) SEND_CODE;
+  plc->extAddr[0] = (uint8_t)SEND_CODE;
   plc->extAddr[1] = 0x10;
 
   plc->XwayNetworkingSet = true;
@@ -332,7 +330,7 @@ int sendPlcMessageToFd(PlcMessage_t* msg, int fd) {
   return writeRes;
 }
 
-void print_data_hex(const uint8_t *data) {
+void print_data_hex(const uint8_t* data) {
   verbose("\tData (HEX): ");
   int len = data[5] + 6;
   for (int i = 0; i < len; i++) {

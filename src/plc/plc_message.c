@@ -49,20 +49,17 @@ PlcMessage_t* createACK(PlcMessage_t* msg, bool res) {
   // supposes f1 address
   PlcMessage_t* ack = createPlcMessage();
 
-
-  if(res){
+  if (res) {
     setAPDU(ack, APDU_WRITE_RESP, NULL, 0);
-  }
-  else{
+  } else {
     setAPDU(ack, APDU_ERR, NULL, 0);
   }
 
   uint8_t ext[2];
-  ext[0] = (uint8_t) RECEIVER_CODE;
+  ext[0] = (uint8_t)RECEIVER_CODE;
   ext[1] = msg->npdu.extendedAddr[1];
 
-  setNPDU(ack, msg->npdu.type, msg->npdu.receiver, msg->npdu.sender,
-          ext);
+  setNPDU(ack, msg->npdu.type, msg->npdu.receiver, msg->npdu.sender, ext);
 
   return ack;
 }
@@ -155,7 +152,7 @@ size_t serializePlcMessage(PlcMessage_t* msg, uint8_t* serMsg) {
     serMsg += apdu->dataLen;
   }
 
-  return sizeof(uint8_t) * (size_t)(serMsg - initSerMsg );
+  return sizeof(uint8_t) * (size_t)(serMsg - initSerMsg);
 }
 
 // returns the msg
@@ -224,6 +221,4 @@ uint8_t* getPlcMessageData(PlcMessage_t* msg) {
   return apdu->data;
 }
 
-uint8_t* getPlcExtAddr(PlcMessage_t* msg){
-  return msg->npdu.extendedAddr;
-}
+uint8_t* getPlcExtAddr(PlcMessage_t* msg) { return msg->npdu.extendedAddr; }

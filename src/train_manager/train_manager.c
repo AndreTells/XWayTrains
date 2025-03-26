@@ -29,7 +29,7 @@ void handle_sigint(int sig) {
   if (sig != SIGINT) {
     return;
   }
-  verbose("\n[INTERPRETER TEST]: Ctrl-C Captured. Exiting Program \n");
+  verbose("\n[TRAIN MANAGER]: Ctrl-C Captured. Exiting Program \n");
 
   if (resManager != NULL) {
     (void)endResourceManagerProxy(resManager);
@@ -42,36 +42,23 @@ void handle_sigint(int sig) {
   exit(0);
 }
 
-TrainId_e str_to_train_id(const char* id_str) {
-  uint16_t id;
-  if (str_to_uint16(id_str, &id) == -1) {
-    verbose("[str_to_train_id] " VERBOSE_KRED
-            "Fail: Train id out of uint16_t range \n" VERBOSE_RESET);
-    exit(EXIT_FAILURE);
-  }
-
-  switch (id) {
-    case TRAIN_1:
-    case TRAIN_2:
-    case TRAIN_3:
-    case TRAIN_4:
-      return id;
-    default:
-      verbose("[str_to_train_id] " VERBOSE_KRED "Fail: Invalid Train Id \n");
-      exit(EXIT_FAILURE);
-  }
-}
+struct train_thread_attr{
+  char * routeFilePath;
+  int id;
+};
 
 /**
  * @brief Entry point for the train thread
  * @param[in] data Pointer to the Train_t instance
  * @return Thread exit status (always NULL)
  */
-void * trainThread(char* routeFilePath) {
-  verbose("[TrainThread][%s] Initializing ... \n", routeFilePath);
-  Train_t* train = initTrain(plc, resManager, routeFilePath);
+void * trainThread(struct train_thread_attr* attr) {
+  verbose("[TrainThread][%s][%d] Initializing ... \n", attr->routeFilePath, attr->id);
+  Train_t* train = initTrain(plc, resManager, attr->routeFilePath);
   assert(train != NULL);
 
+  // TODO set Train IDs
+  setTrainId(train, attr->id);
   int execRes = executeRoute(train, XWAY_HOST_STATION);
   sleep(3);
 
@@ -110,7 +97,7 @@ int main(const int argc, char** argv) {
     verbose("[Train Manager] no train1 specified\n");
     exit(EXIT_FAILURE);
   }
-  const TrainId_e trainId1 = str_to_train_id(trainIdStr1);
+  const int trainId1 = atoi(trainIdStr1);
   verbose("[Train Manager]: using train1 %d \n", trainId1);
 
   char* trainIdStr2;
@@ -118,15 +105,15 @@ int main(const int argc, char** argv) {
     verbose("[Train Manager] no train2 specified\n");
     exit(EXIT_FAILURE);
   }
-  const TrainId_e trainId2 = str_to_train_id(trainIdStr1);
+  const int trainId2 = atoi(trainIdStr2);
   verbose("[Train Manager]: using train2 %d \n", trainId2);
 
-  verbose("[Train Test] connecting to ressource manager\n");
+  verbose("[Train Manager] connecting to ressource manager\n");
   resManager =
       initResourceManagerProxy(RES_MANAGER_REMOTE_IP, RES_MANAGER_PORT);
   assert(resManager != NULL);
 
-  verbose("[Train Test] connecting to plc\n");
+  verbose("[Train Manager] connecting to plc\n");
   plc = initPlcProxy(HOST_IP, PLC_REMOTE_IP, PLC_PORT);
   int netRes = setXwayAddrs(plc, XWAY_HOST_STATION, XWAY_REMOTE_STATION,
                             XWAY_NETWORK, XWAY_PORT);
@@ -135,12 +122,19 @@ int main(const int argc, char** argv) {
   assert(netRes == 0);
 
   // create 2 threads
-  // TODO thread
   pthread_t thread1;
   pthread_t thread2;
 
-  pthread_create(&thread1, NULL, (void*(*)(void*))trainThread, routeFilePath1);
-  pthread_create(&thread2, NULL, (void*(*)(void*))trainThread, routeFilePath2);
+  struct train_thread_attr attr1;
+  attr1.routeFilePath = routeFilePath1;
+  attr1.id = trainId1;
+
+  struct train_thread_attr attr2;
+  attr2.routeFilePath = routeFilePath2;
+  attr2.id = trainId2;
+
+  pthread_create(&thread1, NULL, (void*(*)(void*))trainThread, &attr1);
+  pthread_create(&thread2, NULL, (void*(*)(void*))trainThread, &attr2);
 
   // wait for threads to end, even if they should be infinite loops
   pthread_join(thread1, NULL);

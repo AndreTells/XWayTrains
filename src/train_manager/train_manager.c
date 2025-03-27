@@ -42,8 +42,8 @@ void handle_sigint(int sig) {
   exit(0);
 }
 
-struct train_thread_attr{
-  char * routeFilePath;
+struct train_thread_attr {
+  char* routeFilePath;
   int id;
 };
 
@@ -52,8 +52,9 @@ struct train_thread_attr{
  * @param[in] data Pointer to the Train_t instance
  * @return Thread exit status (always NULL)
  */
-void * trainThread(struct train_thread_attr* attr) {
-  verbose("[TrainThread][%s][%d] Initializing ... \n", attr->routeFilePath, attr->id);
+void* trainThread(struct train_thread_attr* attr) {
+  verbose("[TrainThread][%s][%d] Initializing ... \n", attr->routeFilePath,
+          attr->id);
   Train_t* train = initTrain(plc, resManager, attr->routeFilePath);
   assert(train != NULL);
 
@@ -133,8 +134,8 @@ int main(const int argc, char** argv) {
   attr2.routeFilePath = routeFilePath2;
   attr2.id = trainId2;
 
-  pthread_create(&thread1, NULL, (void*(*)(void*))trainThread, &attr1);
-  pthread_create(&thread2, NULL, (void*(*)(void*))trainThread, &attr2);
+  pthread_create(&thread1, NULL, (void* (*)(void*))trainThread, &attr1);
+  pthread_create(&thread2, NULL, (void* (*)(void*))trainThread, &attr2);
 
   // wait for threads to end, even if they should be infinite loops
   pthread_join(thread1, NULL);

@@ -115,8 +115,8 @@ int main(const int argc, char** argv) {
   attr2.routeFilePath = routeFilePath2;
   attr2.station = XWAY_HOST_STATION2;
 
-  pthread_create(&thread1, NULL, (void*(*)(void*))trainThread, &attr1);
-  pthread_create(&thread2, NULL, (void*(*)(void*))trainThread, &attr2);
+  pthread_create(&thread1, NULL, (void* (*)(void*))trainThread, &attr1);
+  pthread_create(&thread2, NULL, (void* (*)(void*))trainThread, &attr2);
 
   // wait for threads to end, even if they should be infinite loops
   pthread_join(thread1, NULL);

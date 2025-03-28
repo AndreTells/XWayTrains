@@ -55,64 +55,61 @@ int main(int argc, char* argv[]) {
   assert(resManager != NULL);
 
   verbose("[INTERPRETER TEST] connecting to plc\n");
-  plc = initPlcProxy(HOST_IP, PLC_REMOTE_IP, PLC_PORT);
-  int netRes = setXwayAddrs(plc, XWAY_HOST_STATION, XWAY_REMOTE_STATION,
-                            XWAY_NETWORK, XWAY_PORT);
+  plc = initPlcProxy(PLC_REMOTE_IP, PLC_PORT, XWAY_REMOTE_STATION);
 
   assert(plc != NULL);
-  assert(netRes == 0);
 
   verbose("[INTERPRETER TEST] creating Train object\n");
-  Train_t* train = initTrain(plc, resManager, " ");
+  Train_t* train = initTrain(plc, resManager, " ", XWAY_HOST_STATION);
 
   verbose("[INTERPRETER TEST] setting the train Id\n");
   char cmd1[] = "trainId 1";
-  assert(executeCommand(cmd1, train, plc, XWAY_HOST_STATION, resManager) == 0);
+  assert(executeCommand(cmd1, train, plc, resManager) == 0);
 
   verbose("[INTERPRETER TEST] taking resource resource 0\n");
   char cmdr1[] = "resource lock 3";
-  assert(executeCommand(cmdr1, train, plc, XWAY_HOST_STATION, resManager) == 0);
+  assert(executeCommand(cmdr1, train, plc,  resManager) == 0);
 
   verbose("[INTERPRETER TEST] setting switch 31\n");
   char cmds1[] = "plc switch 31";
-  assert(executeCommand(cmds1, train, plc, XWAY_HOST_STATION, resManager) == 0);
+  assert(executeCommand(cmds1, train, plc, resManager) == 0);
 
   verbose("[INTERPRETER TEST] setting switch 31\n");
   char cmds2[] = "plc switch 22";
-  assert(executeCommand(cmds2, train, plc, XWAY_HOST_STATION, resManager) == 0);
+  assert(executeCommand(cmds2, train, plc, resManager) == 0);
 
   verbose("[INTERPRETER TEST] setting switch 31\n");
   char cmds3[] = "plc switch 33";
-  assert(executeCommand(cmds3, train, plc, XWAY_HOST_STATION, resManager) == 0);
+  assert(executeCommand(cmds3, train, plc, resManager) == 0);
 
   verbose("[INTERPRETER TEST] setting switch 31\n");
   char cmds4[] = "plc switch 23";
-  assert(executeCommand(cmds4, train, plc, XWAY_HOST_STATION, resManager) == 0);
+  assert(executeCommand(cmds4, train, plc, resManager) == 0);
 
   for (int i = 0; i < 3; i++) {
     verbose("[INTERPRETER TEST] setting rail 3\n");
     char cmd2[] = "plc rail 3";
-    assert(executeCommand(cmd2, train, plc, XWAY_HOST_STATION, resManager) ==
+    assert(executeCommand(cmd2, train, plc, resManager) ==
            0);
 
     verbose("[INTERPRETER TEST] setting rail 23\n");
     char cmd3[] = "plc rail 23";
-    assert(executeCommand(cmd3, train, plc, XWAY_HOST_STATION, resManager) ==
+    assert(executeCommand(cmd3, train, plc, resManager) ==
            0);
 
     verbose("[INTERPRETER TEST] setting rail 10\n");
     char cmd4[] = "plc rail 10";
-    assert(executeCommand(cmd4, train, plc, XWAY_HOST_STATION, resManager) ==
+    assert(executeCommand(cmd4, train, plc, resManager) ==
            0);
 
     verbose("[INTERPRETER TEST] setting rail 29\n");
     char cmd5[] = "plc rail 29";
-    assert(executeCommand(cmd5, train, plc, XWAY_HOST_STATION, resManager) ==
+    assert(executeCommand(cmd5, train, plc, resManager) ==
            0);
 
     verbose("[INTERPRETER TEST] setting rail 19\n");
     char cmd6[] = "plc rail 19";
-    assert(executeCommand(cmd6, train, plc, XWAY_HOST_STATION, resManager) ==
+    assert(executeCommand(cmd6, train, plc, resManager) ==
            0);
   }
 

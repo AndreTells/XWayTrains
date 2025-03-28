@@ -18,6 +18,8 @@
 #define SERVER_ADDR "10.31.125.14"
 #define PLC_PORT 502
 
+const uint8_t plcStation = 0x0E;
+
 PlcMessage_t* unitTestTryGetPlcMessage(int fd){
   uint8_t serMsg[MAX_MSG_SIZE];
 
@@ -37,21 +39,15 @@ PlcMessage_t* unitTestTryGetPlcMessage(int fd){
 
 void test_initPlcProxy_invalid() {
   verbose("[Plc Proxy] initPlcProxy Invalid ... \n");
-  PlcProxy_t* proxy = initPlcProxy(NULL, NULL, 0);
+  PlcProxy_t* proxy = initPlcProxy(NULL, 0, 0);
   assert(proxy == NULL);
   verbose("[Plc Proxy] initPlcProxy Invalid ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 }
 
 void test_init_endPlcProxy() {
   verbose("[Plc Proxy] init & endPlcProxy ... \n");
-  PlcProxy_t* proxy = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
-
-  uint8_t pc_station = 0x28;
   uint8_t plc_station = 0x0E;
-
-  uint8_t network = 1;
-  uint8_t port = 0;
-  setXwayAddrs(proxy,  pc_station, plc_station, network, port);
+  PlcProxy_t* proxy = initPlcProxy(SERVER_ADDR, PLC_PORT, plc_station);
 
   assert(proxy != NULL);
 
@@ -62,13 +58,8 @@ void test_init_endPlcProxy() {
 
 void test_sendMessagePlcProxy() {
   verbose("[Plc Proxy] sendMessagePlcProxy ... \n");
-  PlcProxy_t* proxy = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
-  uint8_t pc_station = 0x28;
-  uint8_t plc_station = 0x0E;
+  PlcProxy_t* proxy = initPlcProxy(SERVER_ADDR, PLC_PORT, plcStation);
 
-  uint8_t network = 1;
-  uint8_t port = 0;
-  setXwayAddrs(proxy,  pc_station, plc_station, network, port);
   assert(proxy != NULL);
 
   /* making a message */
@@ -76,11 +67,12 @@ void test_sendMessagePlcProxy() {
   assert(msg != NULL);
   int res;
 
+  uint8_t pc_station = 0x28;
   res = configWritePlcMessage(msg, TOGGLE_SWITCH, pc_station , TRAIN_1, SWITCH_GROUP_31);
   assert(res == 0);
   // attempting to send the message
 
-  ssize_t ret = sendMessagePlcProxy(proxy, msg);
+  ssize_t ret = sendMessagePlcProxy(proxy, msg, pc_station);
   assert(ret > 0);
 
   freeMessage(msg);
@@ -134,13 +126,9 @@ void test_readMessagePlcProxy() {
 
   (void)write(serverFd, &response, 24);
 
-  PlcProxy_t* proxy = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT);
-  uint8_t pc_station = 0x28;
   uint8_t plc_station = 0x0E;
+  PlcProxy_t* proxy = initPlcProxy(SERVER_ADDR, PLC_PORT, plc_station);
 
-  uint8_t network = 1;
-  uint8_t port = 0;
-  setXwayAddrs(proxy,  pc_station, plc_station, network, port);
   assert(proxy != NULL);
 
   PlcMessage_t* receivedMsg = readMessagePlcProxy(proxy, TRAIN_1);

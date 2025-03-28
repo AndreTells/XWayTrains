@@ -68,17 +68,14 @@ int main(int argc, char* argv[]) {
   assert(resManager != NULL);
 
   verbose("[Train Test] connecting to plc\n");
-  plc = initPlcProxy(HOST_IP, PLC_REMOTE_IP, PLC_PORT);
-  int netRes = setXwayAddrs(plc, XWAY_HOST_STATION, XWAY_REMOTE_STATION,
-                            XWAY_NETWORK, XWAY_PORT);
+  plc = initPlcProxy(PLC_REMOTE_IP, PLC_PORT, XWAY_REMOTE_STATION);
 
   assert(plc != NULL);
-  assert(netRes == 0);
 
-  Train_t* train = initTrain(plc, resManager, routeFilePath);
+  Train_t* train = initTrain(plc, resManager, routeFilePath, XWAY_HOST_STATION);
   assert(train != NULL);
 
-  int execRes = executeRoute(train, XWAY_HOST_STATION);
+  int execRes = executeRoute(train);
   sleep(3);
 
   assert(execRes == 0);

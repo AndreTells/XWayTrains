@@ -59,8 +59,8 @@ format_code:
 static_analyser:
 # 	clang-tidy src/* -- -std=c11 -I include
 
-test: \
-		build/test/remote build/test/resource_database\
+test: clean \
+		build/test/resource_database\
 		build/test/resource_manager_proxy \
 		build/test/request_queue \
 		build/test/plc_message \
@@ -68,7 +68,6 @@ test: \
 		build/test/plc_proxy \
 		build/test/resource_manager \
 		build/test/interpreter \
-		build/test/comm
 
 	@printf "\n[Unit testing]\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_database -s
@@ -86,26 +85,10 @@ test: \
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_facade -s
 	@printf "\n\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_proxy -s
-	@printf "\n\n"
-	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/comm -s
 	@printf "\nDone unit testing\n"
 
 build: build/remote_test/train \
 	build/train_manager
-
-build/test/remote: $(RTEST_SRC_DIR)/main.c \
-					$(RTEST_SRC_DIR)/comm.c \
-					$(COMMON_SRC_DIR)/verbose.c \
-					$(COMMON_SRC_DIR)/comm_general.c
-	mkdir -p build/test
-	$(CC) $(CFLAGS) $^ -o $@
-
-build/test/comm: $(TEST_SRC_DIR)/unit_test_comm.c \
-					$(RTEST_SRC_DIR)/comm.c \
-					$(COMMON_SRC_DIR)/verbose.c \
-					$(COMMON_SRC_DIR)/flags.c
-	mkdir -p build/test
-	$(CC) -g $(CFLAGS) $^ -o $@
 
 # --------------------------------------------------------------------- #
 # Unit testing the resource Manager                                     #

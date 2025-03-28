@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <assert.h>
 #include <bits/pthreadtypes.h>
 #include <signal.h>
@@ -16,10 +17,13 @@
 
 #define PLC_REMOTE_IP "10.31.125.14"
 #define PLC_PORT 502
-#define XWAY_HOST_STATION 0x28
+#define XWAY_HOST_STATION1 0x28
+#define XWAY_HOST_STATION2 0x29
 #define XWAY_REMOTE_STATION 0x0E
 #define XWAY_NETWORK 1
 #define XWAY_PORT 0
+
+#define NUM_LAPS 3
 
 PlcProxy_t* plc = NULL;
 
@@ -44,7 +48,7 @@ void handle_sigint(int sig) {
 
 struct train_thread_attr{
   char * routeFilePath;
-  int id;
+  uint8_t station;
 };
 
 /**
@@ -53,21 +57,18 @@ struct train_thread_attr{
  * @return Thread exit status (always NULL)
  */
 void * trainThread(struct train_thread_attr* attr) {
-  verbose("[TrainThread][%s][%d] Initializing ... \n", attr->routeFilePath, attr->id);
-  Train_t* train = initTrain(plc, resManager, attr->routeFilePath);
+  verbose("[TrainThread][%s] Initializing ... \n", attr->routeFilePath);
+  Train_t* train = initTrain(plc, resManager, attr->routeFilePath, attr->station);
   assert(train != NULL);
 
-  // TODO set Train IDs
-  setTrainId(train, attr->id);
-  int execRes = executeRoute(train, XWAY_HOST_STATION);
-  sleep(3);
+  for(int i=0;i<NUM_LAPS;i++){
+    int execRes = executeRoute(train);
 
-  assert(execRes == 0);
+    assert(execRes == 0);
+    verbose("\n\n\nlap completed\n\n\n");
+  }
 
   endTrain(train);
-  endResourceManagerProxy(resManager);
-  endPlcProxy(plc);
-
   return NULL;
 }
 
@@ -92,34 +93,15 @@ int main(const int argc, char** argv) {
   }
   verbose("[Train Manager]: using route2 %s \n", routeFilePath2);
 
-  char* trainIdStr1;
-  if (!get_flag_value(argc, argv, "--train1", &trainIdStr1)) {
-    verbose("[Train Manager] no train1 specified\n");
-    exit(EXIT_FAILURE);
-  }
-  const int trainId1 = atoi(trainIdStr1);
-  verbose("[Train Manager]: using train1 %d \n", trainId1);
-
-  char* trainIdStr2;
-  if (!get_flag_value(argc, argv, "--train2", &trainIdStr2)) {
-    verbose("[Train Manager] no train2 specified\n");
-    exit(EXIT_FAILURE);
-  }
-  const int trainId2 = atoi(trainIdStr2);
-  verbose("[Train Manager]: using train2 %d \n", trainId2);
-
   verbose("[Train Manager] connecting to ressource manager\n");
   resManager =
       initResourceManagerProxy(RES_MANAGER_REMOTE_IP, RES_MANAGER_PORT);
   assert(resManager != NULL);
 
   verbose("[Train Manager] connecting to plc\n");
-  plc = initPlcProxy(HOST_IP, PLC_REMOTE_IP, PLC_PORT);
-  int netRes = setXwayAddrs(plc, XWAY_HOST_STATION, XWAY_REMOTE_STATION,
-                            XWAY_NETWORK, XWAY_PORT);
+  plc = initPlcProxy(PLC_REMOTE_IP, PLC_PORT, XWAY_REMOTE_STATION);
 
   assert(plc != NULL);
-  assert(netRes == 0);
 
   // create 2 threads
   pthread_t thread1;
@@ -127,11 +109,11 @@ int main(const int argc, char** argv) {
 
   struct train_thread_attr attr1;
   attr1.routeFilePath = routeFilePath1;
-  attr1.id = trainId1;
+  attr1.station = XWAY_HOST_STATION1;
 
   struct train_thread_attr attr2;
   attr2.routeFilePath = routeFilePath2;
-  attr2.id = trainId2;
+  attr2.station = XWAY_HOST_STATION2;
 
   pthread_create(&thread1, NULL, (void*(*)(void*))trainThread, &attr1);
   pthread_create(&thread2, NULL, (void*(*)(void*))trainThread, &attr2);
@@ -140,7 +122,7 @@ int main(const int argc, char** argv) {
   pthread_join(thread1, NULL);
   pthread_join(thread2, NULL);
 
+  endPlcProxy(plc);
+  endResourceManagerProxy(resManager);
   return 0;
-
-  exit(EXIT_SUCCESS);
 }

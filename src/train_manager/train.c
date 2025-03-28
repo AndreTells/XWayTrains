@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <unistd.h>
 
 #include "common/verbose.h"
@@ -12,7 +13,7 @@
 #include "train_manager/resource_manager_proxy.h"
 
 Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
-                   char* routeFilePath) {
+                   char* routeFilePath, uint8_t xwayStation) {
   verbose("[Train]: initialisation ... \n");
   // accounting for invalid inputs
   if (plc == NULL || resManager == NULL) {
@@ -25,6 +26,7 @@ Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
   train->trainId = UNKNOWN_TRAIN;
   train->plc = plc;
   train->resManager = resManager;
+  train->xwayStation = xwayStation;
 
   verbose("[Train]: Opening route file ... \n");
   train->path = initPath(routeFilePath);
@@ -59,8 +61,9 @@ int setTrainId(Train_t* train, int id) {
 
 enum TrainId_e getTrainId(Train_t* train) { return train->trainId; }
 
-int executeRoute(Train_t* train, uint8_t station) {
+int executeRoute(Train_t* train) {
   verbose("[Train]: Executing Train route ... \n");
+  rewind(train->path);
 
   // read a line
   while (true) {
@@ -72,7 +75,7 @@ int executeRoute(Train_t* train, uint8_t station) {
 
     verbose("[Train]: Executing command ... \n");
     int execRes =
-        executeCommand(cmd, train, train->plc, station, train->resManager);
+        executeCommand(cmd, train, train->plc,train->resManager);
     if (execRes != 0) {
       verbose("[Train]: Executing command ... \n" VERBOSE_KRED
               "fail \n" VERBOSE_RESET);

@@ -18,6 +18,7 @@
 typedef FILE* Path_t;
 
 struct Train_t {
+  uint8_t xwayStation;
   enum TrainId_e trainId;
   PlcProxy_t* plc;
   ResourceManagerProxy_t* resManager;
@@ -41,7 +42,7 @@ typedef struct Train_t Train_t;
  *       `endTrain()`.
  */
 Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
-                   char* routeFilePath);
+                   char* routeFilePath, uint8_t xwayStation);
 
 /**
  * @brief Gracefully terminate a Train instance
@@ -68,5 +69,5 @@ int setTrainId(Train_t* train, int id);
  */
 enum TrainId_e getTrainId(Train_t* train);
 
-int executeRoute(Train_t* train, uint8_t station);
+int executeRoute(Train_t* train);
 #endif  // TRAIN_H_

@@ -15,6 +15,7 @@
 #define PLC_PORT 502
 
 const uint8_t station = 0x28;
+const uint8_t plcStation = 0x0E;
 
 void test_executeCommand_nullArguments() {
   verbose("[Interpreter] executeCommand NULL Args ... \n");
@@ -22,14 +23,14 @@ void test_executeCommand_nullArguments() {
   char cmd[] = "trainId 5";
 
   /* Allocate non-NULL pointers using malloc; actual implementations are provided by mocks. */
-  PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
+  PlcProxy_t* plc = initPlcProxy(SERVER_ADDR, PLC_PORT, plcStation);
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
-  Train_t* train = initTrain(plc,resMgr," ");
+  Train_t* train = initTrain(plc,resMgr," ", station);
 
-  assert(executeCommand(NULL, train, plc, station, resMgr) == -1);
-  assert(executeCommand(cmd, NULL, plc,station, resMgr) == -1);
-  assert(executeCommand(cmd, train, NULL,station, resMgr) == -1);
-  assert(executeCommand(cmd, train, plc,station, NULL) == -1);
+  assert(executeCommand(NULL, train, plc, resMgr) == -1);
+  assert(executeCommand(cmd, NULL, plc, resMgr) == -1);
+  assert(executeCommand(cmd, train, NULL, resMgr) == -1);
+  assert(executeCommand(cmd, train, plc, NULL) == -1);
 
   endTrain(train);
   endResourceManagerProxy(resMgr);
@@ -43,11 +44,11 @@ void test_executeCommand_setTrainId_success() {
 
   char cmd[] = "trainId 4";
 
-  PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
+  PlcProxy_t* plc = initPlcProxy(SERVER_ADDR, PLC_PORT, plcStation);
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
-  Train_t* train = initTrain(plc,resMgr," ");
+  Train_t* train = initTrain(plc,resMgr," ", station);
 
-  int ret = executeCommand(cmd, train, plc, station,resMgr);
+  int ret = executeCommand(cmd, train, plc, resMgr);
   assert(ret == 0);
 
   endTrain(train);
@@ -62,11 +63,11 @@ void test_executeCommand_plc_invalidParams() {
 
   char cmd[] = "plc rail"; // Missing target id parameter
 
-  PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
+  PlcProxy_t* plc = initPlcProxy(SERVER_ADDR, PLC_PORT, plcStation );
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
-  Train_t* train = initTrain(plc,resMgr," ");
+  Train_t* train = initTrain(plc,resMgr," ", station);
 
-  int ret = executeCommand(cmd, train, plc,station, resMgr);
+  int ret = executeCommand(cmd, train, plc, resMgr);
   assert(ret == -1);
 
   endTrain(train);
@@ -81,21 +82,21 @@ void test_executeCommand_plc_validParams() {
 
   int ret = 0;
 
-  PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
+  PlcProxy_t* plc = initPlcProxy(SERVER_ADDR, PLC_PORT, plcStation );
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
-  Train_t* train = initTrain(plc,resMgr," ");
+  Train_t* train = initTrain(plc,resMgr," ", station);
 
   // setVerbose(true);
   char cmd [20] = "plc rail 22";
-  ret = executeCommand(cmd, train, plc,station, resMgr);
+  ret = executeCommand(cmd, train, plc, resMgr);
   assert(ret == 0);
 
   strcpy(cmd,"plc switch 7");
-  ret = executeCommand(cmd, train, plc,station, resMgr);
+  ret = executeCommand(cmd, train, plc, resMgr);
   assert(ret == 0);
 
   strcpy(cmd, "plc invert 4");
-  ret = executeCommand(cmd, train, plc,station, resMgr);
+  ret = executeCommand(cmd, train, plc,resMgr);
   assert(ret == 0);
 
   endTrain(train);
@@ -110,11 +111,11 @@ void test_executeCommand_resource_invalidParams() {
 
   char cmd[] = "resource"; // Missing request type and resource IDs
 
-  PlcProxy_t* plc = initPlcProxy(HOST_ADDR, SERVER_ADDR, PLC_PORT );
+  PlcProxy_t* plc = initPlcProxy(SERVER_ADDR, PLC_PORT, plcStation );
   ResourceManagerProxy_t* resMgr = initResourceManagerProxy(" ", 0);
-  Train_t* train = initTrain(plc,resMgr," ");
+  Train_t* train = initTrain(plc,resMgr," ", station);
 
-  int ret = executeCommand(cmd, train, plc,station, resMgr);
+  int ret = executeCommand(cmd, train, plc, resMgr);
   assert(ret == -1);
 
   endTrain(train);

@@ -9,7 +9,7 @@
 #include "train_manager/train.h"
 
 Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
-                   [[maybe_unused]] char* routeFilePath) {
+                   [[maybe_unused]] char* routeFilePath, [[maybe_unused]] uint8_t xwayStation) {
   // accounting for invalid inputs
   if (plc == NULL || resManager == NULL) {
     return NULL;
@@ -21,6 +21,7 @@ Train_t* initTrain(PlcProxy_t* plc, ResourceManagerProxy_t* resManager,
   train->trainId = UNKNOWN_TRAIN;
   train->plc = plc;
   train->resManager = resManager;
+  train->xwayStation = xwayStation;
 
   return train;
 }

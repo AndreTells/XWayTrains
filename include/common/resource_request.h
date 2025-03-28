@@ -9,12 +9,12 @@
  * @enum Resource_e
  * @brief Enumerates available resource identifiers.
  */
-typedef enum { RESOURCE0, RESOURCE1, RESOURCE2, RESOURCE4 } Resource_e;
+typedef enum { RESOURCE0, RESOURCE1, RESOURCE2, RESOURCE4, RESOURCE5, RESOURCE6} Resource_e;
 
 /**
  * @brief Maximum resource available.
  */
-static const Resource_e MAX_RESOURCE = RESOURCE4;
+static const Resource_e MAX_RESOURCE = RESOURCE6;
 
 /**
  * @enum ResourceRequestType_e

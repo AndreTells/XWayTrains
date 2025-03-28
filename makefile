@@ -295,7 +295,10 @@ run/train_manager1: build/train_manager
 	./build/train_manager --route1 route/train1.route --route2 route/train2.route -v --xway1 40 --xway2 41
 
 run/train_manager2: build/train_manager
-	./build/train_manager --route1 route/train3.route --route2 route/train4.route -v --xway1 42 --xway1 43
+	./build/train_manager --route1 route/train3.route --route2 route/train4.route -v --xway1 42 --xway2 43
+
+run/train_manager2teste: build/train_manager
+	./build/train_manager --route1 route/train3.route --route2 route/empty4.route -v --xway1 40 --xway2 43
 
 clean:
 	rm -fr build/* vgcore.*

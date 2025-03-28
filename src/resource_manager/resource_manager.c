@@ -11,7 +11,7 @@
 #include "common/verbose.h"
 #include "resource_manager/request_queue.h"
 
-#define MAX_CLIENTS 4
+#define MAX_CLIENTS 50
 #define THREAD_POOL_SIZE 4
 
 struct ResourceManager_t {

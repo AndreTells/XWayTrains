@@ -1,5 +1,6 @@
 #include "common/resource_request.h"
 
+#include <stdio.h>
 #include <arpa/inet.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -181,25 +182,37 @@ int answerResourceRequest(int fd, ResourceRequestResponse_t* resp) {
 }
 
 ResourceRequest_t* recvResourceRequest(int fd) {
-  int res;
-  res = fileDescriptorTimedWait(fd);
+  int res = fileDescriptorTimedWait(fd);
   if (res < 0) {
     return NULL;
   }
 
   ResourceRequest_t* req = malloc(sizeof(ResourceRequest_t));
+  if (!req) {
+    perror("malloc failed");
+    return NULL;
+  }
 
   uint8_t buf[RESOURCE_REQUEST_SERIALIZED_SIZE];
   memset(buf, 0, RESOURCE_REQUEST_SERIALIZED_SIZE);
 
-  res = (int)read(fd, buf, RESOURCE_REQUEST_SERIALIZED_SIZE);
+  // Ensure full read of RESOURCE_REQUEST_SERIALIZED_SIZE bytes
+  ssize_t bytesRead = 0;
+  while (bytesRead < RESOURCE_REQUEST_SERIALIZED_SIZE) {
+    ssize_t res = read(fd, buf + bytesRead, RESOURCE_REQUEST_SERIALIZED_SIZE - bytesRead);
+    if (res == -1) {
+      perror("read error");
+      free(req);
+      return NULL;
+    } else if (res == 0) {
+      // Connection closed before reading full message
+      free(req);
+      return NULL;
+    }
+    bytesRead += res;
+  }
 
   deserializeResourceRequest(buf, req);
-
-  if (res == -1) {
-    free(req);
-    return NULL;
-  }
 
   req->returnFd = fd;
 
@@ -207,29 +220,39 @@ ResourceRequest_t* recvResourceRequest(int fd) {
 }
 
 ResourceRequestResponse_t* recvResourceRequestResponse(int fd) {
-  int res;
-  res = fileDescriptorTimedWait(fd);
+  int res = fileDescriptorTimedWait(fd);
   if (res < 0) {
     return NULL;
   }
 
-  ResourceRequestResponse_t* req = malloc(sizeof(ResourceRequest_t));
+  ResourceRequestResponse_t* resReq = malloc(sizeof(ResourceRequestResponse_t));
+  if (!resReq) {
+    perror("malloc failed");
+    return NULL;
+  }
 
   uint8_t buf[RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE];
   memset(buf, 0, RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE);
 
-  res = (int)read(
-      fd, buf,
-      RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE);  // MAY CAUSE AN ISSUE
-
-  deserializeResourceRequestResponse(buf, req);
-
-  if (res == -1) {
-    free(req);
-    return NULL;
+  // Ensure full read of RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE bytes
+  ssize_t bytesRead = 0;
+  while (bytesRead < RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE) {
+    ssize_t res = read(fd, buf + bytesRead, RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE - bytesRead);
+    if (res == -1) {
+      perror("read error");
+      free(resReq);
+      return NULL;
+    } else if (res == 0) {
+      // Connection closed before reading full message
+      free(resReq);
+      return NULL;
+    }
+    bytesRead += res;
   }
 
-  return req;
+  deserializeResourceRequestResponse(buf, resReq);
+
+  return resReq;
 }
 
 ResourceRequest_t* createResourceRequest(const enum TrainId_e requesterId,

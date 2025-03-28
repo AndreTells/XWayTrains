@@ -286,10 +286,39 @@ PlcMessage_t* tryGetPlcMessage(int fd) {
     return NULL;
   }
 
-  ssize_t res = read(fd, serMsg, MAX_MSG_SIZE);
+  // Read enough to get the message size
+  ssize_t bytesRead = 0;
+  while (bytesRead < MSG_SIZE_POS) {
+    ssize_t res = read(fd, serMsg + bytesRead, MSG_SIZE_POS - bytesRead);
+    if (res == -1) {
+      perror("read error");
+      return NULL;
+    } else if (res == 0) {
+      // Connection closed
+      return NULL;
+    }
+    bytesRead += res;
+  }
 
-  if (res == -1) {
+  uint8_t msgSize = serMsg[MSG_SIZE_POS - 1];
+
+  // Validate msgSize to prevent buffer overflow
+  if (msgSize > MAX_MSG_SIZE - MSG_SIZE_POS) {
+    fprintf(stderr, "Invalid message size: %u\n", msgSize);
     return NULL;
+  }
+
+  // Read the rest of the message
+  bytesRead = 0;
+  while (bytesRead < msgSize) {
+    ssize_t res = read(fd, serMsg + MSG_SIZE_POS + bytesRead, msgSize - bytesRead);
+    if (res == -1) {
+      perror("read error");
+      return NULL;
+    } else if (res == 0) {
+      return NULL;
+    }
+    bytesRead += res;
   }
 
   print_data_hex(serMsg);

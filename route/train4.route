@@ -15,4 +15,5 @@ resource lock 3
 plc switch 23
 plc rail 27
 resource release 3
+plc rail 37
 plc invert 7

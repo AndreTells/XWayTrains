@@ -292,10 +292,10 @@ run/resource_manager: build/resource_manager
 	./build/resource_manager -v -ip 127.0.0.1
 
 run/train_manager1: build/train_manager
-	./build/train_manager --route1 route/train1.route --route2 route/train2.route -v
+	./build/train_manager --route1 route/train1.route --route2 route/train2.route -v --xway1 40 --xway2 41
 
 run/train_manager2: build/train_manager
-	./build/train_manager --route1 route/train3.route --route2 route/train4.route -v
+	./build/train_manager --route1 route/train3.route --route2 route/train4.route -v --xway1 42 --xway1 43
 
 clean:
 	rm -fr build/* vgcore.*

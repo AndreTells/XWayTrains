@@ -83,6 +83,8 @@ int executeRoute(Train_t* train) {
       return -1;
     }
 
+    sleep(1);
+
     free(cmd);
   }
 

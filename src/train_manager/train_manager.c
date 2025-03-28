@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdint.h>
 #include <assert.h>
 #include <bits/pthreadtypes.h>
@@ -23,7 +24,7 @@
 #define XWAY_NETWORK 1
 #define XWAY_PORT 0
 
-#define NUM_LAPS 3
+#define NUM_LAPS 2
 
 PlcProxy_t* plc = NULL;
 
@@ -79,6 +80,7 @@ int main(const int argc, char** argv) {
   bool verbose_mode = get_flag_value(argc, argv, VERBOSE_FLAG, NULL);
   setVerbose(verbose_mode);
 
+  // getting route paths
   char* routeFilePath1;
   if (!get_flag_value(argc, argv, "--route1", &routeFilePath1)) {
     verbose("[Train Manager] no route1 specified\n");
@@ -93,6 +95,26 @@ int main(const int argc, char** argv) {
   }
   verbose("[Train Manager]: using route2 %s \n", routeFilePath2);
 
+  verbose("[Train Manager] connecting to ressource manager\n");
+
+  // getting xway addr
+  char* xwayStation1_s;
+  if (!get_flag_value(argc, argv, "--xway1", &xwayStation1_s)) {
+    verbose("[Train Manager] no xway1 specified\n");
+    exit(EXIT_FAILURE);
+  }
+  verbose("[Train Manager]: using xway1 %s \n", xwayStation1_s);
+  uint8_t xwayStation1 = (uint8_t) atoi(xwayStation1_s);
+
+  char* xwayStation2_s;
+  if (!get_flag_value(argc, argv, "--xway2", &xwayStation2_s)) {
+    verbose("[Train Manager] no xway2 specified\n");
+    exit(EXIT_FAILURE);
+  }
+  verbose("[Train Manager]: using xway2 %s \n", xwayStation2_s);
+  uint8_t xwayStation2 = (uint8_t) atoi(xwayStation2_s);
+
+  // initialising proxies
   verbose("[Train Manager] connecting to ressource manager\n");
   resManager =
       initResourceManagerProxy(RES_MANAGER_REMOTE_IP, RES_MANAGER_PORT);
@@ -109,11 +131,11 @@ int main(const int argc, char** argv) {
 
   struct train_thread_attr attr1;
   attr1.routeFilePath = routeFilePath1;
-  attr1.station = XWAY_HOST_STATION1;
+  attr1.station = xwayStation1;
 
   struct train_thread_attr attr2;
   attr2.routeFilePath = routeFilePath2;
-  attr2.station = XWAY_HOST_STATION2;
+  attr2.station = xwayStation2;
 
   pthread_create(&thread1, NULL, (void* (*)(void*))trainThread, &attr1);
   pthread_create(&thread2, NULL, (void* (*)(void*))trainThread, &attr2);

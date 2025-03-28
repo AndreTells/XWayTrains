@@ -222,3 +222,5 @@ uint8_t* getPlcMessageData(PlcMessage_t* msg) {
 }
 
 uint8_t* getPlcExtAddr(PlcMessage_t* msg) { return msg->npdu.extendedAddr; }
+
+uint8_t getSerializedMessageSize(uint8_t* serMsg);

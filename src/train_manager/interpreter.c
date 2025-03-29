@@ -199,7 +199,14 @@ int handleResourceCommand(char** nextToken, Train_t* state, ResourceManagerProxy
 
   qsort(resourceList, len, sizeof(int), compare_ints);
 
-  res = requestResource(resManager, reqType, resourceList, len, getTrainId(state));
+  while(true){
+    res = requestResource(resManager, reqType, resourceList, len, getTrainId(state));
+    if(res == 0){
+      break;
+    }
+    int randomTime = (rand() %5) + 1;
+    sleep(randomTime);
+  }
 
   if (res == -1) {
     verbose("[Interpreter]: Contacting the Resource Manager ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);

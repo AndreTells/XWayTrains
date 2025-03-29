@@ -159,8 +159,9 @@ int requestResource(ResourceManagerProxy_t* resManager,
       "[RESOURCE MANAGER PROXY]: Checking if client is registered "
       "... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
+  // TODO: allow client to get more than one resource
   ResourceRequest_t* req =
-      createResourceRequest(clientId, resourceId, reqType, -1);
+      createResourceRequest(clientId, &resourceId, 1, reqType, -1);
 
   verbose("[RESOURCE MANAGER PROXY]: Sending Request ... \n");
   sem_wait(&(resManager->mutex));

@@ -192,7 +192,6 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc,
             "[Interpreter]: Contacting the Resource Manager ... " VERBOSE_KGRN
             "success \n" VERBOSE_RESET);
       }
-      sleep(1);
       break;
 
     case (CMD_RESOURCE):

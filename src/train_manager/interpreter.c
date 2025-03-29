@@ -198,13 +198,14 @@ int handleResourceCommand(char** nextToken, Train_t* state, ResourceManagerProxy
   }
 
   qsort(resourceList, len, sizeof(int), compare_ints);
-  for (size_t i = 0; i < len; i++) {
-    res = requestResource(resManager, reqType, resourceList[i], getTrainId(state));
-    if (res == -1) {
-      verbose("[Interpreter]: Contacting the Resource Manager ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
-      return -1;
-    }
+
+  res = requestResource(resManager, reqType, resourceList, len, getTrainId(state));
+
+  if (res == -1) {
+    verbose("[Interpreter]: Contacting the Resource Manager ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
+    return -1;
   }
+
   verbose("[Interpreter]: Contacting the Resource Manager ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
   return res;
 }

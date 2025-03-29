@@ -142,8 +142,8 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
 }
 
 int requestResource(ResourceManagerProxy_t* resManager,
-                    ResourceRequestType_e reqType, uint8_t resourceId,
-                    const enum TrainId_e clientId) {
+                    ResourceRequestType_e reqType, uint8_t* resourceList,
+                    uint8_t resourceListSize,const enum TrainId_e clientId) {
   int res;
   verbose("[RESOURCE MANAGER PROXY]: Resource Request ... \n");
   verbose("[RESOURCE MANAGER PROXY]: Checking if client is registered ... \n");
@@ -159,9 +159,8 @@ int requestResource(ResourceManagerProxy_t* resManager,
       "[RESOURCE MANAGER PROXY]: Checking if client is registered "
       "... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
-  // TODO: allow client to get more than one resource
   ResourceRequest_t* req =
-      createResourceRequest(clientId, &resourceId, 1, reqType, -1);
+      createResourceRequest(clientId, resourceList, resourceListSize, reqType, -1);
 
   verbose("[RESOURCE MANAGER PROXY]: Sending Request ... \n");
   sem_wait(&(resManager->mutex));

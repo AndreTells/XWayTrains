@@ -43,12 +43,13 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager);
  *
  * @param[in] resManager Pointer to the Resource Manager Proxy instance.
  * @param[in] reqType Type of resource request (e.g., lock or release).
- * @param[in] resourceId Identifier of the resource being requested.
+ * @param[in] resourceList Identifier of the resources being requested.
+ * @param[in] resourceListSize ammount of resources in resource list
  * @param[in] clientId Identifier of the client making the request.
  * @return int Status code (0 on success, non-zero error code on failure).
  */
 int requestResource(ResourceManagerProxy_t* resManager,
-                    ResourceRequestType_e reqType, uint8_t resourceId,
-                    const enum TrainId_e clientId);
+                    ResourceRequestType_e reqType, uint8_t* resourceList,
+                    uint8_t resourceListSize,const enum TrainId_e clientId);
 
 #endif  // RESOURCE_MANAGER_PROXY_H_

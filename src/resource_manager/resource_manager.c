@@ -200,7 +200,7 @@ void* consumerThread(void* data) {
         // for resources
         // if not able to release all and break
         bool lockSucess = true;
-        for(uint32_t i =0; i< req->resourceListSize; i++){
+        for(uint32_t i = 0; i< req->resourceListSize; i++){
           uint8_t resource = (uint8_t) req->resourceList[i];
 
           int resWait = waitResourceProxy(manager->safeDatabase, resource);

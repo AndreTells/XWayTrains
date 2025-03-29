@@ -268,9 +268,13 @@ ResourceRequest_t* createResourceRequest(const enum TrainId_e requesterId,
 
   ResourceRequest_t* req = malloc(sizeof(ResourceRequest_t));
   req->requesterId = requesterId;
+  req->resourceListSize = (uint32_t)resourceListSize;
+
   memset(req->resourceList, 0, MAX_RESOURCE_REQ_SIZE);
-  memcpy(req->resourceList, resourceList, resourceListSize);
-  req->resourceListSize = resourceListSize;
+  for(uint8_t i=0;i<resourceListSize;i++){
+    req->resourceList[i] = (uint32_t)resourceList[i];
+  }
+
   req->reqType = reqType;
   req->returnFd = fd;
 

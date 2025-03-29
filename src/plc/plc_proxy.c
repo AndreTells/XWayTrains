@@ -28,7 +28,6 @@ struct PlcProxy_t {
   int outputFd[MAX_NUM_REGISTRABLE_TRAINS][2];
   bool finished;
   uint8_t remoteStation;
-  uint8_t extAddr[2];
   int sock_fd;
 };
 
@@ -90,8 +89,6 @@ PlcProxy_t* initPlcProxy(char* plcIpAddr, const uint16_t port, uint8_t remoteSta
 
   plcProxy->finished = false;
   plcProxy->remoteStation = remoteStation;
-  plcProxy->extAddr[0] = (uint8_t)SEND_CODE;
-  plcProxy->extAddr[1] = 0x10;
 
   // Initialize the output file descriptors to -1 (invalid)
   for (int i = 0; i < MAX_NUM_REGISTRABLE_TRAINS; i++) {
@@ -167,8 +164,11 @@ ssize_t sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg, uint8_t hostStat
   XwayAddr hostXwayAddr = createXwayAddr(hostStation, XWAY_NETWORK, XWAY_PORT);
   XwayAddr remoteXwayAddr = createXwayAddr(plc->remoteStation, XWAY_NETWORK, XWAY_PORT);
 
+  uint8_t extAddr[2] = {0,0};
+  extAddr[0] = (uint8_t)SEND_CODE;
+  extAddr[1] = 0x10;
   int res = setNPDU(msg, NPDU_5WAY, hostXwayAddr, remoteXwayAddr,
-                    plc->extAddr);
+                   extAddr);
 
   if (res < 0) {
     return res;
@@ -243,6 +243,7 @@ void* plcProxyMsgReceiverThread(void* plcProxy) {
 
     // things that aren't write
     if (!compareMsgType(msg, APDU_WRITE_REQ)) {
+      free(msg);
       continue;
     }
 

@@ -19,15 +19,15 @@
 
 #define MAX_NUM_REGISTRABLE_TRAINS 5  // ignore position 0
 
+#define XWAY_NETWORK 1
+#define XWAY_PORT 0
+
 struct PlcProxy_t {
   pthread_t readerThreadTid;
   sem_t mutex;
   int outputFd[MAX_NUM_REGISTRABLE_TRAINS][2];
   bool finished;
-  bool XwayNetworkingSet;
-  XwayAddr hostXwayAddr;
-  XwayAddr remoteXwayAddr;
-  uint8_t extAddr[2];
+  uint8_t remoteStation;
   int sock_fd;
 };
 
@@ -52,11 +52,10 @@ void* plcProxyMsgReceiverThread(void* plcProxy);
  */
 int plcProxyTryRegisterClient(PlcProxy_t* plcProxy, enum TrainId_e clientId);
 
-PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr,
-                         const uint16_t port) {
+PlcProxy_t* initPlcProxy(char* plcIpAddr, const uint16_t port, uint8_t remoteStation) {
   // check if it's a valid IP address
   verbose("[PLC PROXY]: Initializing ... \n");
-  if (plcIpAddr == NULL || hostIpAddr == NULL) {
+  if (plcIpAddr == NULL) {
     verbose("[PLC PROXY]: Initializing ... " VERBOSE_KRED
             "fail \n" VERBOSE_RESET);
     return NULL;
@@ -70,7 +69,7 @@ PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr,
     return NULL;
   }
 
-  plcProxy->sock_fd = tcpCreateSocketWrapper(false, hostIpAddr, port);
+  plcProxy->sock_fd = tcpCreateSocketWrapper(false, NULL, port);
 
   if (plcProxy->sock_fd == -1) {
     free(plcProxy);
@@ -89,12 +88,7 @@ PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr,
   }
 
   plcProxy->finished = false;
-  // initialising addrs with 0
-  plcProxy->XwayNetworkingSet = false;
-  plcProxy->hostXwayAddr = createXwayAddr(0, 0, 0);
-  plcProxy->remoteXwayAddr = createXwayAddr(0, 0, 0);
-  uint8_t zeroExt[2] = {0, 0};
-  memcpy(plcProxy->extAddr, zeroExt, 2);
+  plcProxy->remoteStation = remoteStation;
 
   // Initialize the output file descriptors to -1 (invalid)
   for (int i = 0; i < MAX_NUM_REGISTRABLE_TRAINS; i++) {
@@ -163,15 +157,18 @@ int endPlcProxy(PlcProxy_t* plc) {
   return 0;
 }
 
-ssize_t sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg) {
-  if (!plc->XwayNetworkingSet) {
-    return -1;
-  }
-
+ssize_t sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg, uint8_t hostStation) {
   verbose("[PLC PROXY]:attempting to send message to plc\n");
   // configuring the networking aspect
-  int res = setNPDU(msg, NPDU_5WAY, plc->hostXwayAddr, plc->remoteXwayAddr,
-                    plc->extAddr);
+
+  XwayAddr hostXwayAddr = createXwayAddr(hostStation, XWAY_NETWORK, XWAY_PORT);
+  XwayAddr remoteXwayAddr = createXwayAddr(plc->remoteStation, XWAY_NETWORK, XWAY_PORT);
+
+  uint8_t extAddr[2] = {0,0};
+  extAddr[0] = (uint8_t)SEND_CODE;
+  extAddr[1] = 0x10;
+  int res = setNPDU(msg, NPDU_5WAY, hostXwayAddr, remoteXwayAddr,
+                   extAddr);
 
   if (res < 0) {
     return res;
@@ -246,6 +243,7 @@ void* plcProxyMsgReceiverThread(void* plcProxy) {
 
     // things that aren't write
     if (!compareMsgType(msg, APDU_WRITE_REQ)) {
+      free(msg);
       continue;
     }
 
@@ -289,10 +287,39 @@ PlcMessage_t* tryGetPlcMessage(int fd) {
     return NULL;
   }
 
-  ssize_t res = read(fd, serMsg, MAX_MSG_SIZE);
+  // Read enough to get the message size
+  ssize_t bytesRead = 0;
+  while (bytesRead < MSG_SIZE_POS) {
+    ssize_t res = read(fd, serMsg + bytesRead, MSG_SIZE_POS - bytesRead);
+    if (res == -1) {
+      perror("read error");
+      return NULL;
+    } else if (res == 0) {
+      // Connection closed
+      return NULL;
+    }
+    bytesRead += res;
+  }
 
-  if (res == -1) {
+  uint8_t msgSize = serMsg[MSG_SIZE_POS - 1];
+
+  // Validate msgSize to prevent buffer overflow
+  if (msgSize > MAX_MSG_SIZE - MSG_SIZE_POS) {
+    fprintf(stderr, "Invalid message size: %u\n", msgSize);
     return NULL;
+  }
+
+  // Read the rest of the message
+  bytesRead = 0;
+  while (bytesRead < msgSize) {
+    ssize_t res = read(fd, serMsg + MSG_SIZE_POS + bytesRead, msgSize - bytesRead);
+    if (res == -1) {
+      perror("read error");
+      return NULL;
+    } else if (res == 0) {
+      return NULL;
+    }
+    bytesRead += res;
   }
 
   print_data_hex(serMsg);
@@ -302,23 +329,8 @@ PlcMessage_t* tryGetPlcMessage(int fd) {
   return msg;
 }
 
-int setXwayAddrs(PlcProxy_t* plc, uint8_t host_station, uint8_t remote_station,
-                 uint8_t network, uint8_t port) {
-  // check if it was already set
-  if (plc->XwayNetworkingSet) {
-    return -1;
-  }
-  plc->hostXwayAddr = createXwayAddr(host_station, network, port);
-  plc->remoteXwayAddr = createXwayAddr(remote_station, network, port);
-  plc->extAddr[0] = (uint8_t)SEND_CODE;
-  plc->extAddr[1] = 0x10;
-
-  plc->XwayNetworkingSet = true;
-  return 0;
-}
-
 // does not consider the situation where it failed to connect to a server
-int sendPlcMessageToFd(PlcMessage_t* msg, int fd) {
+int sendPlcMessageToFd(PlcMessage_t* msg,  int fd) {
   uint8_t serMsg[MAX_MSG_SIZE];
   memset(serMsg, 0, MAX_MSG_SIZE);
 

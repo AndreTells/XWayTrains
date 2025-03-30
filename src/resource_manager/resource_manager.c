@@ -11,7 +11,7 @@
 #include "common/verbose.h"
 #include "resource_manager/request_queue.h"
 
-#define MAX_CLIENTS 4
+#define MAX_CLIENTS 50
 #define THREAD_POOL_SIZE 4
 
 struct ResourceManager_t {
@@ -38,6 +38,8 @@ typedef struct {
   ResourceManager_t* parent;
   ResourceRequestQueue_t* queue;
 } RequestConsumerThread_t;
+
+int freeResourceList(ResourceManager_t* manager,uint32_t requesterId, uint32_t* resourceList, uint32_t resourceListSize);
 
 void* producerThread(void* data);
 
@@ -161,8 +163,8 @@ void* producerThread(void* data) {
 
     verbose(
         "[RESOURCE MANAGER]: Producer Thread received a message from %d "
-        "request type %d for resource %d\n",
-        req->requesterId, req->reqType, req->resourceId);
+        "request type %d \n",
+        req->requesterId, req->reqType);
 
     pushQueue(queue, req);
   }
@@ -195,45 +197,48 @@ void* consumerThread(void* data) {
     ResourceRequestResponseType_e res = RESOURCE_REFUSED;
     switch (req->reqType) {
       case LOCK_RESOURCE:
-        int resWait = waitResourceProxy(manager->safeDatabase, req->resourceId);
-        if (resWait != 0) {
-          verbose(
-              "[RESOURCE MANAGER]: consumer thread timed out waiting for "
-              "resource\n");
-          timedOut = true;
-          break;
+        // for resources
+        // if not able to release all and break
+        bool lockSucess = true;
+        for(uint32_t i = 0; i< req->resourceListSize; i++){
+          uint8_t resource = (uint8_t) req->resourceList[i];
+
+          int resWait = waitResourceProxy(manager->safeDatabase, resource);
+          if (resWait != 0) {
+            verbose(
+                "[RESOURCE MANAGER]: consumer thread timed out waiting for "
+                "resource\n");
+            freeResourceList(manager,req->requesterId, req->resourceList, i);
+            lockSucess = false;
+            break;
+          }
+
+          int resLock = attemptLockResourceProxy(
+              manager->safeDatabase, resource, req->requesterId);
+
+          if (resLock == 0) {
+            verbose("[RESOURCE MANAGER]: consumer thread locked resource %d\n",
+                    resource);
+          }
         }
 
-        int resLock = attemptLockResourceProxy(
-            manager->safeDatabase, req->resourceId, req->requesterId);
-
-        if (resLock == 0) {
-          verbose("[RESOURCE MANAGER]: consumer thread locked resource %d\n",
-                  req->resourceId);
+        if(lockSucess){
           res = RESOURCE_GRANTED;
         }
-
         break;
 
       case RELEASE_RESOURCE:
-        int resRel = releaseResourceProxy(manager->safeDatabase,
-                                          req->resourceId, req->requesterId);
-        if (resRel == 0) {
-          verbose("[RESOURCE MANAGER]: consumer thread released resource %d\n",
-                  req->resourceId);
+        int freeRes = freeResourceList(manager,req->requesterId, req->resourceList, req->resourceListSize);
+
+        if(freeRes == 0 ){
           res = RESOURCE_GRANTED;
         }
+
         break;
       case UNKNOWN_RES_REQ_TYPE:
         timedOut = true;
         manager->finished = true;
         break;
-    }
-
-    if (timedOut) {
-      verbose(
-          "[RESOURCE MANAGER]: consumer thread timed out treating message\n");
-      continue;
     }
 
     int fd = req->returnFd;
@@ -246,4 +251,20 @@ void* consumerThread(void* data) {
 
   free(typedData);
   pthread_exit(NULL);
+}
+
+int freeResourceList(ResourceManager_t* manager,uint32_t requesterId, uint32_t* resourceList, uint32_t resourceListSize){
+  for(uint32_t i=0; i<resourceListSize; i++){
+    uint8_t resource = (uint8_t)resourceList[i];
+    int resRel = releaseResourceProxy(manager->safeDatabase,
+                                      resource, requesterId);
+    if (resRel == 0) {
+      verbose("[RESOURCE MANAGER]: consumer thread released resource %d\n",
+              resource);
+    }
+    else{
+      return -1;
+    }
+  }
+  return 0;
 }

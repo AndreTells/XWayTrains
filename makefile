@@ -59,8 +59,8 @@ format_code:
 static_analyser:
 # 	clang-tidy src/* -- -std=c11 -I include
 
-test: \
-		build/test/remote build/test/resource_database\
+test: clean \
+		build/test/resource_database\
 		build/test/resource_manager_proxy \
 		build/test/request_queue \
 		build/test/plc_message \
@@ -68,7 +68,6 @@ test: \
 		build/test/plc_proxy \
 		build/test/resource_manager \
 		build/test/interpreter \
-		build/test/comm
 
 	@printf "\n[Unit testing]\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/resource_database -s
@@ -86,26 +85,10 @@ test: \
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_facade -s
 	@printf "\n\n"
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/plc_proxy -s
-	@printf "\n\n"
-	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all build/test/comm -s
 	@printf "\nDone unit testing\n"
 
 build: build/remote_test/train \
 	build/train_manager
-
-build/test/remote: $(RTEST_SRC_DIR)/main.c \
-					$(RTEST_SRC_DIR)/comm.c \
-					$(COMMON_SRC_DIR)/verbose.c \
-					$(COMMON_SRC_DIR)/comm_general.c
-	mkdir -p build/test
-	$(CC) $(CFLAGS) $^ -o $@
-
-build/test/comm: $(TEST_SRC_DIR)/unit_test_comm.c \
-					$(RTEST_SRC_DIR)/comm.c \
-					$(COMMON_SRC_DIR)/verbose.c \
-					$(COMMON_SRC_DIR)/flags.c
-	mkdir -p build/test
-	$(CC) -g $(CFLAGS) $^ -o $@
 
 # --------------------------------------------------------------------- #
 # Unit testing the resource Manager                                     #
@@ -301,6 +284,21 @@ build/train_manager: $(TRAIN_MANAGER_SRC_DIR)/train_manager.c \
 	mkdir -p build
 	$(CC) -g $(CFLAGS) $^ -o $@
 
+# --------------------------------------------------------------------- #
+# Execute                                                               #
+# --------------------------------------------------------------------- #
+
+run/resource_manager: build/resource_manager
+	./build/resource_manager -v -ip 127.0.0.1
+
+run/train_manager1: build/train_manager
+	./build/train_manager --route1 route/train1.route --route2 route/train2.route -v --xway1 40 --xway2 41
+
+run/train_manager2: build/train_manager
+	./build/train_manager --route1 route/train3.route --route2 route/train4.route -v --xway1 42 --xway2 43
+
+run/train_manager2teste: build/train_manager
+	./build/train_manager --route1 route/train3.route --route2 route/empty4.route -v --xway1 40 --xway2 43
 
 clean:
 	rm -fr build/* vgcore.*

@@ -13,6 +13,13 @@
 #define MAX_MSG_SIZE 28
 
 /**
+ * @def MSG_SIZE_POS
+ * @brief contains the index of the byte in the message that has encodes the
+ * messages size
+ */
+#define MSG_SIZE_POS 6
+
+/**
  * @struct PlcMessage_t
  * @brief Opaque structure representing a PLC message.
  *

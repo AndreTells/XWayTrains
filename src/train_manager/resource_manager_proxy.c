@@ -142,8 +142,8 @@ int endResourceManagerProxy(ResourceManagerProxy_t* resManager) {
 }
 
 int requestResource(ResourceManagerProxy_t* resManager,
-                    ResourceRequestType_e reqType, uint8_t resourceId,
-                    const enum TrainId_e clientId) {
+                    ResourceRequestType_e reqType, uint8_t* resourceList,
+                    uint8_t resourceListSize,const enum TrainId_e clientId) {
   int res;
   verbose("[RESOURCE MANAGER PROXY]: Resource Request ... \n");
   verbose("[RESOURCE MANAGER PROXY]: Checking if client is registered ... \n");
@@ -160,7 +160,7 @@ int requestResource(ResourceManagerProxy_t* resManager,
       "... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
 
   ResourceRequest_t* req =
-      createResourceRequest(clientId, resourceId, reqType, -1);
+      createResourceRequest(clientId, resourceList, resourceListSize, reqType, -1);
 
   verbose("[RESOURCE MANAGER PROXY]: Sending Request ... \n");
   sem_wait(&(resManager->mutex));
@@ -200,6 +200,7 @@ int requestResource(ResourceManagerProxy_t* resManager,
 
   free(req);
   if (resp->respType != RESOURCE_GRANTED) {
+    verbose("[RESOURCE MANAGER PROXY] Resource refused \n");
     verbose("[RESOURCE MANAGER PROXY]: Resource Request ... " VERBOSE_KRED
             "fail \n" VERBOSE_RESET);
     return -1;
@@ -244,6 +245,7 @@ int resManagerTryRegisterClient(ResourceManagerProxy_t* resManager,
                                 const enum TrainId_e clientId) {
   // index out of range
   if (clientId < 0 || clientId > MAX_NUM_REGISTRABLE_TRAINS - 1) {
+    verbose("[RESOURCE MANAGER PROXY] invalid client Id\n");
     return -1;
   }
   if (resManager->outputFd[clientId][0] != -1) {

@@ -55,9 +55,10 @@ int resource_manager_proxy_request_release(void){
   ResourceManagerProxy_t* proxy = initResourceManagerProxy("127.0.0.1",40);
   assert(proxy != NULL);
 
-  assert(requestResource(proxy,LOCK_RESOURCE, 42, 0) == 0);
+  uint8_t resourceList[2] = {1, 2};
+  assert(requestResource(proxy,LOCK_RESOURCE, resourceList, 2, 0) == 0);
 
-  assert(requestResource(proxy,RELEASE_RESOURCE, 42, 0) == 0);
+  assert(requestResource(proxy,RELEASE_RESOURCE, resourceList, 2, 0) == 0);
 
   assert(endResourceManagerProxy(proxy) == 0);
   verbose("[Resource Manager Proxy] Request release ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);

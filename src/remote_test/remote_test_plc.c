@@ -50,12 +50,9 @@ int main(int argc, char* argv[]) {
   verbose("[PLC TEST CLIENT]: targeting switich %d \n", target);
 
   // sending out messages
-  plc = initPlcProxy(HOST_IP, PLC_REMOTE_IP, PLC_PORT);
-  int netRes = setXwayAddrs(plc, XWAY_HOST_STATION, XWAY_REMOTE_STATION,
-                            XWAY_NETWORK, XWAY_PORT);
+  plc = initPlcProxy(PLC_REMOTE_IP, PLC_PORT, XWAY_REMOTE_STATION);
 
   assert(plc != NULL);
-  assert(netRes == 0);
 
   /* making a message */
   PlcMessage_t* msg = createPlcMessage();
@@ -69,7 +66,7 @@ int main(int argc, char* argv[]) {
 
   // attempting to send the message
   verbose("[PLC TEST CLIENT]: attempting to send message ... \n");
-  ssize_t msgSize = sendMessagePlcProxy(plc, msg);
+  ssize_t msgSize = sendMessagePlcProxy(plc, msg, XWAY_HOST_STATION);
   assert(0 < msgSize);
   verbose("[PLC TEST CLIENT]: attempting to send message ... " VERBOSE_KGRN
           "success \n" VERBOSE_RESET);

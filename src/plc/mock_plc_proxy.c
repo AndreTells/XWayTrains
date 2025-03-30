@@ -19,8 +19,8 @@ struct PlcProxy_t {
   int sock_fd;
 };
 
-PlcProxy_t* initPlcProxy([[maybe_unused]] char* hostIpAddr, char* plcIpAddr,
-                         [[maybe_unused]] const uint16_t port) {
+PlcProxy_t* initPlcProxy(char* plcIpAddr, [[maybe_unused]] const uint16_t port,
+                         [[maybe_unused]] uint8_t remoteStation) {
   // check if it's a valid IP address
   if (plcIpAddr == NULL) {
     return NULL;
@@ -45,19 +45,11 @@ int endPlcProxy(PlcProxy_t* plc) {
 }
 
 ssize_t sendMessagePlcProxy([[maybe_unused]] PlcProxy_t* plc,
-                            [[maybe_unused]] PlcMessage_t* msg) {
+                            [[maybe_unused]] PlcMessage_t* msg, [[maybe_unused]] uint8_t hostStation) {
   return 0;
 }
 
 PlcMessage_t* readMessagePlcProxy([[maybe_unused]] PlcProxy_t* plc,
                                   [[maybe_unused]] enum TrainId_e clientId) {
   return createPlcMessage();
-}
-
-int setXwayAddrs([[maybe_unused]] PlcProxy_t* plc,
-                 [[maybe_unused]] uint8_t host_station,
-                 [[maybe_unused]] uint8_t remote_station,
-                 [[maybe_unused]] uint8_t network,
-                 [[maybe_unused]] uint8_t port) {
-  return 0;
 }

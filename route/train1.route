@@ -8,9 +8,9 @@ plc switch 22
 plc switch 33
 plc rail 23
 plc rail 10
-resource release 1
 resource lock 3
 plc switch 3
 plc rail 29
 resource release 3
+resource release 1
 plc rail 19

@@ -20,6 +20,7 @@ int verbose(const char* __restrict format, ...) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
   int ret = vprintf(format, args);
+  fflush(stdout);
 #pragma GCC diagnostic pop
   va_end(args);
 

@@ -26,14 +26,13 @@ typedef struct PlcProxy_t PlcProxy_t;
  * This function creates and configures a new PLC Proxy instance for
  * communication with the PLC.
  *
- * @param hostIpAddr The IP address of the host machine.
  * @param plcIpAddr The IP address of the PLC.
  * @param port The port number to be used for communication.
+ * @param remoteStation xway station number of the plc
  * @return PlcProxy_t* Pointer to the newly created PLC Proxy instance, or NULL
  * on failure.
  */
-PlcProxy_t* initPlcProxy(char* hostIpAddr, char* plcIpAddr,
-                         const uint16_t port);
+PlcProxy_t* initPlcProxy(char* plcIpAddr, const uint16_t port, uint8_t remoteStation );
 
 /**
  * @brief Gracefully terminate a PLC Proxy instance
@@ -48,7 +47,7 @@ int endPlcProxy(PlcProxy_t* plc);
  * @param[in] msg Pointer to the message to send
  * @return the size of the message sent or -1 on error
  */
-ssize_t sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg);
+ssize_t sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg, uint8_t hostStation);
 
 /**
  * @brief Read a message from the PLC
@@ -58,8 +57,5 @@ ssize_t sendMessagePlcProxy(PlcProxy_t* plc, PlcMessage_t* msg);
  * @note the caller is in charge of freeing memory of the received message
  */
 PlcMessage_t* readMessagePlcProxy(PlcProxy_t* plc, enum TrainId_e cliendtId);
-
-int setXwayAddrs(PlcProxy_t* plc, uint8_t host_station, uint8_t remote_station,
-                 uint8_t network, uint8_t port);
 
 #endif  // PLC_PROXY_H_

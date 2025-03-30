@@ -4,17 +4,18 @@
 #include <stdint.h>
 
 #include "plc/model_info.h"
+#define MAX_RESOURCE_REQ_SIZE 5
 
 /**
  * @enum Resource_e
  * @brief Enumerates available resource identifiers.
  */
-typedef enum { RESOURCE0, RESOURCE1, RESOURCE2, RESOURCE4 } Resource_e;
+typedef enum { RESOURCE0, RESOURCE1, RESOURCE2, RESOURCE4, RESOURCE5, RESOURCE6} Resource_e;
 
 /**
  * @brief Maximum resource available.
  */
-static const Resource_e MAX_RESOURCE = RESOURCE4;
+static const Resource_e MAX_RESOURCE = RESOURCE6;
 
 /**
  * @enum ResourceRequestType_e
@@ -42,7 +43,8 @@ typedef enum {
  */
 typedef struct {
   uint32_t requesterId;
-  uint8_t resourceId;
+  uint32_t resourceListSize;
+  uint32_t resourceList[MAX_RESOURCE_REQ_SIZE];
   ResourceRequestType_e reqType;
   int returnFd;
 } ResourceRequest_t;
@@ -53,7 +55,6 @@ typedef struct {
  */
 typedef struct {
   uint32_t requesterId;
-  uint8_t resourceId;
   ResourceRequestResponseType_e respType;
 } ResourceRequestResponse_t;
 
@@ -106,7 +107,8 @@ ResourceRequestResponse_t* recvResourceRequestResponse(int fd);
  * structure.
  */
 ResourceRequest_t* createResourceRequest(const enum TrainId_e requesterId,
-                                         const uint8_t resourceId,
+                                         const uint8_t* resourceList,
+                                         const uint8_t resourceListSize,
                                          ResourceRequestType_e reqType, int fd);
 /**
  * @brief Destroys a resource request and frees associated memory.

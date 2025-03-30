@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stdlib.h>
 #include <sys/socket.h>
 
@@ -12,7 +13,6 @@ int sendResourceRequest([[maybe_unused]] int fd,
 ResourceRequest_t* recvResourceRequest(int fd) {
   ResourceRequest_t* req = malloc(sizeof(ResourceRequest_t));
   req->requesterId = 0;
-  req->resourceId = 0;
   req->reqType = LOCK_RESOURCE;
   req->returnFd = fd;
 
@@ -21,7 +21,10 @@ ResourceRequest_t* recvResourceRequest(int fd) {
 
 ResourceRequestResponse_t* recvResourceRequestResponse(
     [[maybe_unused]] int fd) {
-  ResourceRequest_t* req = createResourceRequest(0, 0, LOCK_RESOURCE, -1);
+  uint8_t fakeList[2] ={0,0};
+
+  ResourceRequest_t* req = createResourceRequest(0, fakeList, 2, LOCK_RESOURCE, -1);
+
   ResourceRequestResponse_t* resp =
       createResourceRequestResponse(req, RESOURCE_GRANTED);
   free(req);
@@ -34,12 +37,14 @@ int answerResourceRequest([[maybe_unused]] int fd,
 }
 
 ResourceRequest_t* createResourceRequest(const enum TrainId_e requesterId,
-                                         const uint8_t resourceId,
-                                         ResourceRequestType_e reqType,
-                                         int fd) {
+                                         const uint8_t* resourceList,
+                                         const uint8_t resourceListSize,
+                                         ResourceRequestType_e reqType, int fd) {
   ResourceRequest_t* req = malloc(sizeof(ResourceRequest_t));
   req->requesterId = requesterId;
-  req->resourceId = resourceId;
+  memset(req->resourceList, 0, MAX_RESOURCE_REQ_SIZE);
+  memcpy(req->resourceList, resourceList, resourceListSize);
+  req->resourceListSize = resourceListSize;
   req->reqType = reqType;
   req->returnFd = fd;
 
@@ -55,7 +60,6 @@ ResourceRequestResponse_t* createResourceRequestResponse(
     ResourceRequest_t* req, ResourceRequestResponseType_e respType) {
   ResourceRequestResponse_t* resp = malloc(sizeof(ResourceRequestResponse_t));
   resp->requesterId = req->requesterId;
-  resp->resourceId = req->resourceId;
   resp->respType = respType;
 
   return resp;

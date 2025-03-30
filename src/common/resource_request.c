@@ -1,5 +1,6 @@
 #include "common/resource_request.h"
 
+#include <stdio.h>
 #include <arpa/inet.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -11,8 +12,8 @@
 #include "common/verbose.h"
 #include "plc/model_info.h"
 
-#define RESOURCE_REQUEST_SERIALIZED_SIZE (sizeof(uint32_t) * 4)
-#define RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE (sizeof(uint32_t) * 3)
+#define RESOURCE_REQUEST_SERIALIZED_SIZE (sizeof(uint32_t) * 8)
+#define RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE (sizeof(uint32_t) * 2)
 
 /**
  * @brief Serializes a ResourceRequest_t structure into a buffer.
@@ -33,10 +34,17 @@ int serializeResourceRequest(const ResourceRequest_t* req, uint8_t* buffer) {
   memcpy(buffer + offset, &net_val, sizeof(net_val));
   offset += sizeof(net_val);
 
-  // Serialize resourceId
-  net_val = htonl(req->resourceId);
+  // Serialize resourceListSize
+  net_val = htonl(req->resourceListSize);
   memcpy(buffer + offset, &net_val, sizeof(net_val));
   offset += sizeof(net_val);
+
+  // Serialize resourceList
+  for(int i=0; i<MAX_RESOURCE_REQ_SIZE;i++){
+    net_val = htonl(req->resourceList[i]);
+    memcpy(buffer + offset, &net_val, sizeof(net_val));
+    offset += sizeof(net_val);
+  }
 
   // Serialize request type (reqType)
   net_val = htonl(req->reqType);
@@ -72,9 +80,18 @@ int deserializeResourceRequest(const uint8_t* buffer, ResourceRequest_t* req) {
 
   // Deserialize resourceId
   memcpy(&net_val, buffer + offset, sizeof(net_val));
-  const uint32_t resourceId = ntohl(net_val);
-  req->resourceId = resourceId > UINT8_MAX ? UINT8_MAX : (uint8_t)resourceId;
+  const uint32_t resourceListSize = ntohl(net_val);
+  req->resourceListSize = resourceListSize > UINT8_MAX ? UINT8_MAX : (uint8_t)resourceListSize;
   offset += sizeof(net_val);
+
+  // Serialize resourceList
+  for(int i=0; i<MAX_RESOURCE_REQ_SIZE;i++){
+    memcpy(&net_val, buffer + offset, sizeof(net_val));
+    const uint32_t resourceId = ntohl(net_val);
+    req->resourceList[i] = resourceId > UINT8_MAX ? UINT8_MAX : (uint8_t)resourceId;
+    offset += sizeof(net_val);
+
+  }
 
   // Deserialize request type (reqType)
   memcpy(&net_val, buffer + offset, sizeof(net_val));
@@ -109,11 +126,6 @@ int serializeResourceRequestResponse(const ResourceRequestResponse_t* resp,
   memcpy(buffer + offset, &net_val, sizeof(net_val));
   offset += sizeof(net_val);
 
-  // Serialize resourceId
-  net_val = htonl(resp->resourceId);
-  memcpy(buffer + offset, &net_val, sizeof(net_val));
-  offset += sizeof(net_val);
-
   // Serialize response type (respType)
   net_val = htonl(resp->respType);
   memcpy(buffer + offset, &net_val, sizeof(net_val));
@@ -142,12 +154,6 @@ int deserializeResourceRequestResponse(const uint8_t* buffer,
   resp->requesterId = ntohl(net_val);
   offset += sizeof(net_val);
 
-  // Deserialize resourceId
-  memcpy(&net_val, buffer + offset, sizeof(net_val));
-  const uint32_t resourceId = ntohl(net_val);
-  resp->resourceId = resourceId > UINT8_MAX ? UINT8_MAX : (uint8_t)resourceId;
-  offset += sizeof(net_val);
-
   // Deserialize response type (respType)
   memcpy(&net_val, buffer + offset, sizeof(net_val));
   resp->respType = (ResourceRequestResponseType_e)ntohl(net_val);
@@ -159,8 +165,8 @@ int deserializeResourceRequestResponse(const uint8_t* buffer,
 int sendResourceRequest(int fd, ResourceRequest_t* req) {
   verbose(
       "[RESOURCE REQUEST]: sending request from %d request type %d for "
-      "resource %d through %d\n",
-      req->requesterId, req->reqType, req->resourceId, fd);
+      "through %d\n",
+      req->requesterId, req->reqType, fd);
   uint8_t buf[RESOURCE_REQUEST_SERIALIZED_SIZE];
   serializeResourceRequest(req, buf);
 
@@ -170,9 +176,9 @@ int sendResourceRequest(int fd, ResourceRequest_t* req) {
 
 int answerResourceRequest(int fd, ResourceRequestResponse_t* resp) {
   verbose(
-      "[RESOURCE REQUEST]: sending response to %d resp type %d for resource %d "
+      "[RESOURCE REQUEST]: sending response to %d resp type %d"
       "through %d\n",
-      resp->requesterId, resp->respType, resp->resourceId, fd);
+      resp->requesterId, resp->respType, fd);
   uint8_t buf[RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE];
   serializeResourceRequestResponse(resp, buf);
 
@@ -181,25 +187,37 @@ int answerResourceRequest(int fd, ResourceRequestResponse_t* resp) {
 }
 
 ResourceRequest_t* recvResourceRequest(int fd) {
-  int res;
-  res = fileDescriptorTimedWait(fd);
-  if (res < 0) {
+  int resTimedWait = fileDescriptorTimedWait(fd);
+  if (resTimedWait < 0) {
     return NULL;
   }
 
   ResourceRequest_t* req = malloc(sizeof(ResourceRequest_t));
+  if (!req) {
+    perror("malloc failed");
+    return NULL;
+  }
 
   uint8_t buf[RESOURCE_REQUEST_SERIALIZED_SIZE];
   memset(buf, 0, RESOURCE_REQUEST_SERIALIZED_SIZE);
 
-  res = (int)read(fd, buf, RESOURCE_REQUEST_SERIALIZED_SIZE);
+  // Ensure full read of RESOURCE_REQUEST_SERIALIZED_SIZE bytes
+  size_t bytesRead = 0;
+  while (bytesRead < RESOURCE_REQUEST_SERIALIZED_SIZE) {
+    ssize_t res = read(fd, buf + bytesRead, RESOURCE_REQUEST_SERIALIZED_SIZE  - bytesRead);
+    if (res == -1) {
+      perror("read error");
+      free(req);
+      return NULL;
+    } else if (res == 0) {
+      // Connection closed before reading full message
+      free(req);
+      return NULL;
+    }
+    bytesRead += (size_t)res;
+  }
 
   deserializeResourceRequest(buf, req);
-
-  if (res == -1) {
-    free(req);
-    return NULL;
-  }
 
   req->returnFd = fd;
 
@@ -207,38 +225,56 @@ ResourceRequest_t* recvResourceRequest(int fd) {
 }
 
 ResourceRequestResponse_t* recvResourceRequestResponse(int fd) {
-  int res;
-  res = fileDescriptorTimedWait(fd);
-  if (res < 0) {
+  int resTimedWait = fileDescriptorTimedWait(fd);
+  if (resTimedWait < 0) {
     return NULL;
   }
 
-  ResourceRequestResponse_t* req = malloc(sizeof(ResourceRequest_t));
+  ResourceRequestResponse_t* resReq = malloc(sizeof(ResourceRequestResponse_t));
+  if (!resReq) {
+    perror("malloc failed");
+    return NULL;
+  }
 
   uint8_t buf[RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE];
   memset(buf, 0, RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE);
 
-  res = (int)read(
-      fd, buf,
-      RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE);  // MAY CAUSE AN ISSUE
-
-  deserializeResourceRequestResponse(buf, req);
-
-  if (res == -1) {
-    free(req);
-    return NULL;
+  // Ensure full read of RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE bytes
+  size_t bytesRead = 0;
+  while (bytesRead < RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE) {
+    ssize_t res = read(fd, buf + bytesRead, RESOURCE_REQUEST_RESPONSE_SERIALIZED_SIZE - bytesRead);
+    if (res == -1) {
+      perror("read error");
+      free(resReq);
+      return NULL;
+    } else if (res == 0) {
+      // Connection closed before reading full message
+      free(resReq);
+      return NULL;
+    }
+    bytesRead += (size_t)res;
   }
 
-  return req;
+  deserializeResourceRequestResponse(buf, resReq);
+
+  return resReq;
 }
 
 ResourceRequest_t* createResourceRequest(const enum TrainId_e requesterId,
-                                         const uint8_t resourceId,
+                                         const uint8_t* resourceList,
+                                         const uint8_t resourceListSize,
                                          ResourceRequestType_e reqType,
                                          int fd) {
+
   ResourceRequest_t* req = malloc(sizeof(ResourceRequest_t));
   req->requesterId = requesterId;
-  req->resourceId = resourceId;
+  req->resourceListSize = (uint32_t)resourceListSize;
+
+  memset(req->resourceList, 0, MAX_RESOURCE_REQ_SIZE);
+  for(uint8_t i=0;i<resourceListSize;i++){
+    req->resourceList[i] = (uint32_t)resourceList[i];
+  }
+
   req->reqType = reqType;
   req->returnFd = fd;
 
@@ -254,7 +290,6 @@ ResourceRequestResponse_t* createResourceRequestResponse(
     ResourceRequest_t* req, ResourceRequestResponseType_e respType) {
   ResourceRequestResponse_t* resp = malloc(sizeof(ResourceRequestResponse_t));
   resp->requesterId = req->requesterId;
-  resp->resourceId = req->resourceId;
   resp->respType = respType;
 
   return resp;

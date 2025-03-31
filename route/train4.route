@@ -1,12 +1,15 @@
 trainId 4
-resource lock 1 3
+resource lock 1 3 4
 plc switch 10
 plc rail 7
 plc switch 33
 plc rail 29
 plc switch 13
+resource release 3 4
 plc invert 9
 plc rail 9
+resource lock 3
+plc switch 10
 resource release 1
 plc rail 28
 plc switch 23

@@ -4,12 +4,12 @@ plc rail 0
 plc rail 13
 plc switch 22
 plc rail 20
-resource lock 1
+resource lock 1 4
 plc switch 14
 plc switch 13
 plc rail 30
 plc rail 9
-resource release 1
+resource release 1 4
 plc rail 31
 plc switch 21
 plc rail 26

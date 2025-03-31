@@ -197,9 +197,14 @@ int handleResourceCommand(char** nextToken, Train_t* state, ResourceManagerProxy
     return -1;
   }
 
-  qsort(resourceList, len, sizeof(int), compare_ints);
-
-  res = requestResource(resManager, reqType, resourceList, len, getTrainId(state));
+  while(true){
+    res = requestResource(resManager, reqType, resourceList, len, getTrainId(state));
+    if(res == 0){
+      break;
+    }
+    int randomTime = (rand() %5) + 1;
+    sleep(randomTime);
+  }
 
   if (res == -1) {
     verbose("[Interpreter]: Contacting the Resource Manager ... " VERBOSE_KRED "fail \n" VERBOSE_RESET);
@@ -208,6 +213,7 @@ int handleResourceCommand(char** nextToken, Train_t* state, ResourceManagerProxy
 
   verbose("[Interpreter]: Contacting the Resource Manager ... " VERBOSE_KGRN "success \n" VERBOSE_RESET);
   return res;
+
 }
 
 // The refactored executeCommand function now dispatches to helper functions
@@ -244,6 +250,7 @@ int executeCommand(char* cmdLine, Train_t* state, PlcProxy_t* plc, ResourceManag
       break;
     case CMD_SET:
       res = handlePlcCommand(&nextToken, state, plc);
+      (int)usleep(5000);
       break;
     case CMD_RESOURCE:
       res = handleResourceCommand(&nextToken, state, resManager);

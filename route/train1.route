@@ -3,14 +3,13 @@ resource lock 2
 plc switch 31
 plc rail 3
 resource release 2
-resource lock 1
+resource lock 4 3
 plc switch 22
 plc switch 33
 plc rail 23
 plc rail 10
-resource lock 3
+resource release 4
 plc switch 3
 plc rail 29
 resource release 3
-resource release 1
 plc rail 19

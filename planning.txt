@@ -1,7 +1,0 @@
-resources
-0. tj3 t29 pa3 a11 a13 a15
-   switch groups: 7 13 33
-   rails : 29
-1. tj2 a12 ti9
-   switch groups: 12 22
-   rails : 9
